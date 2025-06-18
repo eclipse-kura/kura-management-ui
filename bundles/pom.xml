@@ -88,8 +88,8 @@
                         <target>
                             <artifact>
                                 <groupId>org.eclipse.kura</groupId>
-                                <artifactId>kura-target-definition.target</artifactId>
-                                <version>${kura.target.definition.version}</version>
+                                <artifactId>kura-management-ui.target</artifactId>
+                                <version>${project.version}</version>
                             </artifact>
                         </target>
                     </configuration>
