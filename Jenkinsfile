@@ -26,10 +26,49 @@ spec:
         stage('Build kura-management-ui') {
             timeout(time: 2, unit: 'HOURS') {
                 dir('kura-management-ui') {
-                    withMaven(jdk: 'temurin-jdk17-latest', maven: 'apache-maven-3.9.6') {
+                    withMaven(jdk: 'temurin-jdk17-latest', maven: 'apache-maven-3.9.6', options: [artifactsPublisher(disabled: true)]) {
                         sh 'mvn clean install'
                     }
                 }
+            }
+        }
+
+        stage('Sonar') {
+            timeout(time: 2, unit: 'HOURS') {
+                dir("kura-management-ui") {
+                    withMaven(jdk: 'temurin-jdk17-latest', maven: 'apache-maven-3.9.6', options: [artifactsPublisher(disabled: true)]) {
+                        withCredentials([string(credentialsId: 'sonarcloud-token-kura-management-ui', variable: 'SONARCLOUD_TOKEN')]) {
+                            withSonarQubeEnv {
+                                sh '''
+                                    mvn sonar:sonar \
+                                        -Dmaven.test.failure.ignore=true \
+                                        -Dsonar.organization=eclipse-kura \
+                                        -Dsonar.host.url=${SONAR_HOST_URL} \
+                                        -Dsonar.token=${SONARCLOUD_TOKEN} \
+                                        -Dsonar.pullrequest.branch=${CHANGE_BRANCH} \
+                                        -Dsonar.pullrequest.base=${CHANGE_TARGET} \
+                                        -Dsonar.pullrequest.key=${CHANGE_ID}\
+                                        -Dsonar.java.binaries='target/' \
+                                        -Dsonar.core.codeCoveragePlugin=jacoco \
+                                        -Dsonar.projectKey=eclipse-kura_kura-management-ui \
+                                '''
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+// No need to occupy a node
+stage('quality-gate') {
+    // Sonar quality gate
+    timeout(time: 30, unit: 'MINUTES') {
+        withCredentials([string(credentialsId: 'sonarcloud-token-kura-management-ui', variable: 'SONARCLOUD_TOKEN')]) {
+            def qg = waitForQualityGate()
+            if (qg.status != 'OK') {
+                error "Pipeline aborted due to sonar quality gate failure: ${qg.status}"
             }
         }
     }
