@@ -5,7 +5,8 @@ node {
         sonar: [
             enable: true,
             projectKey: "eclipse-kura_kura-management-ui",
-            tokenId: "sonarcloud-token-kura-management-ui"
+            tokenId: "sonarcloud-token-kura-management-ui",
+            exclusions: "tests/**/*.java"
         ],
     )
 }
