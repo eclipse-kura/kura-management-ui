@@ -1,0 +1,11 @@
+@Library('add-ons-shared-libs@develop') _
+
+node {
+    continuousIntegrationPipeline(
+        sonar: [
+            enable: true,
+            projectKey: "eclipse-kura_kura-management-ui",
+            tokenId: "sonarcloud-token-kura-management-ui"
+        ],
+    )
+}
