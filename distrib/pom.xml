@@ -36,7 +36,7 @@
     </organization>
 
     <properties>
-
+    	
         <addon.installation.dir>/opt/eclipse/kura/plugins</addon.installation.dir>
         <console.files.installation.dir>/opt/eclipse/kura/console</console.files.installation.dir>
 
@@ -56,8 +56,7 @@
 
         <!-- edit following fields and file deb/control/control -->
         <summary>Eclipse Kura Management UI add-on</summary>
-        <long.description>The Eclipse Kura Management UI addon provides a Web UI to manage the Kura
-            framework and its services.</long.description>
+        <long.description>The Eclipse Kura Management UI addon provides a Web UI to manage the Kura framework and its services.</long.description>
     </properties>
 
     <profiles>
@@ -168,7 +167,7 @@
                 <groupId>com.coderplus.maven.plugins</groupId>
                 <artifactId>copy-rename-maven-plugin</artifactId>
                 <version>1.0.1</version>
-                <executions>
+                <executions>        
                     <execution>
                         <id>copy-and-rename-gwt-user-jar</id>
                         <phase>generate-sources</phase>
@@ -176,10 +175,8 @@
                             <goal>copy</goal>
                         </goals>
                         <configuration>
-                            <sourceFile>
-                                ${project.basedir}/../bundles/${com.gwt.user.jar.name}/target/${com.gwt.user.jar.name}-${com.gwt.user.version}.jar</sourceFile>
-                            <destinationFile>
-                                target/input_files/${com.gwt.user.jar.name}_${com.gwt.user.version}.jar</destinationFile>
+                            <sourceFile>${project.basedir}/../bundles/${com.gwt.user.jar.name}/target/${com.gwt.user.jar.name}-${com.gwt.user.version}.jar</sourceFile>
+                            <destinationFile>target/input_files/${com.gwt.user.jar.name}_${com.gwt.user.version}.jar</destinationFile>
                         </configuration>
                     </execution>
                     <execution>
@@ -189,10 +186,8 @@
                             <goal>copy</goal>
                         </goals>
                         <configuration>
-                            <sourceFile>
-                                ${project.basedir}/../bundles/${web2.jar.name}/target/${web2.jar.name}-${project.version}.jar</sourceFile>
-                            <destinationFile>
-                                target/input_files/${web2.jar.name}_${project.version}.jar</destinationFile>
+                            <sourceFile>${project.basedir}/../bundles/${web2.jar.name}/target/${web2.jar.name}-${project.version}.jar</sourceFile>
+                            <destinationFile>target/input_files/${web2.jar.name}_${project.version}.jar</destinationFile>
                         </configuration>
                     </execution>
                 </executions>
@@ -211,16 +206,14 @@
                         </goals>
                         <configuration>
                             <verbose>true</verbose>
-                            <deb>
-                                ${basedir}/target/deb/${package.name}_${package.version}-${package.revision}_${deb.architecture}.deb</deb>
+                            <deb>${basedir}/target/deb/${package.name}_${package.version}-${package.revision}_${deb.architecture}.deb</deb>
                             <snapshotExpand>true</snapshotExpand>
                             <snapshotTemplate>${package.snapshot}</snapshotTemplate>
                             <controlDir>${project.basedir}/deb/control</controlDir>
                             <skipPOMs>false</skipPOMs>
                             <dataSet>
                                 <data>
-                                    <src>
-                                        ${basedir}/target/input_files/${com.gwt.user.jar.name}_${com.gwt.user.version}.jar</src>
+                                    <src>${basedir}/target/input_files/${com.gwt.user.jar.name}_${com.gwt.user.version}.jar</src>
                                     <dst>${com.gwt.user.jar.name}_${com.gwt.user.version}.jar</dst>
                                     <type>file</type>
                                     <mapper>
@@ -233,8 +226,7 @@
                                 </data>
 
                                 <data>
-                                    <src>
-                                        ${basedir}/target/input_files/${web2.jar.name}_${project.version}.jar</src>
+                                    <src>${basedir}/target/input_files/${web2.jar.name}_${project.version}.jar</src>
                                     <dst>${web2.jar.name}_${project.version}.jar</dst>
                                     <type>file</type>
                                     <mapper>
