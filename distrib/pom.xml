@@ -38,6 +38,7 @@
     <properties>
     	
         <addon.installation.dir>/opt/eclipse/kura/plugins</addon.installation.dir>
+        <console.files.installation.dir>/opt/eclipse/kura/console</console.files.installation.dir>
 
         <!-- name of the JAR produced in bundles/target -->
         <web2.jar.name>org.eclipse.kura.web2</web2.jar.name>
@@ -233,6 +234,19 @@
                                         <prefix>${addon.installation.dir}/6s</prefix>
                                         <user>kurad</user>
                                         <group>kurad</group>
+                                        <filemode>600</filemode>
+                                    </mapper>
+                                </data>
+
+                                <data>
+                                    <src>${basedir}/extra/console/</src>
+                                    <type>directory</type>
+                                    <conffile>true</conffile>
+                                    <mapper>
+                                        <type>perm</type>
+                                        <prefix>${console.files.installation.dir}</prefix>
+                                        <user>root</user>
+                                        <group>root</group>
                                         <filemode>600</filemode>
                                     </mapper>
                                 </data>
