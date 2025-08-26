@@ -43,7 +43,8 @@ public class NetworkConfigurationServicePropertiesBuilder {
     private final NetworkConfigurationServiceProperties properties;
     private final String ifname;
 
-    private static final Logger logger = LoggerFactory.getLogger(NetworkConfigurationServicePropertiesBuilder.class);
+    private static final Logger logger = LoggerFactory
+            .getLogger(NetworkConfigurationServicePropertiesBuilder.class);
 
     private final GwtNetInterfaceConfig oldGwtNetInterfaceConfig;
 
@@ -286,7 +287,6 @@ public class NetworkConfigurationServicePropertiesBuilder {
 
                 this.properties.set8021xPassword(this.ifname, gwt8021xConfig.getPassword());
             } else {
-                GwtServerUtil.validateUserPassword(password8021x);
                 this.properties.set8021xPassword(this.ifname, password8021x);
             }
         }
