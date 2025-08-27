@@ -14,6 +14,7 @@ package org.eclipse.kura.web.shared.validator;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import org.eclipse.kura.web.shared.model.GwtPasswordStrenghtRequirements;
 
@@ -27,11 +28,13 @@ public class PasswordStrengthValidators {
     private PasswordStrengthValidators() {
     }
 
-    public static List<Validator<String>> fromConfig(final GwtPasswordStrenghtRequirements userOptions) {
-        return fromConfig(userOptions, new DefaultMessages());
+    public static List<Validator<String>> fromConfig(final Optional<String> identityName,
+            final GwtPasswordStrenghtRequirements userOptions) {
+        return fromConfig(identityName, userOptions, new DefaultMessages());
     }
 
-    public static List<Validator<String>> fromConfig(final GwtPasswordStrenghtRequirements userOptions, final Messages messages) {
+    public static List<Validator<String>> fromConfig(final Optional<String> identityName,
+            final GwtPasswordStrenghtRequirements userOptions, final Messages messages) {
         final List<Validator<String>> result = new ArrayList<>();
 
         final int minPasswordLength = userOptions.getPasswordMinimumLength();
@@ -51,6 +54,8 @@ public class PasswordStrengthValidators {
         if (userOptions.getPasswordRequireSpecialChars()) {
             result.add(containsSpecialChars(messages));
         }
+
+        identityName.ifPresent(id -> result.add(requireDifferentNameAndPassword(id, messages)));
 
         return result;
     }
@@ -82,6 +87,12 @@ public class PasswordStrengthValidators {
         };
     }
 
+    private static Validator<String> requireDifferentNameAndPassword(final String identityName,
+            final Messages messages) {
+
+        return new PredicateValidator(v -> !v.equals(identityName), messages.pwdNotEqualsUsername());
+    }
+
     public interface Messages {
 
         public String pwdStrengthDigitsRequired();
@@ -91,6 +102,8 @@ public class PasswordStrengthValidators {
         public String pwdStrengthBothCasesRequired();
 
         public String pwdStrengthMinLength(final int value);
+
+        public String pwdNotEqualsUsername();
     }
 
     private static class DefaultMessages implements Messages {
@@ -113,6 +126,11 @@ public class PasswordStrengthValidators {
         @Override
         public String pwdStrengthMinLength(final int value) {
             return "Password length must be at least " + value + " characters";
+        }
+
+        @Override
+        public String pwdNotEqualsUsername() {
+            return "The identity name cannot be the same as the password";
         }
     }
 

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2016, 2021 Eurotech and/or its affiliates and others
+ * Copyright (c) 2016, 2025 Eurotech and/or its affiliates and others
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -15,13 +15,11 @@ package org.eclipse.kura.web.shared.service;
 
 import java.util.List;
 
-import org.eclipse.kura.cloud.CloudService;
 import org.eclipse.kura.web.server.Audit;
 import org.eclipse.kura.web.server.RequiredPermissions;
 import org.eclipse.kura.web.shared.GwtKuraException;
 import org.eclipse.kura.web.shared.KuraPermission;
 import org.eclipse.kura.web.shared.model.GwtCloudComponentFactories;
-import org.eclipse.kura.web.shared.model.GwtCloudConnectionEntry;
 import org.eclipse.kura.web.shared.model.GwtCloudEntry;
 import org.eclipse.kura.web.shared.model.GwtConfigComponent;
 import org.eclipse.kura.web.shared.model.GwtXSRFToken;

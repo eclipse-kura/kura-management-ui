@@ -42,9 +42,6 @@ import jakarta.servlet.http.HttpSession;
 
 public class KuraRemoteServiceServlet extends RemoteServiceServlet {
 
-    /**
-     *
-     */
     private static final long serialVersionUID = 3473193315046407200L;
     private static final Logger logger = LoggerFactory.getLogger(KuraRemoteServiceServlet.class);
     private static final Logger auditLogger = LoggerFactory.getLogger("AuditLogger");
@@ -216,9 +213,13 @@ public class KuraRemoteServiceServlet extends RemoteServiceServlet {
             if (item.isFormField()) {
                 String name = item.getFieldName();
 
-                if (name.equals(fieldName)) {
-                    fieldValue = item.getString();
-                    logger.debug("Found field name '{}' with value: {}", name, fieldValue);
+                try {
+                    if (name.equals(fieldName)) {
+                        fieldValue = item.getString();
+                        logger.debug("Found field name '{}' with value: {}", name, fieldValue);
+                    }
+                } catch(IOException e) {
+                    throw new FileUploadException(e.getMessage(), e);
                 }
             }
         }

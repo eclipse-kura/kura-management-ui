@@ -818,10 +818,11 @@ public final class GwtServerUtil {
                 LoginBannerService::getPostLoginBanner);
     }
 
-    public static void validateUserPassword(final String password) throws GwtKuraException {
+    public static void validateUserPassword(final Optional<String> username, final String password)
+            throws GwtKuraException {
 
-        final List<Validator<String>> validators = PasswordStrengthValidators
-                .fromConfig(getPasswordStrenghtRequirements());
+        final List<Validator<String>> validators = PasswordStrengthValidators.fromConfig(username,
+                getPasswordStrenghtRequirements());
 
         final List<String> errors = new ArrayList<>();
 

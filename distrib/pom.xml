@@ -42,8 +42,6 @@
 
         <!-- name of the JAR produced in bundles/target -->
         <web2.jar.name>org.eclipse.kura.web2</web2.jar.name>
-        <com.gwt.user.jar.name>com.gwt.user</com.gwt.user.jar.name>
-        <com.gwt.user.version>2.0.0-SNAPSHOT</com.gwt.user.version>
 
         <deb.architecture>all</deb.architecture>
 
@@ -167,18 +165,7 @@
                 <groupId>com.coderplus.maven.plugins</groupId>
                 <artifactId>copy-rename-maven-plugin</artifactId>
                 <version>1.0.1</version>
-                <executions>        
-                    <execution>
-                        <id>copy-and-rename-gwt-user-jar</id>
-                        <phase>generate-sources</phase>
-                        <goals>
-                            <goal>copy</goal>
-                        </goals>
-                        <configuration>
-                            <sourceFile>${project.basedir}/../bundles/${com.gwt.user.jar.name}/target/${com.gwt.user.jar.name}-${com.gwt.user.version}.jar</sourceFile>
-                            <destinationFile>target/input_files/${com.gwt.user.jar.name}_${com.gwt.user.version}.jar</destinationFile>
-                        </configuration>
-                    </execution>
+                <executions>
                     <execution>
                         <id>copy-and-rename-web2-jar</id>
                         <phase>generate-sources</phase>
@@ -212,19 +199,6 @@
                             <controlDir>${project.basedir}/deb/control</controlDir>
                             <skipPOMs>false</skipPOMs>
                             <dataSet>
-                                <data>
-                                    <src>${basedir}/target/input_files/${com.gwt.user.jar.name}_${com.gwt.user.version}.jar</src>
-                                    <dst>${com.gwt.user.jar.name}_${com.gwt.user.version}.jar</dst>
-                                    <type>file</type>
-                                    <mapper>
-                                        <type>perm</type>
-                                        <prefix>${addon.installation.dir}/3</prefix>
-                                        <user>kurad</user>
-                                        <group>kurad</group>
-                                        <filemode>600</filemode>
-                                    </mapper>
-                                </data>
-
                                 <data>
                                     <src>${basedir}/target/input_files/${web2.jar.name}_${project.version}.jar</src>
                                     <dst>${web2.jar.name}_${project.version}.jar</dst>

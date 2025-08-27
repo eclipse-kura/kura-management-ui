@@ -276,7 +276,8 @@ public class UserConfigUi extends Composite {
                     .setMessage(MSGS.usersDefineNewPassword()) //
                     .setInputCustomizer(input -> input.setType(InputType.PASSWORD)) //
                     .setOnCancel(onDismiss) //
-                    .setValidators(GwtValidators.newPassword(passwordStrengthRequirements)) //
+                    .setValidators(GwtValidators.newPassword(Optional.of(this.userData.getUserName()), //
+                            passwordStrengthRequirements)) //
                     .setOnPick(newPassword -> this.picker.builder() //
                             .setTitle(MSGS.usersConfirmPassword()) //
                             .setMessage(MSGS.usersRepeatPassword()) //
