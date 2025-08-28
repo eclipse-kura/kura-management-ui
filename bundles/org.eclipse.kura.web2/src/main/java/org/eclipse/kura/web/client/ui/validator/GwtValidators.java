@@ -52,8 +52,11 @@ public class GwtValidators {
     public static List<Validator<String>> newPassword(final Optional<String> identityName,
             final GwtPasswordStrenghtRequirements userOptions) {
 
-        final List<Validator<String>> defaultValidators = Arrays.asList(stringLength(255, MSGS.pwdMaxLength()),
-                noWhitespaceCharacters(MSGS.pwdWhitespaceCharacters()), nonEmpty(MSGS.pwdEmpty()));
+        final List<Validator<String>> defaultValidators = new ArrayList<>();
+        
+        defaultValidators.add(stringLength(255, MSGS.pwdMaxLength()));
+        defaultValidators.add(noWhitespaceCharacters(MSGS.pwdWhitespaceCharacters()));
+        defaultValidators.add(nonEmpty(MSGS.pwdEmpty()));
 
         identityName.ifPresent(
                 id -> defaultValidators.add(notEqualsIdentityName(id, MSGS.pwdStrengthNotEqualsIdentityName())));
@@ -96,7 +99,7 @@ public class GwtValidators {
     }
 
     public static Validator<String> notEqualsIdentityName(final String identityName, final String message) {
-        return new ValidatorWrapper<>(new PredicateValidator(v -> !v.equals(identityName), message), Priority.MEDIUM);
+        return new ValidatorWrapper<>(new PredicateValidator(v -> !v.equalsIgnoreCase(identityName), message), Priority.MEDIUM);
     }
 
     public static <T> Validator<T> notInList(final List<T> values, final String message) {
