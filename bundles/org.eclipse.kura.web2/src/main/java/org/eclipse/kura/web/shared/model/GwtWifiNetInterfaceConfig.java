@@ -110,7 +110,8 @@ public class GwtWifiNetInterfaceConfig extends GwtNetInterfaceConfig {
 
     public GwtWifiConfig getActiveWifiConfig() {
         GwtWifiWirelessMode wifiMode = getWirelessModeEnum();
-        GwtWifiConfig activeConfig = null;
+        GwtWifiConfig activeConfig = new GwtWifiConfig();
+        activeConfig.setWirelessMode(wifiMode.name());
 
         if (wifiMode.equals(GwtWifiWirelessMode.netWifiWirelessModeAccessPoint)) {
             activeConfig = this.m_accessPointWifiConfig;
