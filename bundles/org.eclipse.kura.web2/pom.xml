@@ -66,30 +66,6 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-checkstyle-plugin</artifactId>
             </plugin>
-<!--            <plugin>
-                <groupId>org.apache.felix</groupId>
-                <artifactId>maven-bundle-plugin</artifactId>
-                <version>${maven-bundle-plugin.version}</version>
-                <extensions>true</extensions>
-                <configuration>
-                    <manifestLocation>META-INF</manifestLocation>
-                    <instructions>
-                        <Embed-Dependency>*;inline=true</Embed-Dependency>
-                        <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
-                        <Bundle-Name>${project.name}</Bundle-Name>
-                        <Bundle-Version>${project.version}</Bundle-Version>
-                        <Import-Package>
-                            jakarta.servlet,jakarta.servlet.http
-                        </Import-Package>
-                        <Export-Package>
-                            com.google.gwt.user.server.*,com.google.gwt.user.client.rpc.*,
-                            com.google.gwt.i18n.client.*,com.google.gwt.safehtml.shared.*,
-                            com.google.gwt.i18n.shared.*
-                        </Export-Package>
-                        <Require-Capability>osgi.ee;filter:="(&amp;(osgi.ee=JavaSE)(version=17))"</Require-Capability>
-                    </instructions>
-                </configuration>
-            </plugin>-->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-dependency-plugin</artifactId>
