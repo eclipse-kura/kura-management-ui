@@ -130,7 +130,7 @@ public class PasswordStrengthValidators {
 
         @Override
         public String pwdNotEqualsUsername() {
-            return "The identity name cannot be the same as the password";
+            return "The password cannot be the same as the identity name";
         }
     }
 
