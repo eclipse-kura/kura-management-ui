@@ -78,7 +78,7 @@ public class PasswordChangeModal extends Composite {
 
             @Override
             public List<EditorError> validate(Editor<String> editor, String value) {
-                if (value == null || value.trim()isEmpty()) {
+                if (value == null || value.trim().isEmpty()) {
                     return Collections
                             .singletonList(new BasicEditorError(editor, value, MSGS.loginEnterCurrentPassword()));
                 }
