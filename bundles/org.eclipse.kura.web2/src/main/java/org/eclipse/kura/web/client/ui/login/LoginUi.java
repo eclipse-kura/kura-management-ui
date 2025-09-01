@@ -15,6 +15,7 @@ package org.eclipse.kura.web.client.ui.login;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
@@ -24,9 +25,9 @@ import org.eclipse.kura.web.client.ui.AlertDialog;
 import org.eclipse.kura.web.client.ui.AlertDialog.ConfirmListener;
 import org.eclipse.kura.web.shared.GwtKuraErrorCode;
 import org.eclipse.kura.web.shared.GwtKuraException;
-import org.eclipse.kura.web.shared.model.GwtPasswordStrenghtRequirements;
 import org.eclipse.kura.web.shared.model.GwtLoginInfo;
 import org.eclipse.kura.web.shared.model.GwtPasswordAuthenticationResult;
+import org.eclipse.kura.web.shared.model.GwtPasswordStrenghtRequirements;
 import org.eclipse.kura.web.shared.service.GwtLoginInfoService;
 import org.eclipse.kura.web.shared.service.GwtLoginInfoServiceAsync;
 import org.eclipse.kura.web.shared.service.GwtPasswordAuthenticationService;
@@ -370,7 +371,7 @@ public class LoginUi extends Composite {
 
         private void changePassword(final Consumer<Void> onSuccess, final Consumer<Throwable> onFailure) {
 
-            getGwtConsoleUserOptions(options -> this.passwordChangeModal.pickPassword(options,
+            getGwtConsoleUserOptions(options -> this.passwordChangeModal.pickPassword(Optional.of(this.usernameInput.getValue()), options,
                     (oldPass, newPass) -> setNewPassword(oldPass, newPass, onSuccess, onFailure)), onFailure);
         }
 

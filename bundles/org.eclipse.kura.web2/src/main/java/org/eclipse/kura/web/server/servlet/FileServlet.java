@@ -526,7 +526,12 @@ public class FileServlet extends AuditServlet {
         }
 
         DiskFileItem fileItem = fileItems.get(0);
-        byte[] data = fileItem.get();
+        byte[] data;
+        try {
+            data = fileItem.get();
+        } catch(IOException e) {
+            throw new ServletException(e.getMessage());
+        }
         String fileItemString = new String(data, StandardCharsets.UTF_8);
 
         final List<ComponentConfiguration> configImpls;
@@ -894,11 +899,16 @@ class UploadRequest extends JakartaServletFileUpload<DiskFileItem, DiskFileItemF
 
             if (item.isFormField()) {
                 String name = item.getFieldName();
-                String value = item.getString();
+                
+                try {
+                    String value = item.getString();
+                    logger.debug("Form field item name: {}, value: {}", name, value);
 
-                logger.debug("Form field item name: {}, value: {}", name, value);
+                    this.formFields.put(name, value);
+                } catch(IOException e) {
+                    throw new FileUploadException(e.getMessage(), e);
+                }
 
-                this.formFields.put(name, value);
             } else {
                 String fieldName = item.getFieldName();
                 String fileName = item.getName();

@@ -45,6 +45,11 @@
             <artifactId>gwt-user</artifactId>
             <version>${gwt.version}</version>
         </dependency>
+        <dependency>
+            <groupId>org.gwtproject</groupId>
+            <artifactId>gwt-servlet-jakarta</artifactId>
+            <version>${gwt.version}</version>
+        </dependency>
     </dependencies>
         
     <build>
@@ -80,6 +85,11 @@
                                 <artifactItem>
                                     <groupId>org.gwtproject</groupId>
                                     <artifactId>gwt-user</artifactId>
+                                    <version>${gwt.version}</version>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.gwtproject</groupId>
+                                    <artifactId>gwt-servlet-jakarta</artifactId>
                                     <version>${gwt.version}</version>
                                 </artifactItem>
                             </artifactItems>
