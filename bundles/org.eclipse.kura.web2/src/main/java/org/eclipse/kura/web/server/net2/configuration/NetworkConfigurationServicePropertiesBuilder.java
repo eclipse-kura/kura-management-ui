@@ -226,8 +226,7 @@ public class NetworkConfigurationServicePropertiesBuilder {
 
         if (gwtWifiConfig.getPassword() != null) {
             if (GwtServerUtil.PASSWORD_PLACEHOLDER.equals(gwtWifiConfig.getPassword())
-                    && this.oldGwtNetInterfaceConfig instanceof GwtWifiNetInterfaceConfig) {
-                GwtWifiNetInterfaceConfig gwtWifiNetInterfaceConfig = (GwtWifiNetInterfaceConfig) this.oldGwtNetInterfaceConfig;
+                    && this.oldGwtNetInterfaceConfig instanceof GwtWifiNetInterfaceConfig gwtWifiNetInterfaceConfig) {
                 gwtWifiNetInterfaceConfig.setUnescaped(true);
 
                 GwtWifiConfig gwtApConfig = gwtWifiNetInterfaceConfig.getAccessPointWifiConfig();
@@ -235,7 +234,7 @@ public class NetworkConfigurationServicePropertiesBuilder {
 
                 this.properties.setWifiMasterPassphrase(this.ifname, gwtApConfig.getPassword());
             } else {
-                GwtServerUtil.validateUserPassword(gwtWifiConfig.getPassword());
+                GwtServerUtil.validateUserPassword(Optional.empty(), gwtWifiConfig.getPassword());
                 this.properties.setWifiMasterPassphrase(this.ifname, gwtWifiConfig.getPassword());
             }
         }

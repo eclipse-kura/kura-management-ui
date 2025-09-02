@@ -1287,7 +1287,7 @@ public class TabWirelessUi extends Composite implements NetworkTab {
                     || this.security.getSelectedItemText().contentEquals(WIFI_SECURITY_WPA_WPA2_MESSAGE)
                     || this.security.getSelectedItemText().contentEquals(WIFI_SECURITY_WPA2_WPA3_MESSAGE))) {
 
-                this.password.setValidatorsFrom(passwordStrengthRequirements);
+                this.password.setValidatorsFrom(Optional.empty(), passwordStrengthRequirements);
                 passwordStrengthRequirements.setPasswordMinimumLength(Math.min(passwordStrengthRequirements.getPasswordMinimumLength(), 63));
 
                 this.password
@@ -1297,12 +1297,12 @@ public class TabWirelessUi extends Composite implements NetworkTab {
 
                 passwordStrengthRequirements.setPasswordRequireSpecialChars(false);
                 passwordStrengthRequirements.setPasswordMinimumLength(Math.min(passwordStrengthRequirements.getPasswordMinimumLength(), 26));
-                this.password.setValidatorsFrom(passwordStrengthRequirements);
+                this.password.setValidatorsFrom(Optional.empty(), passwordStrengthRequirements);
                 this.password
                         .addValidator(GwtValidators.regex(REGEX_PASS_WEP, MSGS.netWifiWirelessInvalidWEPPassword()));
             } else {
                 passwordStrengthRequirements.allowAnyPassword();
-                this.password.setValidatorsFrom(passwordStrengthRequirements);
+                this.password.setValidatorsFrom(Optional.empty(), passwordStrengthRequirements);
             }
         });
 
