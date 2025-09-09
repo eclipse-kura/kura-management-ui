@@ -2,6 +2,7 @@
 
 node {
     continuousIntegrationPipeline(
+        buildType: "deploy",
         sonar: [
             enable: true,
             projectKey: "eclipse-kura_kura-management-ui",
