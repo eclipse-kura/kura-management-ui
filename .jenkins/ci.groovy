@@ -1,4 +1,4 @@
-@Library('add-ons-shared-libs@develop') _
+@Library('add-ons-shared-libs@feat/repository_deploy') _
 
 node {
     continuousIntegrationPipeline(
