@@ -1794,7 +1794,7 @@ public class TabWirelessUi extends Composite implements NetworkTab {
         if (this.activeConfig != null && this.activeConfig.getChannels() != null
                 && !this.activeConfig.getChannels().isEmpty()) {
             this.netTabs.hardwareTab.channel
-                    .setText(this.channelList.getItemText(this.activeConfig.getChannels().get(0)));
+                    .setText(this.channelList.getItemText(selectedChannelValue));
 
             this.channelList.setSelectedIndex(selectedChannelValue);
         }

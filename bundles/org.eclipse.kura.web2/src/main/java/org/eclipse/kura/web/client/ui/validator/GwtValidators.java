@@ -53,9 +53,9 @@ public class GwtValidators {
 
         final List<Validator<String>> defaultValidators = new ArrayList<>();
         
+        defaultValidators.add(nonEmpty(MSGS.pwdEmpty()));
         defaultValidators.add(stringLength(255, MSGS.pwdMaxLength()));
         defaultValidators.add(noWhitespaceCharacters(MSGS.pwdWhitespaceCharacters()));
-        defaultValidators.add(nonEmpty(MSGS.pwdEmpty()));
 
         identityName.ifPresent(
                 id -> defaultValidators.add(notEqualsIdentityName(id, MSGS.pwdStrengthNotEqualsIdentityName())));
