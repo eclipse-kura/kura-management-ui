@@ -1,6 +1,0 @@
-{
-    "projects": [
-        "bundles/org.eclipse.kura.web2"
-    ],
-    "targetPlatform": "target-definition/kura-management-ui.target.target"
-}
