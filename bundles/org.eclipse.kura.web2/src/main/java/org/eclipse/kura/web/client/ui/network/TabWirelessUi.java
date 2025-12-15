@@ -262,8 +262,6 @@ public class TabWirelessUi extends Composite implements NetworkTab {
 
     @UiField
     Button buttonSsid;
-    @UiField
-    Button buttonPassword;
 
     @UiField
     FormGroup groupVerify;
@@ -664,20 +662,16 @@ public class TabWirelessUi extends Composite implements NetworkTab {
             this.channelList.setEnabled(true);
             loadRadioMode();
 
-            this.buttonPassword.setVisible(false);
-
             // disable Password if security is none, or if Wifi-Enterprise is enabled
             if (this.security.getSelectedItemText().equals(WIFI_SECURITY_NONE_MESSAGE)
                     || this.security.getSelectedItemText().equals(WIFI_SECURITY_WPA2_WPA3_ENTERPRISE_MESSAGE)) {
                 this.password.setEnabled(false);
                 this.verify.setEnabled(false);
-                this.buttonPassword.setEnabled(false);
             }
 
             if (this.security.getSelectedItemText().equals(WIFI_SECURITY_WPA2_WPA3_ENTERPRISE_MESSAGE)) {
                 this.password.setEnabled(false);
                 this.verify.setEnabled(false);
-                this.buttonPassword.setEnabled(false);
                 this.wireless8021xTabAnchorItem.setEnabled(true);
             } else {
                 this.wireless8021xTabAnchorItem.setEnabled(false);
@@ -690,10 +684,8 @@ public class TabWirelessUi extends Composite implements NetworkTab {
                 if (!this.security.getSelectedItemText().equals(WIFI_SECURITY_NONE_MESSAGE)) {
                     if (this.password.getValue() != null && this.password.getValue().length() > 0) {
                         this.password.setEnabled(true);
-                        this.buttonPassword.setEnabled(true);
                     } else {
                         this.password.setEnabled(true);
-                        this.buttonPassword.setEnabled(false);
                     }
                 }
 
@@ -716,7 +708,6 @@ public class TabWirelessUi extends Composite implements NetworkTab {
                 this.buttonSsid.setEnabled(false);
                 if (!this.security.getSelectedItemText().equals(WIFI_SECURITY_NONE_MESSAGE)) {
                     this.password.setEnabled(true);
-                    this.buttonPassword.setEnabled(false);
                 }
                 this.bgscan.setEnabled(false);
                 this.rssi.setEnabled(false);
@@ -938,46 +929,6 @@ public class TabWirelessUi extends Composite implements NetworkTab {
         this.password.setAllowBlank(true);
         this.password.addMouseOutHandler(event -> resetHelp());
 
-        this.buttonPassword.addClickHandler(event -> {
-            EntryClassUi.showWaitModal();
-            TabWirelessUi.this.buttonPassword.setEnabled(false);
-            final GwtWifiConfig gwtWifiConfig = getGwtWifiConfig();
-            TabWirelessUi.this.gwtXSRFService.generateSecurityToken(new AsyncCallback<GwtXSRFToken>() {
-
-                @Override
-                public void onFailure(Throwable ex) {
-                    FailureHandler.handle(ex);
-                }
-
-                @Override
-                public void onSuccess(GwtXSRFToken token) {
-                    TabWirelessUi.this.gwtNetworkService.verifyWifiCredentials(token,
-                            TabWirelessUi.this.selectedNetIfConfig.getName(), gwtWifiConfig,
-                            new AsyncCallback<Boolean>() {
-
-                                @Override
-                                public void onFailure(Throwable caught) {
-                                    FailureHandler.handle(caught);
-                                    EntryClassUi.hideWaitModal();
-                                    TabWirelessUi.this.buttonPassword.setEnabled(true);
-                                    showPasswordVerificationStatus(MSGS.netWifiPasswordVerificationFailed());
-                                }
-
-                                @Override
-                                public void onSuccess(Boolean result) {
-                                    if (!result.booleanValue()) {
-                                        showPasswordVerificationStatus(MSGS.netWifiPasswordVerificationFailed());
-                                    } else {
-                                        showPasswordVerificationStatus(MSGS.netWifiPasswordVerificationSuccess());
-                                    }
-                                    EntryClassUi.hideWaitModal();
-                                    TabWirelessUi.this.buttonPassword.setEnabled(true);
-                                }
-                            });
-                }
-
-            });
-        });
         this.password.addKeyUpHandler(event -> {
             this.password.validate();
 
@@ -1685,7 +1636,6 @@ public class TabWirelessUi extends Composite implements NetworkTab {
         this.radio.setEnabled(visible);
         this.security.setEnabled(visible);
         this.password.setEnabled(visible);
-        this.buttonPassword.setEnabled(visible);
         this.verify.setEnabled(visible);
         this.pairwise.setEnabled(visible);
         this.group.setEnabled(visible);

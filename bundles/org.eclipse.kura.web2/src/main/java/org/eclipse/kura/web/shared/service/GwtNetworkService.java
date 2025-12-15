@@ -94,10 +94,6 @@ public interface GwtNetworkService extends RemoteService {
     @Audit(componentName = "UI Network", description = "Get Wifi Country Code")
     public String getWifiCountryCode(GwtXSRFToken xsrfToken) throws GwtKuraException;
 
-    @Audit(componentName = "UI Network", description = "Verify Wifi credentials")
-    public boolean verifyWifiCredentials(GwtXSRFToken xsrfToken, String interfaceName, GwtWifiConfig gwtWifiConfig)
-            throws GwtKuraException;
-
     public boolean isIEEE80211ACSupported(GwtXSRFToken xsrfToken, String ifaceName) throws GwtKuraException;
 
     public List<String> getDhcpLeases(GwtXSRFToken xsrfToken, String interfaceName) throws GwtKuraException;

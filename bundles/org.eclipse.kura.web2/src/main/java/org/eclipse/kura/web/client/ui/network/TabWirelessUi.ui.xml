@@ -109,8 +109,6 @@
                                     ui:field="helpPassword" />
                                 <kura:NewPasswordInput type="PASSWORD" b:id="password"
                                     ui:field="password" allowPlaceholder="true"/>
-                                <b:Button ui:field="buttonPassword"
-                                    icon="EXCHANGE" iconFixedWidth="true" />
                             </b:FormGroup>
 
                             <b:FormGroup ui:field="groupVerify">
