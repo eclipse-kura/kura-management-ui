@@ -1681,20 +1681,6 @@ public class TabWirelessUi extends Composite implements NetworkTab {
         return result;
     }
 
-    private void showPasswordVerificationStatus(String statusMessage) {
-        final Modal confirm = new Modal();
-        ModalBody confirmBody = new ModalBody();
-        ModalFooter confirmFooter = new ModalFooter();
-
-        confirm.setTitle(MSGS.netWifiPasswordVerificationStatus());
-        confirmBody.add(new Span(statusMessage));
-
-        confirmFooter.add(new Button(MSGS.closeButton(), event -> confirm.hide()));
-        confirm.add(confirmBody);
-        confirm.add(confirmFooter);
-        confirm.show();
-    }
-
     private void loadChannelFrequencies() {
         this.gwtXSRFService.generateSecurityToken(new AsyncCallback<GwtXSRFToken>() {
 
