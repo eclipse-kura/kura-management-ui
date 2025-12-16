@@ -105,15 +105,6 @@ public class GwtNetworkServiceImpl extends OsgiRemoteServiceServlet implements G
     }
 
     @Override
-    public boolean verifyWifiCredentials(GwtXSRFToken xsrfToken, String interfaceName, GwtWifiConfig gwtWifiConfig)
-            throws GwtKuraException {
-        checkXSRFToken(xsrfToken);
-
-        logger.debug("Method verifyWifiCredentials not implemented yet. Returning false.");
-        return false;
-    }
-
-    @Override
     public void renewDhcpLease(GwtXSRFToken xsrfToken, String interfaceName) throws GwtKuraException {
         checkXSRFToken(xsrfToken);
 
