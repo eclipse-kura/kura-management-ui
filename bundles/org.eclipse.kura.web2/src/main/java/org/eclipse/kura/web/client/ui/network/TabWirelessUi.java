@@ -832,6 +832,7 @@ public class TabWirelessUi extends Composite implements NetworkTab {
                 TabWirelessUi.this.helpText.clear();
                 TabWirelessUi.this.helpText.add(new Span(MSGS.netWifiToolTipWirelessModeStation()));
             } else {
+                logger.info("Showing access point help text." + TabWirelessUi.this.wireless.getSelectedItemText());
                 TabWirelessUi.this.helpText.clear();
                 TabWirelessUi.this.helpText.add(new Span(MSGS.netWifiToolTipWirelessModeAccessPoint()));
             }
