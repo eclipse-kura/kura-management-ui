@@ -98,7 +98,13 @@ public class GwtValidators {
     }
 
     public static Validator<String> notEqualsIdentityName(final String identityName, final String message) {
-        return new ValidatorWrapper<>(new PredicateValidator(v -> !v.equalsIgnoreCase(identityName), message), Priority.MEDIUM);
+        return new ValidatorWrapper<>(new PredicateValidator(v -> {
+            if (v == null) {
+                return true;
+            }
+
+            return !v.equalsIgnoreCase(identityName);
+        }, message), Priority.MEDIUM);
     }
 
     public static <T> Validator<T> notInList(final List<T> values, final String message) {
