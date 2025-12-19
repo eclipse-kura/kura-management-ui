@@ -10,3 +10,4 @@ RemoteSystemsTempFiles
 .project
 .settings
 .vscode
+javaConfig.json
