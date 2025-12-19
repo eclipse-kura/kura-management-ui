@@ -151,7 +151,7 @@ public class TabWirelessUi extends Composite implements NetworkTab {
     private static final String REGEX_WIFI_SID = "^[^!#;+\\]/\"\\t][^+\\]/\"\\t]{0,31}$";
     private static final int MAX_SSID_LENGTH = 32;
 
-    private static final String PASSWORD_PLACEHOLDER = "Placeholder";
+    private static final String PLACEHOLDER = "Placeholder";
 
     private final GwtSession session;
     private final TabIp4Ui tcp4Tab;
@@ -582,7 +582,7 @@ public class TabWirelessUi extends Composite implements NetworkTab {
         this.shortI.setValue(String.valueOf(this.activeConfig.getBgscanShortInterval()));
         this.longI.setValue(String.valueOf(this.activeConfig.getBgscanLongInterval()));
         this.password.setValue(this.activeConfig.getPassword());
-        this.buttonShowPassword.setEnabled(!PASSWORD_PLACEHOLDER.equals(TabWirelessUi.this.password.getText()));
+        this.buttonShowPassword.setEnabled(!PLACEHOLDER.equals(TabWirelessUi.this.password.getText()));
         this.radio1.setValue(this.activeConfig.pingAccessPoint());
         this.radio2.setValue(!this.activeConfig.pingAccessPoint());
         this.radio3.setValue(this.activeConfig.ignoreSSID());
@@ -638,7 +638,7 @@ public class TabWirelessUi extends Composite implements NetworkTab {
                 }
                 this.password.setType(InputType.PASSWORD);
                 this.buttonShowPassword.setIcon(IconType.EYE);
-                this.buttonShowPassword.setEnabled(!PASSWORD_PLACEHOLDER.equals(TabWirelessUi.this.password.getText()));
+                this.buttonShowPassword.setEnabled(!PLACEHOLDER.equals(TabWirelessUi.this.password.getText()));
 
             } else if (WIFI_MODE_ACCESS_POINT_MESSAGE.equals(this.wireless.getSelectedItemText())) {
                 // access point mode
@@ -652,7 +652,7 @@ public class TabWirelessUi extends Composite implements NetworkTab {
 
                 this.password.setType(InputType.PASSWORD);
                 this.buttonShowPassword.setIcon(IconType.EYE);
-                this.buttonShowPassword.setEnabled(!PASSWORD_PLACEHOLDER.equals(TabWirelessUi.this.password.getText()));
+                this.buttonShowPassword.setEnabled(!PLACEHOLDER.equals(TabWirelessUi.this.password.getText()));
             }
 
             this.radio.setEnabled(true);
@@ -677,7 +677,7 @@ public class TabWirelessUi extends Composite implements NetworkTab {
             if (WIFI_MODE_STATION_MESSAGE.equals(this.wireless.getSelectedItemText())) {
                 this.ssid.setEnabled(true);
                 this.buttonSsid.setEnabled(true);
-                this.buttonShowPassword.setEnabled(!PASSWORD_PLACEHOLDER.equals(TabWirelessUi.this.password.getText()));
+                this.buttonShowPassword.setEnabled(!PLACEHOLDER.equals(TabWirelessUi.this.password.getText()));
                 if (!this.security.getSelectedItemText().equals(WIFI_SECURITY_NONE_MESSAGE)) {
                     if (this.password.getValue() != null && this.password.getValue().length() > 0) {
                         this.password.setEnabled(true);
@@ -936,7 +936,7 @@ public class TabWirelessUi extends Composite implements NetworkTab {
         this.password.setType(InputType.PASSWORD);
         this.password.addClickHandler(event -> {
             if (TabWirelessUi.this.password.isEnabled()
-                    && TabWirelessUi.this.password.getText().equals(PASSWORD_PLACEHOLDER)) {
+                    && TabWirelessUi.this.password.getText().equals(PLACEHOLDER)) {
                 TabWirelessUi.this.password.setText("");
                 this.buttonShowPassword.setEnabled(true);
                 this.password.validate();
