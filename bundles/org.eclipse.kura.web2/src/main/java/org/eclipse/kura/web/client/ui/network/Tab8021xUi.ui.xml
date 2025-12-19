@@ -102,6 +102,10 @@
                             <b:InlineHelpBlock iconType="EXCLAMATION_TRIANGLE" />
                             <b:TextBox b:id="keystorePid"
                                 ui:field="keystorePid" />
+                            <b:DropDown b:id="keystorePidDropdown"
+                                ui:field="keystorePidDropdown" />
+                            <b:Anchor b:id="keystorePidAnchor"
+                                ui:field="keystorePidAnchor" />
                         </b:FormGroup>
 
                         <b:FormGroup ui:field="identityCaCertName">
@@ -109,8 +113,10 @@
                                 ui:field="labelCaCertName" />
                             <util:HelpButton ui:field="helpCaCertName"/>
                             <b:InlineHelpBlock iconType="EXCLAMATION_TRIANGLE" />
-                            <b:TextBox b:id="caCertName"
-                                ui:field="caCertName" />
+                            <g:FlowPanel>
+                                <b:ListBox b:id="caCertName"
+                                    ui:field="caCertName" />
+                            </g:FlowPanel>
                         </b:FormGroup>
 
                         <b:FormGroup ui:field="identityPublicPrivateKeyPairName">
@@ -118,8 +124,10 @@
                                 ui:field="labelPublicPrivateKeyPairName" />
                             <util:HelpButton ui:field="helpPublicPrivateKeyPairName"/>
                             <b:InlineHelpBlock iconType="EXCLAMATION_TRIANGLE" />
-                            <b:TextBox b:id="publicPrivateKeyPairName"
-                                ui:field="publicPrivateKeyPairName" />
+                            <g:FlowPanel>
+                                <b:ListBox b:id="publicPrivateKeyPairName"
+                                    ui:field="publicPrivateKeyPairName" />
+                            </g:FlowPanel>
                         </b:FormGroup>
 
                         <b:FormGroup ui:field="testCredentials">

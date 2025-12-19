@@ -128,6 +128,14 @@ public class GwtCertificatesServiceImpl extends OsgiRemoteServiceServlet impleme
     }
 
     @Override
+    public List<GwtKeystoreEntry> listKeystoreEntriesByKeystorePidAndKind(String keystorePid,
+            GwtKeystoreEntry.Kind kind) throws GwtKuraException {
+        List<GwtKeystoreEntry> allEntries = listEntries();
+
+        return allEntries.stream().filter(e -> e.getKeystoreName().equals(keystorePid) && e.getKind() == kind).toList();
+    }
+
+    @Override
     public List<GwtKeystoreEntry> listEntries() throws GwtKuraException {
 
         List<GwtKeystoreEntry> result = new ArrayList<>();

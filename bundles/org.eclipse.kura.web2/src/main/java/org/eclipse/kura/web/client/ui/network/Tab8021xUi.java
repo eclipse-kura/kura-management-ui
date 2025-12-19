@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2023 Eurotech and/or its affiliates and others
+ * Copyright (c) 2023, 2025 Eurotech and/or its affiliates and others
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -13,14 +13,29 @@
  *******************************************************************************/
 package org.eclipse.kura.web.client.ui.network;
 
+import java.util.logging.Logger;
+
 import org.eclipse.kura.web.client.messages.Messages;
 import org.eclipse.kura.web.client.util.HelpButton;
+import org.eclipse.kura.web.client.util.request.RequestQueue;
 import org.eclipse.kura.web.shared.model.Gwt8021xConfig;
 import org.eclipse.kura.web.shared.model.Gwt8021xEap;
 import org.eclipse.kura.web.shared.model.Gwt8021xInnerAuth;
+import org.eclipse.kura.web.shared.model.GwtKeystoreEntry;
 import org.eclipse.kura.web.shared.model.GwtNetInterfaceConfig;
 import org.eclipse.kura.web.shared.model.GwtSession;
+import org.eclipse.kura.web.shared.service.GwtCertificatesService;
+import org.eclipse.kura.web.shared.service.GwtCertificatesServiceAsync;
+import org.eclipse.kura.web.shared.service.GwtComponentService;
+import org.eclipse.kura.web.shared.service.GwtComponentServiceAsync;
+import org.eclipse.kura.web.shared.service.GwtSecurityTokenService;
+import org.eclipse.kura.web.shared.service.GwtSecurityTokenServiceAsync;
+import org.gwtbootstrap3.client.ui.Anchor;
+import org.gwtbootstrap3.client.ui.AnchorListItem;
 import org.gwtbootstrap3.client.ui.Button;
+import org.gwtbootstrap3.client.ui.DropDown;
+import org.gwtbootstrap3.client.ui.DropDownHeader;
+import org.gwtbootstrap3.client.ui.DropDownMenu;
 import org.gwtbootstrap3.client.ui.Form;
 import org.gwtbootstrap3.client.ui.FormGroup;
 import org.gwtbootstrap3.client.ui.FormLabel;
@@ -28,6 +43,8 @@ import org.gwtbootstrap3.client.ui.Input;
 import org.gwtbootstrap3.client.ui.ListBox;
 import org.gwtbootstrap3.client.ui.PanelHeader;
 import org.gwtbootstrap3.client.ui.TextBox;
+import org.gwtbootstrap3.client.ui.base.TextBoxBase;
+import org.gwtbootstrap3.client.ui.constants.Toggle;
 import org.gwtbootstrap3.client.ui.constants.ValidationState;
 import org.gwtbootstrap3.client.ui.html.Span;
 
@@ -39,6 +56,14 @@ import com.google.gwt.user.client.ui.ScrollPanel;
 import com.google.gwt.user.client.ui.Widget;
 
 public class Tab8021xUi extends Composite implements NetworkTab {
+
+    protected static final Logger logger = Logger.getLogger(Tab8021xUi.class.getSimpleName());
+
+    private static final String KURA_SERVICE_PID_OSGI_FILTER = "(objectClass=org.eclipse.kura.security.keystore.KeystoreService)";
+
+    private final GwtComponentServiceAsync gwtComponentService = GWT.create(GwtComponentService.class);
+    private final GwtSecurityTokenServiceAsync gwtXSRFService = GWT.create(GwtSecurityTokenService.class);
+    private final GwtCertificatesServiceAsync gwtCertificatesService = GWT.create(GwtCertificatesService.class);
 
     private static Tab8021xUiUiBinder uiBinder = GWT.create(Tab8021xUiUiBinder.class);
 
@@ -102,10 +127,16 @@ public class Tab8021xUi extends Composite implements NetworkTab {
     TextBox keystorePid;
 
     @UiField
-    TextBox caCertName;
+    DropDown keystorePidDropdown;
 
     @UiField
-    TextBox publicPrivateKeyPairName;
+    Anchor keystorePidAnchor;
+
+    @UiField
+    ListBox caCertName;
+
+    @UiField
+    ListBox publicPrivateKeyPairName;
 
     // Help
     @UiField
@@ -163,6 +194,7 @@ public class Tab8021xUi extends Composite implements NetworkTab {
         initHelpButtons();
         initListBoxes();
         initTextBoxes();
+        initDropdownBoxes();
 
         this.buttonTestPassword.setVisible(false);
 
@@ -194,14 +226,59 @@ public class Tab8021xUi extends Composite implements NetworkTab {
     private void initListBoxes() {
         initEapListBox();
         initInnerAuthListBox();
+        initCaCertNameListBox();
+        initPrivateKeyNameListBox();
     }
 
     private void initTextBoxes() {
         initUsernameTextBox();
         initPasswordTextBox();
         initKeystorePidTextBox();
-        initCaCertNameTextBox();
-        initPrivateKeyNameTextBox();
+    }
+
+    private void initDropdownBoxes() {
+
+        this.keystorePidAnchor.setText(MSGS.selectAvailableTargets());
+        this.keystorePidAnchor.setDataToggle(Toggle.DROPDOWN);
+
+        this.keystorePidDropdown.add(this.keystorePidAnchor);
+
+        final DropDownMenu dropDownMenu = new DropDownMenu();
+        dropDownMenu.addStyleName("drop-down");
+
+        DropDownHeader dropDownHeader = new DropDownHeader();
+        dropDownHeader.setVisible(true);
+        dropDownMenu.add(dropDownHeader);
+
+        this.keystorePidDropdown.add(dropDownMenu);
+
+        RequestQueue.submit(context -> this.gwtXSRFService
+                .generateSecurityToken(context.callback(token -> Tab8021xUi.this.gwtComponentService
+                        .findComponentConfigurations(token, KURA_SERVICE_PID_OSGI_FILTER, context.callback(data -> {
+                            if (data.isEmpty()) {
+                                dropDownHeader.setText(MSGS.noTargetsAvailable());
+                            } else {
+                                dropDownHeader.setText(MSGS.targetsAvailable());
+                                data.forEach(targetEntry -> {
+                                    AnchorListItem listItem = createListItem(this.keystorePid,
+                                            targetEntry.getComponentId());
+                                    dropDownMenu.add(listItem);
+                                });
+                            }
+                            dropDownHeader.setVisible(true);
+                        })))));
+    }
+
+    private AnchorListItem createListItem(final TextBoxBase textBox, String targetEntry) {
+        AnchorListItem listItem = new AnchorListItem();
+        listItem.setText("(kura.service.pid=" + targetEntry + ")");
+        listItem.addClickHandler(event -> {
+            Anchor eventGenerator = (Anchor) event.getSource();
+            textBox.setText(eventGenerator.getText());
+            setDirty(true);
+
+        });
+        return listItem;
     }
 
     private void initEapListBox() {
@@ -229,9 +306,7 @@ public class Tab8021xUi extends Composite implements NetworkTab {
             this.innerAuth.addItem(auth.name());
         }
 
-        this.innerAuth.addMouseOverHandler(event -> {
-            setHelpText(MSGS.net8021xInnerAuthHelp());
-        });
+        this.innerAuth.addMouseOverHandler(event -> setHelpText(MSGS.net8021xInnerAuthHelp()));
 
         this.innerAuth.addMouseOutHandler(event -> resetHelpText());
     }
@@ -303,43 +378,59 @@ public class Tab8021xUi extends Composite implements NetworkTab {
             }
 
         });
+
+        this.keystorePid.setReadOnly(true);
     }
 
-    private void initCaCertNameTextBox() {
+    private void initCaCertNameListBox() {
         this.caCertName.addMouseOverHandler(event -> {
             if (this.caCertName.isEnabled()) {
                 setHelpText(MSGS.net8021xCaCertHelp());
             }
         });
 
-        this.caCertName.addBlurHandler(e -> this.caCertName.validate());
-        this.caCertName.setAllowBlank(true);
+        this.caCertName.addItem("");
+
+        String keystorePidValue = this.keystorePid.getValue();
+        RequestQueue
+                .submit(context -> this.gwtCertificatesService.listKeystoreEntriesByKeystorePidAndKind(keystorePidValue,
+                        GwtKeystoreEntry.Kind.TRUSTED_CERT, context.callback(data -> {
+                            if (!data.isEmpty()) {
+                                this.caCertName.clear();
+                                this.caCertName.addItem("");
+                                for (GwtKeystoreEntry certName : data) {
+                                    this.caCertName.addItem(certName.getAlias());
+                                }
+                            }
+                        })));
+
         this.caCertName.addMouseOutHandler(event -> resetHelpText());
 
         this.caCertName.addChangeHandler(event -> setDirty(true));
     }
 
-    private void initPrivateKeyNameTextBox() {
+    private void initPrivateKeyNameListBox() {
         this.publicPrivateKeyPairName.addMouseOverHandler(event -> {
             if (this.publicPrivateKeyPairName.isEnabled()) {
                 setHelpText(MSGS.net8021xPublicPrivateKeyPairHelp());
             }
         });
 
-        this.publicPrivateKeyPairName.addBlurHandler(e -> this.publicPrivateKeyPairName.validate());
-        this.publicPrivateKeyPairName.setAllowBlank(false);
+        String keystorePidValue = this.keystorePid.getValue();
+        RequestQueue
+                .submit(context -> this.gwtCertificatesService.listKeystoreEntriesByKeystorePidAndKind(keystorePidValue,
+                        GwtKeystoreEntry.Kind.KEY_PAIR, context.callback(data -> {
+                            if (!data.isEmpty()) {
+                                this.publicPrivateKeyPairName.clear();
+                                for (GwtKeystoreEntry keyPair : data) {
+                                    this.publicPrivateKeyPairName.addItem(keyPair.getAlias());
+                                }
+                            }
+                        })));
+
         this.publicPrivateKeyPairName.addMouseOutHandler(event -> resetHelpText());
 
-        this.publicPrivateKeyPairName.addChangeHandler(event -> {
-            setDirty(true);
-
-            if (this.publicPrivateKeyPairName.getValue().isEmpty() && this.publicPrivateKeyPairName.isEnabled()) {
-                this.identityPublicPrivateKeyPairName.setValidationState(ValidationState.ERROR);
-            } else {
-                this.identityPublicPrivateKeyPairName.setValidationState(ValidationState.NONE);
-            }
-
-        });
+        this.publicPrivateKeyPairName.addChangeHandler(event -> setDirty(true));
     }
 
     private void update() {
@@ -365,7 +456,25 @@ public class Tab8021xUi extends Composite implements NetworkTab {
         this.caCertName.setEnabled(true);
         this.publicPrivateKeyPairName.setEnabled(true);
 
-        refreshFieldsBasedOnSelectedValues();
+        switch (Gwt8021xEap.valueOf(this.eap.getSelectedValue())) {
+        case PEAP:
+        case TTLS:
+            this.innerAuth.setEnabled(false);
+            setInnerAuthTo(Gwt8021xInnerAuth.MSCHAPV2);
+            this.identityKeystorePid.setVisible(false);
+            this.identityCaCertName.setVisible(false);
+            this.identityPublicPrivateKeyPairName.setVisible(false);
+            break;
+        case TLS:
+            this.innerAuth.setEnabled(false);
+            setInnerAuthTo(Gwt8021xInnerAuth.NONE);
+            this.identityKeystorePid.setVisible(true);
+            this.identityCaCertName.setVisible(true);
+            this.identityPublicPrivateKeyPairName.setVisible(true);
+            break;
+        default:
+            break;
+        }
 
     }
 
@@ -526,24 +635,6 @@ public class Tab8021xUi extends Composite implements NetworkTab {
     public void setNetInterface(GwtNetInterfaceConfig config) {
         setDirty(true);
         this.activeConfig = config.get8021xConfig();
-    }
-
-    private void refreshFieldsBasedOnSelectedValues() {
-        switch (Gwt8021xEap.valueOf(this.eap.getSelectedValue())) {
-        case PEAP:
-        case TTLS:
-            this.innerAuth.setEnabled(false);
-            setInnerAuthTo(Gwt8021xInnerAuth.MSCHAPV2);
-            this.publicPrivateKeyPairName.setEnabled(false);
-            break;
-        case TLS:
-            this.innerAuth.setEnabled(false);
-            setInnerAuthTo(Gwt8021xInnerAuth.NONE);
-            this.password.setEnabled(false);
-            break;
-        default:
-            break;
-        }
     }
 
     private void setInnerAuthTo(Gwt8021xInnerAuth auth) {

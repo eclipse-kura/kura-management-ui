@@ -40,9 +40,9 @@ import com.google.gwt.user.client.ui.RootPanel;
 /**
  * Entry point classes define <code>onModuleLoad()</code>.
  */
-public class denali implements EntryPoint {
+public class Denali implements EntryPoint {
 
-    Logger logger = Logger.getLogger(denali.class.getSimpleName());
+    Logger logger = Logger.getLogger(Denali.class.getSimpleName());
     private final GwtSecurityTokenServiceAsync gwtXSRFService = GWT.create(GwtSecurityTokenService.class);
     private final GwtDeviceServiceAsync gwtDeviceService = GWT.create(GwtDeviceService.class);
     private final GwtSecurityServiceAsync gwtSecurityService = GWT.create(GwtSecurityService.class);
@@ -88,12 +88,12 @@ public class denali implements EntryPoint {
 
             @Override
             public void onFailure(Throwable ex) {
-                FailureHandler.handle(ex, denali.class.getSimpleName());
+                FailureHandler.handle(ex, Denali.class.getSimpleName());
             }
 
             @Override
             public void onSuccess(GwtXSRFToken token) {
-                denali.this.gwtDeviceService.findSystemProperties(token, new AsyncCallback<List<GwtGroupedNVPair>>() {
+                Denali.this.gwtDeviceService.findSystemProperties(token, new AsyncCallback<List<GwtGroupedNVPair>>() {
 
                     @Override
                     public void onSuccess(List<GwtGroupedNVPair> results) {
@@ -117,11 +117,11 @@ public class denali implements EntryPoint {
                             });
                         }
 
-                        denali.this.gwtSecurityService.getCababilities(new AsyncCallback<GwtSecurityCapabilities>() {
+                        Denali.this.gwtSecurityService.getCababilities(new AsyncCallback<GwtSecurityCapabilities>() {
 
                             @Override
                             public void onFailure(final Throwable caught) {
-                                FailureHandler.handle(caught, denali.class.getSimpleName());
+                                FailureHandler.handle(caught, Denali.class.getSimpleName());
                             }
 
                             @Override
@@ -130,7 +130,7 @@ public class denali implements EntryPoint {
                                     gwtSession.setDevelopMode(true);
                                 }
 
-                                denali.this.gwtDeviceService.getSupportedFeatures(token,
+                                Denali.this.gwtDeviceService.getSupportedFeatures(token,
                                         new AsyncCallback<GwtSupportedFeatures>() {
 
                                             @Override
@@ -143,7 +143,7 @@ public class denali implements EntryPoint {
 
                                             @Override
                                             public void onFailure(Throwable caught) {
-                                                FailureHandler.handle(caught, denali.class.getSimpleName());
+                                                FailureHandler.handle(caught, Denali.class.getSimpleName());
 
                                             }
                                         });
@@ -154,7 +154,7 @@ public class denali implements EntryPoint {
 
                     @Override
                     public void onFailure(Throwable caught) {
-                        FailureHandler.handle(caught, denali.class.getSimpleName());
+                        FailureHandler.handle(caught, Denali.class.getSimpleName());
                     }
                 });
             }

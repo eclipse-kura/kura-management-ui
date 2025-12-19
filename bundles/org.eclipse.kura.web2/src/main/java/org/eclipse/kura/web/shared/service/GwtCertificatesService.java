@@ -40,6 +40,9 @@ public interface GwtCertificatesService extends RemoteService {
 
     public List<String> listKeystoreServicePids() throws GwtKuraException;
 
+    public List<GwtKeystoreEntry> listKeystoreEntriesByKeystorePidAndKind(String keystorePid,
+            GwtKeystoreEntry.Kind kind) throws GwtKuraException;
+
     @Audit(componentName = "UI Certificate", description = "Remove certificate")
     public void removeEntry(GwtXSRFToken xsrfToken, GwtKeystoreEntry certificate) throws GwtKuraException;
 }
