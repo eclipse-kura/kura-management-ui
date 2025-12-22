@@ -62,8 +62,7 @@ public class NewPasswordInput extends Input {
         });
     }
 
-    public void setValidatorsFrom(final Optional<String> identityName,
-            final GwtPasswordStrenghtRequirements userOptions) {
+    public void setValidatorsFrom(final Optional<String> identityName, final GwtPasswordStrenghtRequirements userOptions) {
         this.validators.clear();
 
         for (final Validator<String> validator : GwtValidators.newPassword(identityName, userOptions)) {

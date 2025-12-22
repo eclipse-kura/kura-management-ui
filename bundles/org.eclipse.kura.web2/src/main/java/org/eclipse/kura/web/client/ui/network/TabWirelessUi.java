@@ -279,7 +279,6 @@ public class TabWirelessUi extends Composite implements NetworkTab {
     HelpBlock helpWireless;
     @UiField
     HelpBlock helpPassword;
-
     @UiField
     HelpBlock helpShortI;
     @UiField
@@ -398,9 +397,8 @@ public class TabWirelessUi extends Composite implements NetworkTab {
         }
     }
 
-    @UiHandler(value = { "wireless", "ssid", "radio", "security", "password", "pairwise", "group", "bgscan", "longI",
-            "shortI", "radio1", "radio2", "radio3", "radio4", "rssi", "channelList", "countryCode" })
-
+    @UiHandler(value = { "wireless", "ssid", "radio", "security", "password", "pairwise", "group", "bgscan",
+            "longI", "shortI", "radio1", "radio2", "radio3", "radio4", "rssi", "channelList", "countryCode" })
     public void onChange(ChangeEvent e) {
         setDirty(true);
     }
@@ -1441,8 +1439,7 @@ public class TabWirelessUi extends Composite implements NetworkTab {
                     || this.security.getSelectedItemText().contentEquals(WIFI_SECURITY_WPA2_WPA3_MESSAGE))) {
 
                 this.password.setValidatorsFrom(Optional.empty(), passwordStrengthRequirements);
-                passwordStrengthRequirements.setPasswordMinimumLength(
-                        Math.min(passwordStrengthRequirements.getPasswordMinimumLength(), 63));
+                passwordStrengthRequirements.setPasswordMinimumLength(Math.min(passwordStrengthRequirements.getPasswordMinimumLength(), 63));
 
                 this.password
                         .addValidator(GwtValidators.regex(REGEX_PASS_WPA, MSGS.netWifiWirelessInvalidWPAPassword()));
