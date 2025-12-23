@@ -831,7 +831,6 @@ public class TabWirelessUi extends Composite implements NetworkTab {
                 return MSGS.netWifiToolTipWirelessModeAccessPoint();
             }
         });
-
         this.ssidHelp.setHelpText(MSGS.netWifiToolTipNetworkName());
 
         this.radioHelp.setHelpText(MSGS.netWifiToolTipRadioMode());
@@ -863,10 +862,8 @@ public class TabWirelessUi extends Composite implements NetworkTab {
 
     private void initWirelessModeItem() {
         this.labelWireless.setText(MSGS.netWifiWirelessMode());
-
         this.wireless.addItem(WIFI_MODE_STATION_MESSAGE);
         this.wireless.addItem(WIFI_MODE_ACCESS_POINT_MESSAGE);
-
         this.wireless.addMouseOverHandler(event -> {
             if (TabWirelessUi.this.wireless.getSelectedItemText().equals(WIFI_MODE_STATION_MESSAGE)) {
                 TabWirelessUi.this.helpText.clear();
@@ -880,6 +877,7 @@ public class TabWirelessUi extends Composite implements NetworkTab {
 
         this.wireless.addChangeHandler(event -> {
             setDirty(true);
+            TabWirelessUi.this.helpWireless.setText("");
             TabWirelessUi.this.groupWireless.setValidationState(ValidationState.NONE);
 
             if (TabWirelessUi.this.wireless.getSelectedItemText().equals(WIFI_MODE_STATION_MESSAGE)) {
@@ -1223,10 +1221,6 @@ public class TabWirelessUi extends Composite implements NetworkTab {
         return Collections.singletonList(frequencyEntry);
     }
 
-    /*
-     * Remove/Add 802.1x option from security dropdown when in Access Point mode
-     */
-
     private void remove8021xFromSecurityDropdown() {
         for (int i = 0; i < this.security.getItemCount(); i++) {
             if (this.security.getItemText(i).equals(WIFI_SECURITY_WPA2_WPA3_ENTERPRISE_MESSAGE)) {
@@ -1327,8 +1321,7 @@ public class TabWirelessUi extends Composite implements NetworkTab {
             if (this.security != null && isWpaLikePairwiseSecurity()) {
 
                 this.password.setValidatorsFrom(Optional.empty(), passwordStrengthRequirements);
-                passwordStrengthRequirements.setPasswordMinimumLength(
-                        Math.min(passwordStrengthRequirements.getPasswordMinimumLength(), 63));
+                passwordStrengthRequirements.setPasswordMinimumLength(Math.min(passwordStrengthRequirements.getPasswordMinimumLength(), 63));
 
                 this.password
                         .addValidator(GwtValidators.regex(REGEX_PASS_WPA, MSGS.netWifiWirelessInvalidWPAPassword()));
@@ -1339,8 +1332,7 @@ public class TabWirelessUi extends Composite implements NetworkTab {
                 this.password
                         .addValidator(GwtValidators.regex(REGEX_PASS_WEP, MSGS.netWifiWirelessInvalidWEPPassword()));
             } else {
-                // Clears all validators when password is not required (None and WPA2/WPA3
-                // Enterprise Securities)
+                // Clears all validators when password is not required
                 this.password.setValidators();
             }
         });
@@ -1356,10 +1348,6 @@ public class TabWirelessUi extends Composite implements NetworkTab {
         this.noSsidText.setText(MSGS.netWifiAlertNoSSID());
         this.scanFailText.setText(MSGS.netWifiAlertScanFail());
     }
-
-    /*
-     * Initialize SSID Network Name
-     */
 
     private void initSsid() {
         this.ssidInit = true;
@@ -1741,9 +1729,6 @@ public class TabWirelessUi extends Composite implements NetworkTab {
         return result;
     }
 
-    /*
-     * Channel Frequencies Related Methods
-     */
 
     private void updateChannelListValues(List<GwtWifiChannelFrequency> freqChannels) {
 
@@ -1967,4 +1952,5 @@ public class TabWirelessUi extends Composite implements NetworkTab {
         }
         return toolTipMessage;
     }
+
 }
