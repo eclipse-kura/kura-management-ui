@@ -497,8 +497,8 @@ public class Tab8021xUi extends Composite implements NetworkTab {
         this.password.setValue("");
 
         this.keystorePid.setValue("");
-        this.caCertName.setValue("");
-        this.publicPrivateKeyPairName.setValue("");
+        this.caCertName.setSelectedIndex(0);
+        this.publicPrivateKeyPairName.setSelectedIndex(0);
         update();
     }
 
@@ -522,8 +522,8 @@ public class Tab8021xUi extends Composite implements NetworkTab {
         this.password.setValue(this.activeConfig.getPassword());
 
         this.keystorePid.setValue(this.activeConfig.getKeystorePid());
-        this.caCertName.setValue(this.activeConfig.getCaCertName());
-        this.publicPrivateKeyPairName.setValue(this.activeConfig.getPublicPrivateKeyPairName());
+        selectByValue(this.caCertName, this.activeConfig.getCaCertName());
+        selectByValue(this.publicPrivateKeyPairName, this.activeConfig.getPublicPrivateKeyPairName());
     }
 
     @Override
@@ -570,7 +570,7 @@ public class Tab8021xUi extends Composite implements NetworkTab {
                 result = false;
             }
 
-            if (isNonEmptyString(this.publicPrivateKeyPairName)) {
+            if (isNonEmptyString(this.publicPrivateKeyPairName.getSelectedItemText())) {
                 this.identityPublicPrivateKeyPairName.setValidationState(ValidationState.ERROR);
                 result = false;
             }
@@ -587,7 +587,7 @@ public class Tab8021xUi extends Composite implements NetworkTab {
                 result = false;
             }
 
-            if (isNonEmptyString(this.keystorePid) && !isNonEmptyString(this.caCertName)) {
+            if (isNonEmptyString(this.keystorePid) && !isNonEmptyString(this.caCertName.getSelectedItemText())) {
                 this.identityKeystorePid.setValidationState(ValidationState.ERROR);
                 result = false;
             }
@@ -598,6 +598,10 @@ public class Tab8021xUi extends Composite implements NetworkTab {
 
     private boolean isNonEmptyString(TextBox value) {
         return value.getValue() == null || value.getValue().trim().isEmpty();
+    }
+
+    private boolean isNonEmptyString(String value) {
+        return value == null || value.trim().isEmpty();
     }
 
     @Override
@@ -625,8 +629,8 @@ public class Tab8021xUi extends Composite implements NetworkTab {
         }
 
         updated8021xConfig.setKeystorePid(this.keystorePid.getText());
-        updated8021xConfig.setCaCertName(this.caCertName.getText());
-        updated8021xConfig.setPublicPrivateKeyPairName(this.publicPrivateKeyPairName.getText());
+        updated8021xConfig.setCaCertName(this.caCertName.getSelectedItemText());
+        updated8021xConfig.setPublicPrivateKeyPairName(this.publicPrivateKeyPairName.getSelectedItemText());
 
         updatedNetIf.setEnterpriseConfig(updated8021xConfig);
     }
@@ -656,4 +660,12 @@ public class Tab8021xUi extends Composite implements NetworkTab {
         this.helpText.add(new Span(MSGS.netHelpDefaultHint()));
     }
 
+    public void selectByValue(ListBox listBox, String value) {
+        for (int i = 0; i < listBox.getItemCount(); i++) {
+            if (listBox.getValue(i).equals(value)) {
+                listBox.setSelectedIndex(i);
+                break;
+            }
+        }
+    }
 }
