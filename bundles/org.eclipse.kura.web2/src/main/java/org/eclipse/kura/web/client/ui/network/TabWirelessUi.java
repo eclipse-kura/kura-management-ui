@@ -276,6 +276,8 @@ public class TabWirelessUi extends Composite implements NetworkTab {
     FormGroup groupLongI;
 
     @UiField
+    HelpBlock helpWireless;
+    @UiField
     HelpBlock helpPassword;
     @UiField
     HelpBlock helpShortI;
@@ -453,6 +455,7 @@ public class TabWirelessUi extends Composite implements NetworkTab {
             this.tcp4Status = this.tcp4Tab.getStatus();
             this.tcp6Status = this.tcp6Tab.getStatus();
         }
+        // Ignore warning: gwt doesn't support the proposed Java syntax
         if (config instanceof GwtWifiNetInterfaceConfig) {
             this.selectedNetIfConfig = (GwtWifiNetInterfaceConfig) config;
 
