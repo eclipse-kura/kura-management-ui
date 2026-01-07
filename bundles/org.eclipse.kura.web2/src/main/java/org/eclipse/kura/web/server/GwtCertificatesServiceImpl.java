@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2011, 2024 Eurotech and/or its affiliates and others
+ * Copyright (c) 2011, 2025 Eurotech and/or its affiliates and others
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -125,6 +125,15 @@ public class GwtCertificatesServiceImpl extends OsgiRemoteServiceServlet impleme
         }, KeystoreService.class);
 
         return pids;
+    }
+
+    @Override
+    public List<GwtKeystoreEntry> listKeystoreEntriesByKeystorePidAndKind(String keystorePid,
+            GwtKeystoreEntry.Kind kind) throws GwtKuraException {
+        List<GwtKeystoreEntry> allEntries = listEntries();
+
+        return new ArrayList<>(allEntries.stream()
+                .filter(e -> e.getKeystoreName().equals(keystorePid) && e.getKind() == kind).toList());
     }
 
     @Override

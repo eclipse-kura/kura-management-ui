@@ -129,7 +129,7 @@ public class FileServlet extends AuditServlet {
     public void destroy() {
         super.destroy();
 
-        logger.info("Servlet {} destroyed", getServletName());
+        logger.debug("Servlet {} destroyed", getServletName());
 
         if (this.fileCleaningTracker != null) {
             logger.info("Number of temporary files tracked: {}", this.fileCleaningTracker.getTrackCount());
@@ -140,7 +140,7 @@ public class FileServlet extends AuditServlet {
     public void init() throws ServletException {
         super.init();
 
-        logger.info("Servlet {} initialized", getServletName());
+        logger.debug("Servlet {} initialized", getServletName());
 
         ServletContext ctx = getServletContext();
         this.fileCleaningTracker = JakartaFileCleaner.getFileCleaningTracker(ctx);
@@ -151,8 +151,8 @@ public class FileServlet extends AuditServlet {
         int sizeThreshold = getFileUploadInMemorySizeThreshold();
         File repository = new File(System.getProperty(JAVA_IO_TMPDIR));
 
-        logger.info("DiskFileItemFactory.DEFAULT_THRESHOLD: {}", DiskFileItemFactory.DEFAULT_THRESHOLD);
-        logger.info("DiskFileItemFactory: using size threshold of: {}", sizeThreshold);
+        logger.debug("DiskFileItemFactory.DEFAULT_THRESHOLD: {}", DiskFileItemFactory.DEFAULT_THRESHOLD);
+        logger.debug("DiskFileItemFactory: using size threshold of: {}", sizeThreshold);
 
         this.diskFileItemFactory = DiskFileItemFactory.builder() //
                 .setBufferSize(sizeThreshold) //
@@ -529,7 +529,7 @@ public class FileServlet extends AuditServlet {
         byte[] data;
         try {
             data = fileItem.get();
-        } catch(IOException e) {
+        } catch (IOException e) {
             throw new ServletException(e.getMessage());
         }
         String fileItemString = new String(data, StandardCharsets.UTF_8);
@@ -899,13 +899,13 @@ class UploadRequest extends JakartaServletFileUpload<DiskFileItem, DiskFileItemF
 
             if (item.isFormField()) {
                 String name = item.getFieldName();
-                
+
                 try {
                     String value = item.getString();
                     logger.debug("Form field item name: {}, value: {}", name, value);
 
                     this.formFields.put(name, value);
-                } catch(IOException e) {
+                } catch (IOException e) {
                     throw new FileUploadException(e.getMessage(), e);
                 }
 
