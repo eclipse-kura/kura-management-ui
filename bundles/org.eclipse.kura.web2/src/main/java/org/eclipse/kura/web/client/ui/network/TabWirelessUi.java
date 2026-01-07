@@ -800,6 +800,13 @@ public class TabWirelessUi extends Composite implements NetworkTab {
         enabledBgScanItems(!this.bgscan.getSelectedItemText().equals(WIFI_BGSCAN_NONE_MESSAGE));
 
         showPairwiseItems(isWpaLikePairwiseSecurity(), false);
+
+
+        this.radio1.setEnabled(true);
+        this.radio1.setVisible(true);
+        this.radio2.setEnabled(true);
+        this.radio2.setVisible(true);
+        this.labelPing.setVisible(true);
     }
 
     private void enabledBgScanItems(boolean isBgScanEnabled) {
