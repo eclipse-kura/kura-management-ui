@@ -24,15 +24,15 @@ import java.nio.file.Paths;
 import java.util.Optional;
 import java.util.stream.Stream;
 
-import jakarta.servlet.http.HttpServlet;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-
 import org.eclipse.kura.system.SystemService;
 import org.eclipse.kura.web.server.util.ServiceLocator;
 import org.eclipse.kura.web.shared.GwtKuraException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 public class SkinServlet extends HttpServlet {
 
@@ -48,7 +48,7 @@ public class SkinServlet extends HttpServlet {
         try {
             fResourceFile = checkFile(resourceName);
         } catch (GwtKuraException | IOException e) {
-            logger.warn("Failed to load skin resource, {}", e.getMessage());
+            logger.debug("No skin resource to load: {}", e.getMessage());
         }
 
         if (fResourceFile == null) {
