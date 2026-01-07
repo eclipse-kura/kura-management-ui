@@ -360,7 +360,7 @@ public class TabWirelessUi extends Composite implements NetworkTab {
 
         changeRadioModeToBand();
 
-        initSharedItems();
+        initCommonItems();
         initStationModeItems();
         initHelpButtons();
         initRegDomErrorModal();
@@ -442,12 +442,16 @@ public class TabWirelessUi extends Composite implements NetworkTab {
         result = result && !this.groupWireless.getValidationState().equals(ValidationState.ERROR)
                 && !this.groupPassword.getValidationState().equals(ValidationState.ERROR);
 
-        result = result && !this.groupShortI.getValidationState().equals(ValidationState.ERROR)
-                && !this.groupLongI.getValidationState().equals(ValidationState.ERROR);
+        if (WIFI_MODE_STATION_MESSAGE.equals(this.wireless.getSelectedItemText()) && !this.bgscan.getSelectedItemText()
+                .equals(WIFI_BGSCAN_NONE_MESSAGE)) {
+            result = result && !this.groupShortI.getValidationState().equals(ValidationState.ERROR)
+                    && !this.groupLongI.getValidationState().equals(ValidationState.ERROR);
+        }
 
         return result;
     }
 
+    @SuppressWarnings("all") // Ignoring warning gwt doesn't support the proposed Java syntax
     @Override
     public void setNetInterface(GwtNetInterfaceConfig config) {
         setDirty(true);
@@ -455,7 +459,6 @@ public class TabWirelessUi extends Composite implements NetworkTab {
             this.tcp4Status = this.tcp4Tab.getStatus();
             this.tcp6Status = this.tcp6Tab.getStatus();
         }
-        // Ignore warning: gwt doesn't support the proposed Java syntax
         if (config instanceof GwtWifiNetInterfaceConfig) {
             this.selectedNetIfConfig = (GwtWifiNetInterfaceConfig) config;
 
@@ -468,7 +471,7 @@ public class TabWirelessUi extends Composite implements NetworkTab {
         if (isDirty()) {
             setDirty(false);
             if (this.selectedNetIfConfig == null) {
-                reset();
+                resetForm();
             } else {
                 update();
             }
@@ -514,13 +517,13 @@ public class TabWirelessUi extends Composite implements NetworkTab {
     }
 
     private void update() {
-        setValues();
+        setCurrentItemsValues();
         this.netTabs.updateTabs();
         refreshForm();
         setPasswordValidation();
     }
 
-    private void setValues() {
+    private void setCurrentItemsValues() {
 
         if (this.activeConfig == null) {
             return;
@@ -534,10 +537,16 @@ public class TabWirelessUi extends Composite implements NetworkTab {
 
         this.ssid.setValue(GwtSafeHtmlUtils.htmlUnescape(this.activeConfig.getWirelessSsid()));
 
-        // ------------
-
         setRadioModeByValue(this.activeConfig.getRadioMode());
 
+        setCurrentSecurityValues();
+        setCurrentGroupCiphersValues();
+        setCurrentBgscanValues();
+        setCurrentPingApValues();
+        setCurrentIgnoreSsidValues();
+    }
+
+    private void setCurrentSecurityValues() {
         String activeSecurity = this.activeConfig.getSecurity();
         if (activeSecurity != null) {
             for (int i = 0; i < this.security.getItemCount(); i++) {
@@ -548,6 +557,9 @@ public class TabWirelessUi extends Composite implements NetworkTab {
             }
         }
 
+        this.password.setValue(this.activeConfig.getPassword());
+        this.buttonShowPassword.setEnabled(!PLACEHOLDER.equals(TabWirelessUi.this.password.getText()));
+
         String activePairwiseCiphers = this.activeConfig.getPairwiseCiphers();
         if (activePairwiseCiphers != null) {
             for (int i = 0; i < this.pairwise.getItemCount(); i++) {
@@ -557,7 +569,9 @@ public class TabWirelessUi extends Composite implements NetworkTab {
                 }
             }
         }
+    }
 
+    private void setCurrentGroupCiphersValues() {
         String activeGroupCiphers = this.activeConfig.getPairwiseCiphers();
         if (activeGroupCiphers != null) {
             for (int i = 0; i < this.group.getItemCount(); i++) {
@@ -567,7 +581,9 @@ public class TabWirelessUi extends Composite implements NetworkTab {
                 }
             }
         }
+    }
 
+    private void setCurrentBgscanValues() {
         String activeBgscanModule = this.activeConfig.getBgscanModule();
         if (activeBgscanModule != null) {
             for (int i = 0; i < this.bgscan.getItemCount(); i++) {
@@ -581,10 +597,14 @@ public class TabWirelessUi extends Composite implements NetworkTab {
         this.rssi.setValue(String.valueOf(this.activeConfig.getBgscanRssiThreshold()));
         this.shortI.setValue(String.valueOf(this.activeConfig.getBgscanShortInterval()));
         this.longI.setValue(String.valueOf(this.activeConfig.getBgscanLongInterval()));
-        this.password.setValue(this.activeConfig.getPassword());
-        this.buttonShowPassword.setEnabled(!PLACEHOLDER.equals(TabWirelessUi.this.password.getText()));
+    }
+
+    private void setCurrentPingApValues() {
         this.radio1.setValue(this.activeConfig.pingAccessPoint());
         this.radio2.setValue(!this.activeConfig.pingAccessPoint());
+    }
+
+    private void setCurrentIgnoreSsidValues() {
         this.radio3.setValue(this.activeConfig.ignoreSSID());
         this.radio4.setValue(!this.activeConfig.ignoreSSID());
     }
@@ -617,54 +637,74 @@ public class TabWirelessUi extends Composite implements NetworkTab {
         }
     }
 
-    private void setStationModeItems(String tcpip4Status, String tcpip6Status) {
-        add8021xFromSecurityDropdown();
-
-        if (tcpip4Status.equals(IPV4_STATUS_WAN_MESSAGE) || tcpip6Status.equals(IPV4_STATUS_WAN_MESSAGE)) {
-            this.wireless.setEnabled(false);
-        }
-
-        this.ssid.setEnabled(true);
-        this.buttonSsid.setEnabled(true);
-        this.password.setType(InputType.PASSWORD);
-        this.buttonShowPassword.setIcon(IconType.EYE);
-        this.buttonShowPassword.setEnabled(!PLACEHOLDER.equals(TabWirelessUi.this.password.getText()));
-        if (!this.security.getSelectedItemText().equals(WIFI_SECURITY_NONE_MESSAGE)) {
+    private void updatePasswordItemVisibility(boolean isPasswordEnabled) {
+        this.groupPassword.setValidationState(ValidationState.NONE);
+        if (isPasswordEnabled) {
+            this.password.setType(InputType.PASSWORD);
+            this.buttonShowPassword.setIcon(IconType.EYE);
+            this.buttonShowPassword.setEnabled(!PLACEHOLDER.equals(TabWirelessUi.this.password.getText()));
             this.password.setEnabled(true);
             this.password.setVisible(true);
             this.passwordHelp.setVisible(true);
             this.labelPassword.setVisible(true);
+            this.buttonShowPassword.setEnabled(!PLACEHOLDER.equals(TabWirelessUi.this.password.getText()));
+            this.buttonShowPassword.setVisible(true);
+
+        } else {
+            this.password.setEnabled(false);
+            this.password.setVisible(false);
+            this.passwordHelp.setVisible(false);
+            this.labelPassword.setVisible(false);
+            this.buttonShowPassword.setEnabled(false);
+            this.buttonShowPassword.setVisible(false);
+            // Clear password validators and errors when hidden
+            this.password.setValidators();
+            this.helpPassword.setText("");
+        }
+    }
+
+    private void refreshCommonWirelessFormItems() {
+        // Shared items between Station and Access Point mode
+
+        this.radio.setEnabled(true);
+        this.channelList.setEnabled(true);
+        loadRadioMode();
+
+        this.wireless8021xTabAnchorItem
+                .setEnabled(this.security.getSelectedItemText().equals(WIFI_SECURITY_WPA2_WPA3_ENTERPRISE_MESSAGE));
+
+        loadCountryCode();
+    }
+
+    private void refreshForm() {
+
+        String tcpip4Status = this.tcp4Tab.getStatus();
+        String tcpip6Status = this.tcp6Tab.getStatus();
+
+        // Tcp/IP disabled
+        if (tcpip4Status.equals(MessageUtils.get(GwtNetIfStatus.netIPv4StatusDisabled.name()))
+                && tcpip6Status.equals(MessageUtils.get(GwtNetIfStatus.netIPv6StatusDisabled.name()))) {
+            setForm(false);
+        } else {
+            setForm(true);
+
+            refreshCommonWirelessFormItems();
+
+            if (WIFI_MODE_STATION_MESSAGE.equals(this.wireless.getSelectedItemText())) {
+
+                refreshStationModeItems(tcpip4Status, tcpip6Status);
+
+            } else if (WIFI_MODE_ACCESS_POINT_MESSAGE.equals(this.wireless.getSelectedItemText())) {
+
+                refreshAccessPointModeItems(tcpip4Status, tcpip6Status);
+
+            }
         }
 
-        this.radio1.setEnabled(true);
-        this.radio1.setVisible(true);
-        this.radio2.setEnabled(true);
-        this.radio2.setVisible(true);
-        this.labelPing.setVisible(true);
-
-        this.bgscan.setEnabled(true);
-        this.bgscan.setVisible(true);
-        this.bgscanHelp.setVisible(true);
-        this.labelBgscan.setVisible(true);
-
-        enabledBgScanItems(!this.bgscan.getSelectedItemText().equals(WIFI_BGSCAN_NONE_MESSAGE));
-
-        showPairwiseItems(isWpaLikePairwiseSecurity(), false);
+        this.netTabs.updateTabs();
     }
 
-    private void enabledBgScanItems(boolean isBgScanEnabled) {
-        this.rssi.setVisible(isBgScanEnabled);
-        this.rssiHelp.setVisible(isBgScanEnabled);
-        this.labelRssi.setVisible(isBgScanEnabled);
-        this.shortI.setVisible(isBgScanEnabled);
-        this.shortIHelp.setVisible(isBgScanEnabled);
-        this.labelShortI.setVisible(isBgScanEnabled);
-        this.longI.setVisible(isBgScanEnabled);
-        this.longIHelp.setVisible(isBgScanEnabled);
-        this.labelLongI.setVisible(isBgScanEnabled);
-    }
-
-    private void setAccessPointModeItems(String tcpip4Status, String tcpip6Status) {
+    private void refreshAccessPointModeItems(String tcpip4Status, String tcpip6Status) {
 
         remove8021xFromSecurityDropdown();
 
@@ -675,16 +715,6 @@ public class TabWirelessUi extends Composite implements NetworkTab {
 
         this.ssid.setEnabled(true);
         this.buttonSsid.setEnabled(false);
-
-        this.password.setType(InputType.PASSWORD);
-        this.buttonShowPassword.setIcon(IconType.EYE);
-        this.buttonShowPassword.setEnabled(!PLACEHOLDER.equals(TabWirelessUi.this.password.getText()));
-        if (!this.security.getSelectedItemText().equals(WIFI_SECURITY_NONE_MESSAGE)) {
-            this.password.setEnabled(true);
-            this.password.setVisible(true);
-            this.labelPassword.setVisible(true);
-            this.passwordHelp.setVisible(true);
-        }
 
         this.bgscan.setEnabled(false);
         this.bgscan.setVisible(false);
@@ -724,57 +754,67 @@ public class TabWirelessUi extends Composite implements NetworkTab {
         this.labelGroup.setVisible(isPairwiseEnabled && !isAccessPointMode);
     }
 
-    private void setSharedItemsOnWirelessForm() {
-        // Shared items between Station and Access Point mode
+    private void setForm(boolean visible) {
+        this.wireless.setEnabled(visible);
+        this.ssid.setEnabled(visible);
+        this.buttonSsid.setEnabled(visible);
+        this.radio.setEnabled(visible);
+        this.security.setEnabled(visible);
+        this.password.setEnabled(visible);
+        this.buttonShowPassword.setEnabled(visible);
+        this.pairwise.setEnabled(visible);
+        this.group.setEnabled(visible);
+        this.bgscan.setEnabled(visible);
 
-        this.radio.setEnabled(true);
-        this.channelList.setEnabled(true);
-        loadRadioMode();
+        this.rssi.setEnabled(visible);
+        this.shortI.setEnabled(visible);
+        this.longI.setEnabled(visible);
 
-        // disable Password if security is none, or if Wifi-Enterprise is enabled
-        if (this.security.getSelectedItemText().equals(WIFI_SECURITY_NONE_MESSAGE)
-                || this.security.getSelectedItemText().equals(WIFI_SECURITY_WPA2_WPA3_ENTERPRISE_MESSAGE)) {
-            this.password.setEnabled(false);
-            this.password.setVisible(false);
-            this.passwordHelp.setVisible(false);
-            this.labelPassword.setVisible(false);
-        }
+        this.radio1.setEnabled(visible);
+        this.radio2.setEnabled(visible);
+        this.radio3.setEnabled(visible);
+        this.radio4.setEnabled(visible);
 
-        this.wireless8021xTabAnchorItem
-                .setEnabled(this.security.getSelectedItemText().equals(WIFI_SECURITY_WPA2_WPA3_ENTERPRISE_MESSAGE));
+        this.channelList.setEnabled(visible);
+        this.noChannels.setVisible(false);
 
-        loadCountryCode();
+        this.countryCode.setVisible(visible);
+        this.countryCode.setEnabled(false);
     }
 
-    private void refreshForm() {
+    private void refreshStationModeItems(String tcpip4Status, String tcpip6Status) {
+        add8021xFromSecurityDropdown();
 
-        String tcpip4Status = this.tcp4Tab.getStatus();
-        String tcpip6Status = this.tcp6Tab.getStatus();
-
-        // Tcp/IP disabled
-        if (tcpip4Status.equals(MessageUtils.get(GwtNetIfStatus.netIPv4StatusDisabled.name()))
-                && tcpip6Status.equals(MessageUtils.get(GwtNetIfStatus.netIPv6StatusDisabled.name()))) {
-            setForm(false);
-        } else {
-            setForm(true);
-
-            setSharedItemsOnWirelessForm();
-
-            if (WIFI_MODE_STATION_MESSAGE.equals(this.wireless.getSelectedItemText())) {
-
-                setStationModeItems(tcpip4Status, tcpip6Status);
-
-            } else if (WIFI_MODE_ACCESS_POINT_MESSAGE.equals(this.wireless.getSelectedItemText())) {
-
-                setAccessPointModeItems(tcpip4Status, tcpip6Status);
-
-            }
+        if (tcpip4Status.equals(IPV4_STATUS_WAN_MESSAGE) || tcpip6Status.equals(IPV4_STATUS_WAN_MESSAGE)) {
+            this.wireless.setEnabled(false);
         }
 
-        this.netTabs.updateTabs();
+        this.ssid.setEnabled(true);
+        this.buttonSsid.setEnabled(true);
+
+        this.bgscan.setEnabled(true);
+        this.bgscan.setVisible(true);
+        this.bgscanHelp.setVisible(true);
+        this.labelBgscan.setVisible(true);
+
+        enabledBgScanItems(!this.bgscan.getSelectedItemText().equals(WIFI_BGSCAN_NONE_MESSAGE));
+
+        showPairwiseItems(isWpaLikePairwiseSecurity(), false);
     }
 
-    private void reset() {
+    private void enabledBgScanItems(boolean isBgScanEnabled) {
+        this.rssi.setVisible(isBgScanEnabled);
+        this.rssiHelp.setVisible(isBgScanEnabled);
+        this.labelRssi.setVisible(isBgScanEnabled);
+        this.shortI.setVisible(isBgScanEnabled);
+        this.shortIHelp.setVisible(isBgScanEnabled);
+        this.labelShortI.setVisible(isBgScanEnabled);
+        this.longI.setVisible(isBgScanEnabled);
+        this.longIHelp.setVisible(isBgScanEnabled);
+        this.labelLongI.setVisible(isBgScanEnabled);
+    }
+
+    private void resetForm() {
 
         for (int i = 0; i < this.wireless.getItemCount(); i++) {
             if (this.wireless.getSelectedItemText().equals(WIFI_MODE_STATION_MESSAGE)) {
@@ -788,6 +828,25 @@ public class TabWirelessUi extends Composite implements NetworkTab {
             }
         }
 
+        resetSecurityItems();
+
+        for (int i = 0; i < this.group.getItemCount(); i++) {
+            if (this.group.getItemText(i).equals(WIFI_CIPHERS_CCMP_TKIP_MESSAGE)) {
+                this.group.setSelectedIndex(i);
+            }
+        }
+
+        resetBgscanItems();
+
+        this.radio2.setValue(true);
+        this.radio4.setValue(true);
+
+        if (this.selectedNetIfConfig != null) {
+            update();
+        }
+    }
+
+    private void resetSecurityItems() {
         for (int i = 0; i < this.security.getItemCount(); i++) {
             if (this.security.getItemText(i).equals(WIFI_SECURITY_WPA2_MESSAGE)) {
                 this.security.setSelectedIndex(i);
@@ -802,13 +861,9 @@ public class TabWirelessUi extends Composite implements NetworkTab {
                 this.pairwise.setSelectedIndex(i);
             }
         }
+    }
 
-        for (int i = 0; i < this.group.getItemCount(); i++) {
-            if (this.group.getItemText(i).equals(WIFI_CIPHERS_CCMP_TKIP_MESSAGE)) {
-                this.group.setSelectedIndex(i);
-            }
-        }
-
+    private void resetBgscanItems() {
         for (int i = 0; i < this.bgscan.getItemCount(); i++) {
             if (this.bgscan.getItemText(i).equals(WIFI_BGSCAN_NONE_MESSAGE)) {
                 this.bgscan.setSelectedIndex(i);
@@ -818,12 +873,6 @@ public class TabWirelessUi extends Composite implements NetworkTab {
         this.rssi.setValue("");
         this.shortI.setValue("");
         this.longI.setValue("");
-        this.radio2.setValue(true);
-        this.radio4.setValue(true);
-
-        if (this.selectedNetIfConfig != null) {
-            update();
-        }
     }
 
     private void initHelpButtons() {
@@ -848,10 +897,10 @@ public class TabWirelessUi extends Composite implements NetworkTab {
     }
 
     /*
-     * Initialize shared items between Station and Access Point mode
+     * Initialize common items between Station and Access Point mode
      */
 
-    private void initSharedItems() {
+    private void initCommonItems() {
         initWirelessModeItem();
         initNetworkNameItem();
         initRadioBandItem();
@@ -890,6 +939,13 @@ public class TabWirelessUi extends Composite implements NetworkTab {
                 TabWirelessUi.this.activeConfig = TabWirelessUi.this.selectedNetIfConfig.getAccessPointWifiConfig();
             }
             TabWirelessUi.this.netTabs.updateTabs();
+
+            // disable Password if security is none, or if Wifi-Enterprise is enabled
+            boolean shouldPasswordItemBeEnabled = !this.security.getSelectedItemText()
+                    .equals(WIFI_SECURITY_NONE_MESSAGE)
+                    && !this.security.getSelectedItemText().equals(WIFI_SECURITY_WPA2_WPA3_ENTERPRISE_MESSAGE);
+            updatePasswordItemVisibility(shouldPasswordItemBeEnabled);
+
             update();
             checkPassword();
             TabWirelessUi.this.wirelessHelp.updateHelpText();
@@ -912,28 +968,28 @@ public class TabWirelessUi extends Composite implements NetworkTab {
         this.ssid.addMouseOutHandler(event -> resetHelp());
         this.buttonSsid.addClickHandler(event -> {
             if (!TabWirelessUi.this.ssidInit) {
-                initSsid();
+                initWirelessScanSsid();
                 TabWirelessUi.this.ssidDataProvider.getList().clear();
                 TabWirelessUi.this.searching.setVisible(true);
                 TabWirelessUi.this.noSsid.setVisible(false);
                 TabWirelessUi.this.ssidGrid.setVisible(false);
                 TabWirelessUi.this.scanFail.setVisible(false);
             }
-            initModal();
-            loadSsidData(false);
+            initWirelessScanModal();
+            loadWirelessScanData(false);
         });
 
         this.buttonSsidForceUpdate.addClickHandler(event -> {
             if (!TabWirelessUi.this.ssidInit) {
-                initSsid();
+                initWirelessScanSsid();
                 TabWirelessUi.this.ssidDataProvider.getList().clear();
                 TabWirelessUi.this.searching.setVisible(true);
                 TabWirelessUi.this.noSsid.setVisible(false);
                 TabWirelessUi.this.ssidGrid.setVisible(false);
                 TabWirelessUi.this.scanFail.setVisible(false);
             }
-            initModal();
-            loadSsidData(true);
+            initWirelessScanModal();
+            loadWirelessScanData(true);
         });
     }
 
@@ -976,6 +1032,13 @@ public class TabWirelessUi extends Composite implements NetworkTab {
         this.security.addChangeHandler(event -> {
             setDirty(true);
             setPasswordValidation();
+
+            // disable Password if security is none, or if Wifi-Enterprise is enabled
+            boolean shouldPasswordItemBeEnabled = !this.security.getSelectedItemText()
+                    .equals(WIFI_SECURITY_NONE_MESSAGE)
+                    && !this.security.getSelectedItemText().equals(WIFI_SECURITY_WPA2_WPA3_ENTERPRISE_MESSAGE);
+            updatePasswordItemVisibility(shouldPasswordItemBeEnabled);
+
             refreshForm();
             checkPassword();
         });
@@ -1100,7 +1163,6 @@ public class TabWirelessUi extends Composite implements NetworkTab {
      */
 
     private void initStationModeItems() {
-
         initGroupCiphersItem();
         initBgScanItems();
         initAccessPointPingItems();
@@ -1248,6 +1310,7 @@ public class TabWirelessUi extends Composite implements NetworkTab {
     private Validator<String> newBgScanValidator(TextBox field) {
         return new Validator<String>() {
 
+            @SuppressWarnings("all") // Ignoring warning, gwt doesn't support \\d in regex
             @Override
             public List<EditorError> validate(Editor<String> editor, String value) {
                 List<EditorError> result = new ArrayList<>();
@@ -1318,31 +1381,36 @@ public class TabWirelessUi extends Composite implements NetworkTab {
         EntryClassUi.loadPasswordStrengthRequirements(passwordStrengthRequirements -> {
 
             if (getWirelessMode() != GwtWifiWirelessMode.netWifiWirelessModeAccessPoint) {
+
                 passwordStrengthRequirements.allowAnyPassword();
-            }
 
-            if (this.security != null && isWpaLikePairwiseSecurity()) {
-
-                this.password.setValidatorsFrom(Optional.empty(), passwordStrengthRequirements);
-                passwordStrengthRequirements.setPasswordMinimumLength(Math.min(passwordStrengthRequirements.getPasswordMinimumLength(), 63));
-
-                this.password
-                        .addValidator(GwtValidators.regex(REGEX_PASS_WPA, MSGS.netWifiWirelessInvalidWPAPassword()));
-
-            } else if (this.security != null && this.security.getSelectedItemText().equals(WIFI_SECURITY_WEP_MESSAGE)) {
-
-                this.password.setValidators();
-                this.password
-                        .addValidator(GwtValidators.regex(REGEX_PASS_WEP, MSGS.netWifiWirelessInvalidWEPPassword()));
             } else {
-                // Clears all validators when password is not required
-                this.password.setValidators();
+                if (this.security != null && isWpaLikePairwiseSecurity()) {
+
+                    this.password.setValidatorsFrom(Optional.empty(), passwordStrengthRequirements);
+                    passwordStrengthRequirements.setPasswordMinimumLength(
+                            Math.min(passwordStrengthRequirements.getPasswordMinimumLength(), 63));
+
+                    this.password
+                            .addValidator(
+                                    GwtValidators.regex(REGEX_PASS_WPA, MSGS.netWifiWirelessInvalidWPAPassword()));
+
+                } else if (this.security != null
+                        && this.security.getSelectedItemText().equals(WIFI_SECURITY_WEP_MESSAGE)) {
+
+                    this.password.setValidators();
+                    this.password
+                            .addValidator(
+                                    GwtValidators.regex(REGEX_PASS_WEP, MSGS.netWifiWirelessInvalidWEPPassword()));
+                } else {
+                    // Clears all validators when password is not required
+                    this.password.setValidators();
+                }
             }
         });
-
     }
 
-    private void initModal() {
+    private void initWirelessScanModal() {
         this.ssidModal.setTitle("Wireless Networks");
         this.ssidTitle.setText("Available networks in range");
         this.ssidModal.show();
@@ -1352,7 +1420,7 @@ public class TabWirelessUi extends Composite implements NetworkTab {
         this.scanFailText.setText(MSGS.netWifiAlertScanFail());
     }
 
-    private void initSsid() {
+    private void initWirelessScanSsid() {
         this.ssidInit = true;
         TextColumn<GwtWifiHotspotEntry> col1 = new TextColumn<GwtWifiHotspotEntry>() {
 
@@ -1423,10 +1491,10 @@ public class TabWirelessUi extends Composite implements NetworkTab {
 
         this.ssidGrid.setSelectionModel(this.ssidSelectionModel);
 
-        this.ssidSelectionModel.addSelectionChangeHandler(this::ssidSelectionHandler);
+        this.ssidSelectionModel.addSelectionChangeHandler(this::wirelessScanSsidSelectionHandler);
     }
 
-    private void ssidSelectionHandler(SelectionChangeEvent event) {
+    private void wirelessScanSsidSelectionHandler(SelectionChangeEvent event) {
         GwtWifiHotspotEntry wifiHotspotEntry = TabWirelessUi.this.ssidSelectionModel.getSelectedObject();
         if (wifiHotspotEntry != null) {
             int channelToSelect = getChannelIndexFromValue(wifiHotspotEntry.getChannel());
@@ -1439,18 +1507,18 @@ public class TabWirelessUi extends Composite implements NetworkTab {
                 this.activeConfig.setChannels(Collections.singletonList(wifiHotspotEntry.getChannel()));
             }
 
-            getSecurityFromSsidSelection(wifiHotspotEntry);
+            getSecurityFromWirelessScanSelection(wifiHotspotEntry);
 
-            getPairwiseCipherFromSsidSelection(wifiHotspotEntry);
+            getPairwiseCipherFromWirelessScanSelection(wifiHotspotEntry);
 
-            getGroupCipherFromSsidSelection(wifiHotspotEntry);
+            getGroupCipherFromWirelessScanSelection(wifiHotspotEntry);
 
             TabWirelessUi.this.ssidModal.hide();
 
         }
     }
 
-    private void getSecurityFromSsidSelection(GwtWifiHotspotEntry wifiHotspotEntry) {
+    private void getSecurityFromWirelessScanSelection(GwtWifiHotspotEntry wifiHotspotEntry) {
         TabWirelessUi.this.ssid.setValue(GwtSafeHtmlUtils.htmlUnescape(wifiHotspotEntry.getSSID()));
         String sec = wifiHotspotEntry.getSecurity();
         for (int i = 0; i < TabWirelessUi.this.security.getItemCount(); i++) {
@@ -1462,7 +1530,7 @@ public class TabWirelessUi extends Composite implements NetworkTab {
         }
     }
 
-    private void getPairwiseCipherFromSsidSelection(GwtWifiHotspotEntry wifiHotspotEntry) {
+    private void getPairwiseCipherFromWirelessScanSelection(GwtWifiHotspotEntry wifiHotspotEntry) {
         String pairwiseCiphers = wifiHotspotEntry.getPairwiseCiphersEnum().name();
         for (int i = 0; i < TabWirelessUi.this.pairwise.getItemCount(); i++) {
             if (MessageUtils.get(pairwiseCiphers).equals(TabWirelessUi.this.pairwise.getItemText(i))) {
@@ -1472,7 +1540,7 @@ public class TabWirelessUi extends Composite implements NetworkTab {
         }
     }
 
-    private void getGroupCipherFromSsidSelection(GwtWifiHotspotEntry wifiHotspotEntry) {
+    private void getGroupCipherFromWirelessScanSelection(GwtWifiHotspotEntry wifiHotspotEntry) {
         String groupCiphers = wifiHotspotEntry.getGroupCiphersEnum().name();
         for (int i = 0; i < TabWirelessUi.this.group.getItemCount(); i++) {
             if (MessageUtils.get(groupCiphers).equals(TabWirelessUi.this.group.getItemText(i))) {
@@ -1482,7 +1550,7 @@ public class TabWirelessUi extends Composite implements NetworkTab {
         }
     }
 
-    private void loadSsidData(boolean recompute) {
+    private void loadWirelessScanData(boolean recompute) {
         this.ssidDataProvider.getList().clear();
         this.searching.setVisible(true);
         this.noSsid.setVisible(false);
@@ -1513,36 +1581,40 @@ public class TabWirelessUi extends Composite implements NetworkTab {
 
                                 @Override
                                 public void onSuccess(List<GwtWifiHotspotEntry> result) {
-                                    TabWirelessUi.this.ssidDataProvider.getList().clear();
-                                    for (GwtWifiHotspotEntry pair : result) {
-                                        if (pair.getSecurity().equals(GwtWifiSecurity.netWifiSecurityWPA3.value())
-                                                || pair.getSecurity()
-                                                        .equals(GwtWifiSecurity.netWifiSecurityWPA2_WPA3.value())) {
-                                            if (TabWirelessUi.this.isWPA3Supported.get()) {
-                                                TabWirelessUi.this.ssidDataProvider.getList().add(pair);
-                                            }
-                                        } else {
-                                            TabWirelessUi.this.ssidDataProvider.getList().add(pair);
-                                        }
-                                    }
-                                    TabWirelessUi.this.ssidDataProvider.flush();
-                                    if (!TabWirelessUi.this.ssidDataProvider.getList().isEmpty()) {
-                                        TabWirelessUi.this.searching.setVisible(false);
-                                        TabWirelessUi.this.noSsid.setVisible(false);
-                                        int size = TabWirelessUi.this.ssidDataProvider.getList().size();
-                                        TabWirelessUi.this.ssidGrid.setVisibleRange(0, size);
-                                        TabWirelessUi.this.ssidGrid.setVisible(true);
-                                        TabWirelessUi.this.scanFail.setVisible(false);
-                                    } else {
-                                        TabWirelessUi.this.searching.setVisible(false);
-                                        TabWirelessUi.this.noSsid.setVisible(true);
-                                        TabWirelessUi.this.ssidGrid.setVisible(false);
-                                        TabWirelessUi.this.scanFail.setVisible(false);
-                                    }
+                                    fillWirelessScanDataOnSuccess(result);
                                 }
                             });
                 }
             });
+        }
+    }
+
+    private void fillWirelessScanDataOnSuccess(List<GwtWifiHotspotEntry> wirelessScanResults) {
+        TabWirelessUi.this.ssidDataProvider.getList().clear();
+        for (GwtWifiHotspotEntry pair : wirelessScanResults) {
+            if (pair.getSecurity().equals(GwtWifiSecurity.netWifiSecurityWPA3.value())
+                    || pair.getSecurity()
+                            .equals(GwtWifiSecurity.netWifiSecurityWPA2_WPA3.value())) {
+                if (TabWirelessUi.this.isWPA3Supported.get()) {
+                    TabWirelessUi.this.ssidDataProvider.getList().add(pair);
+                }
+            } else {
+                TabWirelessUi.this.ssidDataProvider.getList().add(pair);
+            }
+        }
+        TabWirelessUi.this.ssidDataProvider.flush();
+        if (!TabWirelessUi.this.ssidDataProvider.getList().isEmpty()) {
+            TabWirelessUi.this.searching.setVisible(false);
+            TabWirelessUi.this.noSsid.setVisible(false);
+            int size = TabWirelessUi.this.ssidDataProvider.getList().size();
+            TabWirelessUi.this.ssidGrid.setVisibleRange(0, size);
+            TabWirelessUi.this.ssidGrid.setVisible(true);
+            TabWirelessUi.this.scanFail.setVisible(false);
+        } else {
+            TabWirelessUi.this.searching.setVisible(false);
+            TabWirelessUi.this.noSsid.setVisible(true);
+            TabWirelessUi.this.ssidGrid.setVisible(false);
+            TabWirelessUi.this.scanFail.setVisible(false);
         }
     }
 
@@ -1561,6 +1633,7 @@ public class TabWirelessUi extends Composite implements NetworkTab {
                     return i;
                 }
             } catch (NumberFormatException automaticChannel) {
+                // skip non-integer values to avoid ui crash
             }
         }
         return -1;
@@ -1580,7 +1653,27 @@ public class TabWirelessUi extends Composite implements NetworkTab {
     private GwtWifiConfig getGwtWifiConfig() {
         GwtWifiConfig gwtWifiConfig = new GwtWifiConfig();
 
-        // mode
+        getWirelessModeFromConfig(gwtWifiConfig);
+        getSsidFromConfig(gwtWifiConfig);
+        getRadioModeFromConfig(gwtWifiConfig);
+        getSecurityFromConfig(gwtWifiConfig);
+        getGroupCiphersFromConfig(gwtWifiConfig);
+        getBgscanFromConfig(gwtWifiConfig);
+
+        // ping access point
+        gwtWifiConfig.setPingAccessPoint(this.radio1.getValue());
+
+        // ignore SSID
+        gwtWifiConfig.setIgnoreSSID(this.radio3.getValue());
+
+        // Country Code is not editable at moment.
+        gwtWifiConfig.setCountryCode(this.countryCode.getValue());
+
+        return gwtWifiConfig;
+    }
+
+    private void getWirelessModeFromConfig(GwtWifiConfig gwtWifiConfig) {
+        // Wireless Mode
         GwtWifiWirelessMode wifiMode;
         if (this.wireless.getSelectedItemText().equals(MessageUtils.get(WIFI_MODE_STATION))) {
             wifiMode = GwtWifiWirelessMode.netWifiWirelessModeStation;
@@ -1589,29 +1682,46 @@ public class TabWirelessUi extends Composite implements NetworkTab {
         }
         gwtWifiConfig.setWirelessMode(wifiMode.name());
 
-        // ssid
-        gwtWifiConfig.setWirelessSsid(GwtSafeHtmlUtils.htmlUnescape(this.ssid.getText().trim()));
-
-        // driver
+        // Driver
         String driver = "";
-        if (GwtWifiWirelessMode.netWifiWirelessModeAccessPoint.equals(wifiMode)) {
-            driver = this.selectedNetIfConfig.getAccessPointWifiConfig().getDriver();
-        } else if (GwtWifiWirelessMode.netWifiWirelessModeAdHoc.equals(wifiMode)) {
-            driver = this.selectedNetIfConfig.getAdhocWifiConfig().getDriver();
-        } else if (GwtWifiWirelessMode.netWifiWirelessModeStation.equals(wifiMode)) {
-            driver = this.selectedNetIfConfig.getStationWifiConfig().getDriver();
-        }
-        gwtWifiConfig.setDriver(driver); // use previous value
+        switch (wifiMode) {
+            case netWifiWirelessModeAccessPoint: {
+                driver = this.selectedNetIfConfig.getAccessPointWifiConfig().getDriver();
+                break;
+            }
 
-        // radio mode
+            case netWifiWirelessModeAdHoc: {
+                driver = this.selectedNetIfConfig.getAdhocWifiConfig().getDriver();
+                break;
+            }
+
+            case netWifiWirelessModeStation: {
+                driver = this.selectedNetIfConfig.getStationWifiConfig().getDriver();
+                break;
+            }
+
+            default:
+                break;
+        }
+
+        gwtWifiConfig.setDriver(driver); // use previous value
+    }
+
+    private void getSsidFromConfig(GwtWifiConfig gwtWifiConfig) {
+        gwtWifiConfig.setWirelessSsid(GwtSafeHtmlUtils.htmlUnescape(this.ssid.getText().trim()));
+    }
+
+    private void getRadioModeFromConfig(GwtWifiConfig gwtWifiConfig) {
         String radioValue = this.radio.getSelectedValue();
 
         gwtWifiConfig.setRadioMode(radioValueToRadioMode(radioValue).name());
 
         gwtWifiConfig
                 .setChannels(Collections.singletonList(getChannelValueByIndex(this.channelList.getSelectedIndex())));
+    }
 
-        // security
+    private void getSecurityFromConfig(GwtWifiConfig gwtWifiConfig) {
+        // Security Type
         String secValue = this.security.getSelectedItemText();
         for (GwtWifiSecurity sec : GwtWifiSecurity.values()) {
             if (MessageUtils.get(sec.name()).equals(secValue)) {
@@ -1627,15 +1737,22 @@ public class TabWirelessUi extends Composite implements NetworkTab {
             }
         }
 
-        // Group Ciphers value
+        // Password
+        if (this.groupPassword.getValidationState().equals(ValidationState.NONE)) {
+            gwtWifiConfig.setPassword(this.password.getText());
+        }
+    }
+
+    private void getGroupCiphersFromConfig(GwtWifiConfig gwtWifiConfig) {
         String groupCiphersValue = this.group.getSelectedItemText();
         for (GwtWifiCiphers ciphers : GwtWifiCiphers.values()) {
             if (MessageUtils.get(ciphers.name()).equals(groupCiphersValue)) {
                 gwtWifiConfig.setGroupCiphers(ciphers.name());
             }
         }
+    }
 
-        // bgscan
+    private void getBgscanFromConfig(GwtWifiConfig gwtWifiConfig) {
         String bgscanModuleValue = this.bgscan.getSelectedItemText();
         for (GwtWifiBgscanModule module : GwtWifiBgscanModule.values()) {
             if (MessageUtils.get(module.name()).equals(bgscanModuleValue)) {
@@ -1661,22 +1778,6 @@ public class TabWirelessUi extends Composite implements NetworkTab {
         } else {
             gwtWifiConfig.setBgscanLongInterval(0);
         }
-
-        // password
-        if (this.groupPassword.getValidationState().equals(ValidationState.NONE)) {
-            gwtWifiConfig.setPassword(this.password.getText());
-        }
-
-        // ping access point
-        gwtWifiConfig.setPingAccessPoint(this.radio1.getValue());
-
-        // ignore SSID
-        gwtWifiConfig.setIgnoreSSID(this.radio3.getValue());
-
-        // Country Code is not editable at moment.
-        gwtWifiConfig.setCountryCode(this.countryCode.getValue());
-
-        return gwtWifiConfig;
     }
 
     private GwtWifiRadioMode radioValueToRadioMode(String radioValue) {
@@ -1691,34 +1792,6 @@ public class TabWirelessUi extends Composite implements NetworkTab {
         return GwtWifiRadioMode.netWifiRadioModeBGN;
     }
 
-    private void setForm(boolean visible) {
-        this.wireless.setEnabled(visible);
-        this.ssid.setEnabled(visible);
-        this.buttonSsid.setEnabled(visible);
-        this.radio.setEnabled(visible);
-        this.security.setEnabled(visible);
-        this.password.setEnabled(visible);
-        this.buttonShowPassword.setEnabled(visible);
-        this.pairwise.setEnabled(visible);
-        this.group.setEnabled(visible);
-        this.bgscan.setEnabled(visible);
-
-        this.rssi.setEnabled(visible);
-        this.shortI.setEnabled(visible);
-        this.longI.setEnabled(visible);
-
-        this.radio1.setEnabled(visible);
-        this.radio2.setEnabled(visible);
-        this.radio3.setEnabled(visible);
-        this.radio4.setEnabled(visible);
-
-        this.channelList.setEnabled(visible);
-        this.noChannels.setVisible(false);
-
-        this.countryCode.setVisible(visible);
-        this.countryCode.setEnabled(false);
-    }
-
     private boolean checkPassword() {
         boolean result = true;
 
@@ -1731,7 +1804,6 @@ public class TabWirelessUi extends Composite implements NetworkTab {
         }
         return result;
     }
-
 
     private void updateChannelListValues(List<GwtWifiChannelFrequency> freqChannels) {
 
