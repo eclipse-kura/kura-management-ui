@@ -1973,7 +1973,7 @@ public class TabWirelessUi extends Composite implements NetworkTab {
 
     }
 
-    private void fillRadioMode() {
+    private void fillRadioMode(boolean acSupported) {
         this.radio.addItem(WIFI_BAND_2GHZ_MESSAGE, WIFI_RADIO_BG);
         this.radio.addItem(WIFI_BAND_5GHZ_MESSAGE, WIFI_RADIO_A);
         this.radio.addItem(WIFI_BAND_BOTH_MESSAGE, WIFI_RADIO_BGN);
