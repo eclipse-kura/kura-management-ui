@@ -574,7 +574,7 @@ public class TabWirelessUi extends Composite implements NetworkTab {
     }
 
     private void setCurrentGroupCiphersValues() {
-        String activeGroupCiphers = this.activeConfig.getPairwiseCiphers();
+        String activeGroupCiphers = this.activeConfig.getGroupCiphers();
         if (activeGroupCiphers != null) {
             for (int i = 0; i < this.group.getItemCount(); i++) {
                 if (this.group.getItemText(i).equals(MessageUtils.get(activeGroupCiphers))) { // activeConfig.getGroupCiphers()
