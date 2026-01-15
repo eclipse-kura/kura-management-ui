@@ -165,6 +165,7 @@ public class GwtNetworkServiceImpl extends OsgiRemoteServiceServlet implements G
         checkXSRFToken(xsrfToken);
 
         logger.debug("Method isIEEE80211ACSupported not implemented yet. Returning true.");
+        return true;
     }
 
     @Override
