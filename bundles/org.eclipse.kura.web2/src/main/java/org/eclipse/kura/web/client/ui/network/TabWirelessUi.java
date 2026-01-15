@@ -964,7 +964,6 @@ public class TabWirelessUi extends Composite implements NetworkTab {
             updatePasswordItemVisibility();
 
             update();
-            checkPassword();
             TabWirelessUi.this.wirelessHelp.updateHelpText();
         });
     }
@@ -1394,7 +1393,8 @@ public class TabWirelessUi extends Composite implements NetworkTab {
 
             if (getWirelessMode() != GwtWifiWirelessMode.netWifiWirelessModeAccessPoint) {
 
-                passwordStrengthRequirements.allowAnyPassword();
+                this.password.setValidators();
+                checkPassword();
                 return;
 
             }
@@ -1420,6 +1420,8 @@ public class TabWirelessUi extends Composite implements NetworkTab {
                 // Clears all validators when password is not required
                 this.password.setValidators();
             }
+
+            checkPassword();
         });
     }
 
@@ -1808,6 +1810,9 @@ public class TabWirelessUi extends Composite implements NetworkTab {
     private boolean checkPassword() {
         boolean result = true;
 
+        if(this.password != null) {
+            this.groupPassword.setValidationState(ValidationState.NONE);
+        }
         if (this.password != null && this.password.isVisible() && this.password.isEnabled()
                 && !this.password.validate()) {
             this.groupPassword.setValidationState(ValidationState.ERROR);
