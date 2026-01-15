@@ -1909,7 +1909,7 @@ public class TabWirelessUi extends Composite implements NetworkTab {
             public void onSuccess(GwtXSRFToken token) {
 
                 TabWirelessUi.this.gwtNetworkService.isIEEE80211ACSupported(token,
-                        TabWirelessUi.this.selectedNetIfConfig.getName(), new AsyncCallback<Void>() {
+                        TabWirelessUi.this.selectedNetIfConfig.getName(), new AsyncCallback<Boolean>() {
 
                             @Override
                             public void onFailure(Throwable caught) {
@@ -1917,7 +1917,7 @@ public class TabWirelessUi extends Composite implements NetworkTab {
                             }
 
                             @Override
-                            public void onSuccess(Void result) {
+                            public void onSuccess(Boolean acSupported) {
 
                                 String selectedRadioMode = TabWirelessUi.this.radio.getSelectedValue() != null
                                         ? TabWirelessUi.this.radio.getSelectedValue()
@@ -1925,7 +1925,7 @@ public class TabWirelessUi extends Composite implements NetworkTab {
 
                                 TabWirelessUi.this.radio.clear();
 
-                                fillRadioMode();
+                                fillRadioMode(acSupported);
 
                                 if (selectedRadioMode != null) {
                                     setRadioModeByValue(selectedRadioMode);

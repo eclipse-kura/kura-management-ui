@@ -161,7 +161,7 @@ public class GwtNetworkServiceImpl extends OsgiRemoteServiceServlet implements G
     }
 
     @Override
-    public void isIEEE80211ACSupported(GwtXSRFToken xsrfToken, String ifaceName) throws GwtKuraException {
+    public boolean isIEEE80211ACSupported(GwtXSRFToken xsrfToken, String ifaceName) throws GwtKuraException {
         checkXSRFToken(xsrfToken);
 
         logger.debug("Method isIEEE80211ACSupported not implemented yet. Returning true.");
