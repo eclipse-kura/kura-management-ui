@@ -90,8 +90,8 @@ public class GwtDeviceServiceImpl extends OsgiRemoteServiceServlet implements Gw
                     formatUptime(Long.parseLong(systemAdminService.getUptime()))));
             pairs.add(new GwtGroupedNVPair(DEV_INFO, "devLastWifiChannel",
                     String.valueOf(systemService.getKuraWifiTopChannel())));
-            pairs.add(new GwtGroupedNVPair(DEV_INFO, "devInternetAvailable",
-                    String.valueOf(systemService.isInternetAvailable())));
+            pairs.add(new GwtGroupedNVPair(DEV_INFO, "devInternetConnectionStatus",
+                    systemService.getInternetConnectionStatus().toString()));
 
             pairs.add(new GwtGroupedNVPair(DEV_HW, "devModelName", systemService.getModelName()));
             pairs.add(new GwtGroupedNVPair(DEV_HW, "devModelId", systemService.getModelId()));
