@@ -173,10 +173,10 @@ public abstract class SnapshotSelectorModal extends Composite {
 
     /*
      * Use it to show again the modal without resetting it. It can be used when the user does not confirm the advanced
-     * mode confirmation alert to recover the modal previously hidden.
+     * mode confirmation alert to recover the modal previously hidden. Should be overriden if needed.
      */
 
-    public void recoverAndShowMainModal() {
+    protected void recoverAndShowMainModal() {
         this.snapshotModal.show();
     }
 
