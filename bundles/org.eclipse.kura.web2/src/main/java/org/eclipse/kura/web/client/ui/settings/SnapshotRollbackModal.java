@@ -46,15 +46,7 @@ public class SnapshotRollbackModal extends SnapshotSelectorModal {
 
         clearClickHandlers();
 
-        this.cancelButton = new SnapshotSelectorActionButton(MSGS.cancelButton(), FONT_AWESOME_STYLE_NAME,
-                ButtonType.PRIMARY, e -> hideAndReset());
-
-        this.rollbackOrNextButton = new SnapshotSelectorActionButton(MSGS.rollback(), FONT_AWESOME_STYLE_NAME,
-                ButtonType.PRIMARY,
-                e -> onRollbackOrNextClick(getSelectedSnapshot(), getSelectedPidsList(), getAdvancedModeValue()));
-
-        addFooterButton(this.cancelButton);
-        addFooterButton(this.rollbackOrNextButton);
+        setupFooterButtons();
 
         setModalTitleDescriptionAndHints(MSGS.deviceSnapshotRollbackTitle(), MSGS.deviceSnapshotRollbackConfirm(),
                 MSGS.deviceSnapshotRollbackHint());
@@ -62,6 +54,16 @@ public class SnapshotRollbackModal extends SnapshotSelectorModal {
         setAdvancedModePanelVisible(true);
 
         setAdvancedModeClickHandler(this::onAdvancedModeClick);
+    }
+
+    @Override
+    protected void recoverAndShowMainModal() {
+        
+        this.snapshotFooter.clear();
+        
+        setupFooterButtons();
+
+        super.recoverAndShowMainModal(); // o this.snapshotModal.show()
     }
 
     /*
@@ -192,5 +194,17 @@ public class SnapshotRollbackModal extends SnapshotSelectorModal {
             this.advancedModeClickHandler.removeHandler();
         }
 
+    }
+
+    private void setupFooterButtons() {
+        this.cancelButton = new SnapshotSelectorActionButton(MSGS.cancelButton(), FONT_AWESOME_STYLE_NAME,
+                ButtonType.PRIMARY, e -> hideAndReset());
+
+        this.rollbackOrNextButton = new SnapshotSelectorActionButton(MSGS.rollback(), FONT_AWESOME_STYLE_NAME,
+                ButtonType.PRIMARY,
+                e -> onRollbackOrNextClick(getSelectedSnapshot(), getSelectedPidsList(), getAdvancedModeValue()));
+
+        addFooterButton(this.cancelButton);
+        addFooterButton(this.rollbackOrNextButton);
     }
 }
