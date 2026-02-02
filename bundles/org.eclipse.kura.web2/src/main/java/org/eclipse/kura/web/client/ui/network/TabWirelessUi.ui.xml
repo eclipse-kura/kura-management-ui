@@ -107,10 +107,8 @@
                                 <util:HelpButton ui:field="passwordHelp"/>
                                 <b:HelpBlock color="red"
                                     ui:field="helpPassword" />
-                                <kura:NewPasswordInput type="PASSWORD" b:id="password"
-                                    ui:field="password" allowPlaceholder="true"/>
-                                <b:Button ui:field="buttonShowPassword"
-                                        icon="EYE" iconFixedWidth="true" />
+                                <kura:NewPasswordInputForm b:id="passwordInputForm"
+                                    ui:field="passwordInputForm"/>
                             </b:FormGroup>
 
                             <b:FormGroup>

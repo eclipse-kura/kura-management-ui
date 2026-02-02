@@ -274,22 +274,23 @@ public class UserConfigUi extends Composite {
             this.picker.builder() //
                     .setTitle(MSGS.usersSetPassword()) //
                     .setMessage(MSGS.usersDefineNewPassword()) //
-                    .setInputCustomizer(input -> input.setType(InputType.PASSWORD)) //
+                    .setPasswordInputCustomizer(input -> input.setInputPasswordType(InputType.PASSWORD)) //
                     .setOnCancel(onDismiss) //
                     .setValidators(GwtValidators.newPassword(Optional.of(this.userData.getUserName()), //
                             passwordStrengthRequirements)) //
                     .setOnPick(newPassword -> this.picker.builder() //
                             .setTitle(MSGS.usersConfirmPassword()) //
                             .setMessage(MSGS.usersRepeatPassword()) //
-                            .setInputCustomizer(input -> input.setType(InputType.PASSWORD)) //
+                            .setPasswordInputCustomizer(input -> input.setInputPasswordType(InputType.PASSWORD)) //
                             .setOnCancel(onDismiss) //
                             .setValidators(Collections.singletonList(GwtValidators
-                                    .predicate(confirm -> newPassword.equals(confirm), MSGS.usersPasswordMismatch()))) //
+                                    .predicate(
+                                            newPassword::equals, MSGS.usersPasswordMismatch()))) //
                             .setOnPick(p -> {
                                 this.userData.setNewPassword(Optional.of(p));
                                 this.listener.onUserDataChanged(this.userData);
-                            }).pick())
-                    .pick();
+                            }).pick(true))
+                    .pick(true);
         });
 
     }

@@ -177,7 +177,7 @@ public class UsersPanelUi extends Composite implements Tab, UserConfigUi.Listene
                                     this.dataProvider.getList().add(userConfig);
                                     setDirty(true);
                                 }))))))
-                .pick());
+                .pick(false));
 
         this.delete.addClickHandler(e -> this.alertDialog.show(MSGS.usersConfirmDeleteIdentity(), () -> {
             this.dataProvider.getList().remove(this.selectionModel.getSelectedObject());
