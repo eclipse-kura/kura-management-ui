@@ -182,7 +182,7 @@ public class Picker extends Composite implements HasId {
             return result;
         }
 
-        public void pick(boolean isPasswordInput) {
+        public void pick(Class<?> inputType) {
             requireNonNull(this.provider, "provider cannot be null");
             requireNonNull(this.validators, "validators cannot be null");
             requireNonNull(this.consumer, "onPick cannot be null");
@@ -196,10 +196,13 @@ public class Picker extends Composite implements HasId {
                 Picker.this.label.setText("");
             }
 
-            if (isPasswordInput) {
+            if (inputType == NewPasswordInputForm.class) {
                 pickNewPasswordInput();
-            } else {
+            } else if (inputType == Input.class) {
                 pickInput();
+            } else {
+                throw new IllegalArgumentException("Supported input types are Input and NewPasswordInputForm, but was "
+                        + inputType.getName());
             }
 
             Picker.this.modal.show();

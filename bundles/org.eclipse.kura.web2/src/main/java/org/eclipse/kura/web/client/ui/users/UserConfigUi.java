@@ -22,6 +22,7 @@ import org.eclipse.kura.web.client.configuration.HasConfiguration;
 import org.eclipse.kura.web.client.messages.Messages;
 import org.eclipse.kura.web.client.ui.ConfigurableComponentUi;
 import org.eclipse.kura.web.client.ui.EntryClassUi;
+import org.eclipse.kura.web.client.ui.NewPasswordInputForm;
 import org.eclipse.kura.web.client.ui.Picker;
 import org.eclipse.kura.web.client.ui.drivers.assets.BooleanInputCell;
 import org.eclipse.kura.web.client.ui.validator.GwtValidators;
@@ -288,8 +289,8 @@ public class UserConfigUi extends Composite {
                             .setOnPick(p -> {
                                 this.userData.setNewPassword(Optional.of(p));
                                 this.listener.onUserDataChanged(this.userData);
-                            }).pick(true))
-                    .pick(true);
+                            }).pick(NewPasswordInputForm.class)) //
+                    .pick(NewPasswordInputForm.class);
         });
 
     }

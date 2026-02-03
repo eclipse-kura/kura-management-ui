@@ -1095,6 +1095,7 @@ public class TabWirelessUi extends Composite implements NetworkTab {
                     && TabWirelessUi.this.passwordInputForm.getInputPasswordText().equals(PLACEHOLDER)) {
                 TabWirelessUi.this.passwordInputForm.setInputPasswordText("");
                 this.passwordInputForm.validateInputPassword();
+                this.passwordInputForm.setShowPasswordButtonEnabled(true);
             }
         });
 
