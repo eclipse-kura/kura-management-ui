@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2020, 2025 Eurotech and/or its affiliates and others
+ * Copyright (c) 2020, 2026 Eurotech and/or its affiliates and others
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -284,8 +284,7 @@ public class UserConfigUi extends Composite {
                             .setPasswordInputCustomizer(input -> input.setInputPasswordType(InputType.PASSWORD)) //
                             .setOnCancel(onDismiss) //
                             .setValidators(Collections.singletonList(GwtValidators
-                                    .predicate(
-                                            newPassword::equals, MSGS.usersPasswordMismatch()))) //
+                                    .predicate(newPassword::equals, MSGS.usersPasswordMismatch()))) //
                             .setOnPick(p -> {
                                 this.userData.setNewPassword(Optional.of(p));
                                 this.listener.onUserDataChanged(this.userData);

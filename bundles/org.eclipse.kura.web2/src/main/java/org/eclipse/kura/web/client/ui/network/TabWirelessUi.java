@@ -1079,11 +1079,11 @@ public class TabWirelessUi extends Composite implements NetworkTab {
             }
         });
 
-        this.passwordInputForm.setInputPasswordBlurHandler(e -> this.passwordInputForm.validateInputPassword());
+        this.passwordInputForm.setInputPasswordBlurHandler(handler -> this.passwordInputForm.validateInputPassword());
         this.passwordInputForm.setInputPasswordAllowBlank(true);
-        this.passwordInputForm.setInputPasswordMouseOutHandler(event -> resetHelp());
+        this.passwordInputForm.setInputPasswordMouseOutHandler(handler -> resetHelp());
 
-        this.passwordInputForm.setInputPasswordKeyUpHandler(event -> this.passwordInputForm.validateInputPassword());
+        this.passwordInputForm.setInputPasswordKeyUpHandler(handler -> this.passwordInputForm.validateInputPassword());
         this.passwordInputForm.setInputPasswordChangeHandler(handler -> {
             refreshForm();
             checkPassword();
@@ -1101,7 +1101,7 @@ public class TabWirelessUi extends Composite implements NetworkTab {
         // Show Password button
         updatePasswordItemVisibility();
 
-        this.passwordInputForm.setShowPasswordButtonMouseOverHandler(event -> {
+        this.passwordInputForm.setShowPasswordButtonMouseOverHandler(handler -> {
             TabWirelessUi.this.helpText.clear();
             TabWirelessUi.this.helpText.add(new Span(MSGS.netWifiToolTipShowButtonPassword()));
         });
