@@ -226,7 +226,7 @@ public class Picker extends Composite implements HasId {
         private void pickNewPasswordInput() {
             final NewPasswordInputForm inputForm = initNewPasswordInput();
 
-            final State<U> localState = new State<>(inputForm, provider, validators, consumer,
+            final State<U> localState = new State<>(inputForm, this.provider, this.validators, this.consumer,
                     this.onCancel.orElse(() -> {
                     }));
 

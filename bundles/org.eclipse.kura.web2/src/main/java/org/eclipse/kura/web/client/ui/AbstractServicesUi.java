@@ -390,7 +390,6 @@ public abstract class AbstractServicesUi extends Composite {
         }
 
         final NewPasswordInputForm input = new NewPasswordInputForm();
-        input.setInputPasswordText(param.getValue());
         input.setShowPasswordButtonEnabled(!PLACEHOLDER.equals(input.getInputPasswordText()));
         input.setInputPasswordClickHandler(handler -> {
             if (input.isInputPasswordEnabled()
