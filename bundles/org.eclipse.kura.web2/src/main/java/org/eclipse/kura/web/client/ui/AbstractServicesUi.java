@@ -390,7 +390,15 @@ public abstract class AbstractServicesUi extends Composite {
         }
 
         final NewPasswordInputForm input = new NewPasswordInputForm();
+
+        if (param.getValue() != null) {
+            input.setInputPasswordText(param.getValue());
+        } else {
+            input.setInputPasswordText("");
+        }
+        
         input.setShowPasswordButtonEnabled(!PLACEHOLDER.equals(input.getInputPasswordText()));
+        
         input.setInputPasswordClickHandler(handler -> {
             if (input.isInputPasswordEnabled()
                     && input.getInputPasswordText().equals(PLACEHOLDER)) {
@@ -399,11 +407,6 @@ public abstract class AbstractServicesUi extends Composite {
                 input.setShowPasswordButtonEnabled(true);
             }
         });
-        if (param.getValue() != null) {
-            input.setInputPasswordText(param.getValue());
-        } else {
-            input.setInputPasswordText("");
-        }
 
         if (param.getMin() != null && param.getMin().equals(param.getMax())) {
             input.setInputPasswordReadOnly(true);
