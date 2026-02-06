@@ -23,7 +23,7 @@ import java.util.logging.Logger;
 import org.eclipse.kura.system.SystemService;
 import org.eclipse.kura.web.client.messages.Messages;
 import org.eclipse.kura.web.client.ui.EntryClassUi;
-import org.eclipse.kura.web.client.ui.NewPasswordInput;
+import org.eclipse.kura.web.client.ui.NewPasswordInputForm;
 import org.eclipse.kura.web.client.ui.validator.GwtValidators;
 import org.eclipse.kura.web.client.util.FailureHandler;
 import org.eclipse.kura.web.client.util.HelpButton;
@@ -244,7 +244,7 @@ public class TabWirelessUi extends Composite implements NetworkTab {
     TextBox longI;
 
     @UiField
-    NewPasswordInput password;
+    NewPasswordInputForm passwordInputForm;
 
     @UiField
     TextBox rssi;
@@ -260,9 +260,6 @@ public class TabWirelessUi extends Composite implements NetworkTab {
 
     @UiField
     Button buttonSsid;
-
-    @UiField
-    Button buttonShowPassword;
 
     @UiField
     FormGroup groupRssi;
@@ -400,7 +397,7 @@ public class TabWirelessUi extends Composite implements NetworkTab {
         }
     }
 
-    @UiHandler(value = { "wireless", "ssid", "radio", "security", "password", "pairwise", "group", "bgscan",
+    @UiHandler(value = { "wireless", "ssid", "radio", "security", "passwordInputForm", "pairwise", "group", "bgscan",
             "longI", "shortI", "radio1", "radio2", "radio3", "radio4", "rssi", "channelList", "countryCode" })
     public void onChange(ChangeEvent e) {
         setDirty(true);
@@ -560,7 +557,7 @@ public class TabWirelessUi extends Composite implements NetworkTab {
             }
         }
 
-        this.password.setValue(this.activeConfig.getPassword());
+        this.passwordInputForm.setInputPasswordValue(this.activeConfig.getPassword());
 
         String activePairwiseCiphers = this.activeConfig.getPairwiseCiphers();
         if (activePairwiseCiphers != null) {
@@ -648,24 +645,24 @@ public class TabWirelessUi extends Composite implements NetworkTab {
 
         this.groupPassword.setValidationState(ValidationState.NONE);
         if (shouldPasswordItemBeEnabled) {
-            this.password.setType(InputType.PASSWORD);
-            this.buttonShowPassword.setIcon(IconType.EYE);
-            this.buttonShowPassword.setEnabled(!PLACEHOLDER.equals(TabWirelessUi.this.password.getText()));
-            this.buttonShowPassword.setVisible(true);
-            this.password.setEnabled(true);
-            this.password.setVisible(true);
+            this.passwordInputForm.setInputPasswordType(InputType.PASSWORD);
+            this.passwordInputForm.setShowPasswordButtonIcon(IconType.EYE);
+            this.passwordInputForm.setShowPasswordButtonEnabled(!PLACEHOLDER.equals(this.passwordInputForm.getInputPasswordText()));
+            this.passwordInputForm.setShowPasswordButtonVisible(true);
+            this.passwordInputForm.setInputPasswordEnabled(true);
+            this.passwordInputForm.setInputPasswordVisible(true);
             this.passwordHelp.setVisible(true);
             this.labelPassword.setVisible(true);
 
         } else {
-            this.password.setEnabled(false);
-            this.password.setVisible(false);
+            this.passwordInputForm.setInputPasswordEnabled(false);
+            this.passwordInputForm.setInputPasswordVisible(false);
             this.passwordHelp.setVisible(false);
             this.labelPassword.setVisible(false);
-            this.buttonShowPassword.setEnabled(false);
-            this.buttonShowPassword.setVisible(false);
+            this.passwordInputForm.setShowPasswordButtonEnabled(false);
+            this.passwordInputForm.setShowPasswordButtonVisible(false);
             // Clear password validators and errors when hidden
-            this.password.setValidators();
+            this.passwordInputForm.setInputPasswordValidators();
             this.helpPassword.setText("");
         }
     }
@@ -875,7 +872,7 @@ public class TabWirelessUi extends Composite implements NetworkTab {
             }
         }
 
-        this.password.setText("");
+        this.passwordInputForm.setInputPasswordText("");
 
         for (int i = 0; i < this.pairwise.getItemCount(); i++) {
             if (this.pairwise.getItemText(i).equals(WIFI_CIPHERS_CCMP_TKIP_MESSAGE)) {
@@ -1075,48 +1072,37 @@ public class TabWirelessUi extends Composite implements NetworkTab {
 
     private void initPasswordItem() {
         this.labelPassword.setText(MSGS.netWifiWirelessPassword());
-        this.password.addMouseOverHandler(event -> {
-            if (TabWirelessUi.this.password.isEnabled()) {
+        this.passwordInputForm.setInputPasswordMouseOverHandler(handler -> {
+            if (TabWirelessUi.this.passwordInputForm.isInputPasswordEnabled()) {
                 TabWirelessUi.this.helpText.clear();
                 TabWirelessUi.this.helpText.add(new Span(MSGS.netWifiToolTipPassword()));
             }
         });
 
-        this.password.addBlurHandler(e -> this.password.validate());
-        this.password.setAllowBlank(true);
-        this.password.addMouseOutHandler(event -> resetHelp());
+        this.passwordInputForm.setInputPasswordBlurHandler(handler -> this.passwordInputForm.validateInputPassword());
+        this.passwordInputForm.setInputPasswordAllowBlank(true);
+        this.passwordInputForm.setInputPasswordMouseOutHandler(handler -> resetHelp());
 
-        this.password.addKeyUpHandler(event -> this.password.validate());
-        this.password.addChangeHandler(event -> {
+        this.passwordInputForm.setInputPasswordKeyUpHandler(handler -> this.passwordInputForm.validateInputPassword());
+        this.passwordInputForm.setInputPasswordChangeHandler(handler -> {
             refreshForm();
             checkPassword();
         });
 
-        this.password.setType(InputType.PASSWORD);
-        this.password.addClickHandler(event -> {
-            if (TabWirelessUi.this.password.isEnabled()
-                    && TabWirelessUi.this.password.getText().equals(PLACEHOLDER)) {
-                TabWirelessUi.this.password.setText("");
-                this.password.validate();
+        this.passwordInputForm.setInputPasswordType(InputType.PASSWORD);
+        this.passwordInputForm.setInputPasswordClickHandler(handler -> {
+            if (TabWirelessUi.this.passwordInputForm.isInputPasswordEnabled()
+                    && TabWirelessUi.this.passwordInputForm.getInputPasswordText().equals(PLACEHOLDER)) {
+                TabWirelessUi.this.passwordInputForm.setInputPasswordText("");
+                this.passwordInputForm.validateInputPassword();
+                this.passwordInputForm.setShowPasswordButtonEnabled(true);
             }
         });
 
         // Show Password button
         updatePasswordItemVisibility();
 
-        this.buttonShowPassword.addClickHandler(event -> {
-            if (TabWirelessUi.this.buttonShowPassword.isEnabled()) {
-                if (this.password.getType().equals(InputType.PASSWORD)) {
-                    TabWirelessUi.this.password.setType(InputType.TEXT);
-                    TabWirelessUi.this.buttonShowPassword.setIcon(IconType.EYE_SLASH);
-                } else {
-                    TabWirelessUi.this.password.setType(InputType.PASSWORD);
-                    TabWirelessUi.this.buttonShowPassword.setIcon(IconType.EYE);
-                }
-            }
-        });
-
-        this.buttonShowPassword.addMouseOverHandler(event -> {
+        this.passwordInputForm.setShowPasswordButtonMouseOverHandler(handler -> {
             TabWirelessUi.this.helpText.clear();
             TabWirelessUi.this.helpText.add(new Span(MSGS.netWifiToolTipShowButtonPassword()));
         });
@@ -1393,7 +1379,7 @@ public class TabWirelessUi extends Composite implements NetworkTab {
 
             if (getWirelessMode() != GwtWifiWirelessMode.netWifiWirelessModeAccessPoint) {
 
-                this.password.setValidators();
+                this.passwordInputForm.setInputPasswordValidators();
                 checkPassword();
                 return;
 
@@ -1401,24 +1387,23 @@ public class TabWirelessUi extends Composite implements NetworkTab {
 
             if (this.security != null && isWpaLikePairwiseSecurity()) {
 
-                this.password.setValidatorsFrom(Optional.empty(), passwordStrengthRequirements);
+                this.passwordInputForm.setInputPasswordValidatorsFrom(Optional.empty(), passwordStrengthRequirements);
                 passwordStrengthRequirements.setPasswordMinimumLength(
                         Math.min(passwordStrengthRequirements.getPasswordMinimumLength(), 63));
 
-                this.password
-                        .addValidator(
-                                GwtValidators.regex(REGEX_PASS_WPA, MSGS.netWifiWirelessInvalidWPAPassword()));
+                this.passwordInputForm.addInputPasswordValidator(
+                        GwtValidators.regex(REGEX_PASS_WPA, MSGS.netWifiWirelessInvalidWPAPassword()));
 
             } else if (this.security != null
                     && this.security.getSelectedItemText().equals(WIFI_SECURITY_WEP_MESSAGE)) {
 
-                this.password.setValidators();
-                this.password
-                        .addValidator(
+                this.passwordInputForm.setInputPasswordValidators();
+                this.passwordInputForm
+                        .addInputPasswordValidator(
                                 GwtValidators.regex(REGEX_PASS_WEP, MSGS.netWifiWirelessInvalidWEPPassword()));
             } else {
                 // Clears all validators when password is not required
-                this.password.setValidators();
+                this.passwordInputForm.setInputPasswordValidators();
             }
 
             checkPassword();
@@ -1754,7 +1739,7 @@ public class TabWirelessUi extends Composite implements NetworkTab {
 
         // Password
         if (this.groupPassword.getValidationState().equals(ValidationState.NONE)) {
-            gwtWifiConfig.setPassword(this.password.getText());
+            gwtWifiConfig.setPassword(this.passwordInputForm.getInputPasswordText());
         }
     }
 
@@ -1810,11 +1795,12 @@ public class TabWirelessUi extends Composite implements NetworkTab {
     private boolean checkPassword() {
         boolean result = true;
 
-        if(this.password != null) {
+        if (this.passwordInputForm != null) {
             this.groupPassword.setValidationState(ValidationState.NONE);
         }
-        if (this.password != null && this.password.isVisible() && this.password.isEnabled()
-                && !this.password.validate()) {
+        if (this.passwordInputForm != null && this.passwordInputForm.isInputPasswordVisible()
+                && this.passwordInputForm.isInputPasswordEnabled()
+                && !this.passwordInputForm.validateInputPassword()) {
             this.groupPassword.setValidationState(ValidationState.ERROR);
             result = false;
         } else {

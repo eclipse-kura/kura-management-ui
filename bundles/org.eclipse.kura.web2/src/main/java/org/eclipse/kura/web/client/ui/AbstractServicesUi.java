@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2016, 2021 Eurotech and/or its affiliates and others
+ * Copyright (c) 2016, 2026 Eurotech and/or its affiliates and others
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -49,7 +49,6 @@ import org.gwtbootstrap3.client.ui.TextArea;
 import org.gwtbootstrap3.client.ui.TextBox;
 import org.gwtbootstrap3.client.ui.base.TextBoxBase;
 import org.gwtbootstrap3.client.ui.constants.IconType;
-import org.gwtbootstrap3.client.ui.constants.InputType;
 import org.gwtbootstrap3.client.ui.constants.Toggle;
 import org.gwtbootstrap3.client.ui.constants.ValidationState;
 import org.gwtbootstrap3.client.ui.form.error.BasicEditorError;
@@ -66,8 +65,10 @@ public abstract class AbstractServicesUi extends Composite {
 
     private static final String TARGET_SUFFIX = ".target";
 
-    protected static final Logger logger = Logger.getLogger(ServicesUi.class.getSimpleName());
+    protected static final Logger logger = Logger.getLogger(AbstractServicesUi.class.getSimpleName());
     protected static final Logger errorLogger = Logger.getLogger("ErrorLogger");
+
+    private static final String PLACEHOLDER = "Placeholder";
 
     protected static final Messages MSGS = GWT.create(Messages.class);
     protected static final LabelComparator<String> DROPDOWN_LABEL_COMPARATOR = new LabelComparator<>();
@@ -388,31 +389,42 @@ public abstract class AbstractServicesUi extends Composite {
             }
         }
 
-        final Input input = new Input();
-        input.setType(InputType.PASSWORD);
+        final NewPasswordInputForm input = new NewPasswordInputForm();
+
         if (param.getValue() != null) {
-            input.setText(param.getValue());
+            input.setInputPasswordText(param.getValue());
         } else {
-            input.setText("");
+            input.setInputPasswordText("");
         }
+        
+        input.setShowPasswordButtonEnabled(!PLACEHOLDER.equals(input.getInputPasswordText()));
+        
+        input.setInputPasswordClickHandler(handler -> {
+            if (input.isInputPasswordEnabled()
+                    && input.getInputPasswordText().equals(PLACEHOLDER)) {
+                input.setInputPasswordText("");
+                input.validateInputPassword();
+                input.setShowPasswordButtonEnabled(true);
+            }
+        });
 
         if (param.getMin() != null && param.getMin().equals(param.getMax())) {
-            input.setReadOnly(true);
-            input.setEnabled(false);
+            input.setInputPasswordReadOnly(true);
+            input.setInputPasswordEnabled(false);
         }
 
-        input.addValidator(new Validator() {
+        input.addInputPasswordValidator(new Validator() {
 
             @Override
             public List<EditorError> validate(Editor editor, Object value) {
 
                 List<EditorError> result = new ArrayList<>();
-                if ((input.getText() == null || "".equals(input.getText().trim())) && param.isRequired()) {
+                if ((input.getInputPasswordText() == null || "".equals(input.getInputPasswordText().trim())) && param.isRequired()) {
                     // null in required field
-                    result.add(new BasicEditorError(input, input.getText(), MSGS.formRequiredParameter()));
+                    result.add(new BasicEditorError(input, input.getInputPasswordText(), MSGS.formRequiredParameter()));
                     AbstractServicesUi.this.valid.put(param.getId(), false);
                 } else {
-                    param.setValue(input.getText());
+                    param.setValue(input.getInputPasswordText());
                     AbstractServicesUi.this.valid.put(param.getId(), true);
                 }
 
@@ -425,14 +437,14 @@ public abstract class AbstractServicesUi extends Composite {
             }
         });
 
-        input.addKeyUpHandler(event -> {
-            input.validate(true);
+        input.setInputPasswordKeyUpHandler(event -> {
+            input.validateInputPassword(true);
             setDirty(true);
         });
 
         formGroup.add(input);
 
-        input.validate(true);
+        input.validateInputPassword(true);
     }
 
     protected void renderBooleanField(final GwtConfigParameter param, boolean isFirstInstance, FormGroup formGroup) {
