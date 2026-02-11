@@ -513,8 +513,10 @@ public class Console implements SelfConfiguringComponent {
                 sessionContextName);
         registerServlet("componentService", DENALI_MODULE_PATH + "/component", new GwtComponentServiceImpl(),
                 sessionContextName);
-        registerServlet("packageService", DENALI_MODULE_PATH + "/package",
-                new GwtPackageServiceImpl(this.sslManagerService::get), sessionContextName);
+        if (supportedFeatures.isPackagesServiceAvailable()) {
+                registerServlet("packageService", DENALI_MODULE_PATH + "/package",
+                    new GwtPackageServiceImpl(this.sslManagerService::get), sessionContextName);
+        }
         registerServlet("snapshotServiceImpl", DENALI_MODULE_PATH + "/snapshot", new GwtSnapshotServiceImpl(),
                 sessionContextName);
         registerServlet("certificateService", DENALI_MODULE_PATH + "/certificate", new GwtCertificatesServiceImpl(),
@@ -523,8 +525,10 @@ public class Console implements SelfConfiguringComponent {
                 sessionContextName);
         registerServlet("usersService", DENALI_MODULE_PATH + "/users", new GwtUserServiceImpl(this.userManager),
                 sessionContextName);
-        registerServlet("fileServlet", DENALI_MODULE_PATH + "/file/*", new FileServlet(supportedFeatures),
-                sessionContextName);
+        if (supportedFeatures.isPackagesServiceAvailable()) {
+                registerServlet("fileServlet", DENALI_MODULE_PATH + "/file/*", new FileServlet(supportedFeatures),
+                    sessionContextName);
+        }
         registerServlet("deviceSnapshotsServlet", DENALI_MODULE_PATH + "/device_snapshots",
                 new DeviceSnapshotsServlet(), sessionContextName);
         if (supportedFeatures.isAssetAvailable()) {

@@ -49,6 +49,8 @@ public class GwtFeatureUtil {
 
         result.setCommandServiceAvailable(isProviderServiceAvailable(PasswordCommandService.class, bundleContext));
 
+        result.setPackagesServiceAvailable(wiredPackages.contains("org.eclipse.kura.deployment.agent"));
+
         return result;
     }
 
