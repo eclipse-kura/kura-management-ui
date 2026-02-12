@@ -569,10 +569,11 @@ public class EntryClassUi extends Composite implements ServicesUi.Listener {
     private void initPackagesPanel() {
 
         /*
-         * If packagesBinder is null, it means that the packages service is not
-         * available, so the menu entry should be hidden. If the packages service is
-         * available but the user does not have permissions to access it, the menu entry
-         * should also be hidden. In other words: kura-deployment addon is not installed
+         * Hide the Packages menu entry when:
+         *  - packagesBinder is null, meaning the packages service (for example, the
+         *    kura-deployment addon) is not available/installed, or
+         *  - the packages service is available but the current user lacks
+         *    PACKAGES_ADMIN permission to access it.
          */
         if (this.packagesBinder == null || !this.userData.checkPermission(KuraPermission.PACKAGES_ADMIN)) {
             this.packages.setVisible(false);
