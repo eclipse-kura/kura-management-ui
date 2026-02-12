@@ -48,8 +48,6 @@ public class PackagesExtendedFileServlet extends FileServlet {
             throw new ServletException(REQUEST_PATH_INFO_NOT_FOUND);
         }
 
-        super.doPost(req, resp);
-
         if (reqPathInfo.startsWith("/deploy")) {
             KuraRemoteServiceServlet.requirePermissions(req, Mode.ALL, new String[] { KuraPermission.PACKAGES_ADMIN });
             doPostDeploy(req);
