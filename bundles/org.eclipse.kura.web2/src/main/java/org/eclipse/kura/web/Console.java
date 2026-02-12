@@ -60,6 +60,7 @@ import org.eclipse.kura.web.server.servlet.ChannelServlet;
 import org.eclipse.kura.web.server.servlet.DeviceSnapshotsServlet;
 import org.eclipse.kura.web.server.servlet.FileServlet;
 import org.eclipse.kura.web.server.servlet.LogServlet;
+import org.eclipse.kura.web.server.servlet.PackagesExtendedFileServlet;
 import org.eclipse.kura.web.server.servlet.RedirectServlet;
 import org.eclipse.kura.web.server.servlet.SendStatusServlet;
 import org.eclipse.kura.web.server.servlet.SkinServlet;
@@ -526,6 +527,10 @@ public class Console implements SelfConfiguringComponent {
         registerServlet("usersService", DENALI_MODULE_PATH + "/users", new GwtUserServiceImpl(this.userManager),
                 sessionContextName);
         if (supportedFeatures.isPackagesServiceAvailable()) {
+                registerServlet("packagesExtendedFileServlet", DENALI_MODULE_PATH + "/file/*",
+                    new PackagesExtendedFileServlet(supportedFeatures),
+                        sessionContextName);
+        } else {
                 registerServlet("fileServlet", DENALI_MODULE_PATH + "/file/*", new FileServlet(supportedFeatures),
                     sessionContextName);
         }
