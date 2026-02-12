@@ -17,13 +17,11 @@ import static java.util.Objects.isNull;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
-import java.net.URL;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -33,7 +31,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
@@ -52,7 +49,6 @@ import org.eclipse.kura.configuration.ComponentConfiguration;
 import org.eclipse.kura.configuration.ConfigurationService;
 import org.eclipse.kura.core.configuration.ComponentConfigurationImpl;
 import org.eclipse.kura.core.configuration.XmlComponentConfigurations;
-import org.eclipse.kura.deployment.agent.DeploymentAgentService;
 import org.eclipse.kura.marshalling.Unmarshaller;
 import org.eclipse.kura.rest.configuration.api.ComponentConfigurationList;
 import org.eclipse.kura.rest.configuration.api.DTOUtil;
@@ -90,30 +86,30 @@ public class FileServlet extends AuditServlet {
 
     private static final String SYSTEM_SERVICE_ERROR_MESSAGE = "Error locating SystemService";
 
-    private static final String CANNOT_CLOSE_INPUT_STREAM = "Cannot close input stream";
+    protected static final String CANNOT_CLOSE_INPUT_STREAM = "Cannot close input stream";
 
-    private static final String CANNOT_CLOSE_OUTPUT_STREAM = "Cannot close output stream";
+    protected static final String CANNOT_CLOSE_OUTPUT_STREAM = "Cannot close output stream";
 
-    private static final String XSRF_TOKEN = "xsrfToken";
+    protected static final String XSRF_TOKEN = "xsrfToken";
 
-    private static final String ERROR_PARSING_THE_FILE_UPLOAD_REQUEST = "Error parsing the file upload request";
+    protected static final String ERROR_PARSING_THE_FILE_UPLOAD_REQUEST = "Error parsing the file upload request";
 
-    private static final String ERROR_PARSING_QUERY_STRING = "Error parsing query string.";
+    protected static final String ERROR_PARSING_QUERY_STRING = "Error parsing query string.";
 
-    private static final String REQUEST_PATH_INFO_NOT_FOUND = "Request path info not found";
+    protected static final String REQUEST_PATH_INFO_NOT_FOUND = "Request path info not found";
 
     private static final long serialVersionUID = -5016170117606322129L;
 
-    private static Logger logger = LoggerFactory.getLogger(FileServlet.class);
+    protected static Logger logger = LoggerFactory.getLogger(FileServlet.class);
 
-    private static final String JAVA_IO_TMPDIR = "java.io.tmpdir";
-    private static final String EXPECTED_1_FILE_PATTERN = "expected 1 file item but found {}";
+    protected static final String JAVA_IO_TMPDIR = "java.io.tmpdir";
+    protected static final String EXPECTED_1_FILE_PATTERN = "expected 1 file item but found {}";
 
     private static final int BUFFER = 1024;
     private static int tooBig = 0x6400000; // Max size of unzipped data, 100MB
     private static int tooMany = 1024; // Max number of files
 
-    private DiskFileItemFactory diskFileItemFactory;
+    protected DiskFileItemFactory diskFileItemFactory;
     private FileCleaningTracker fileCleaningTracker;
 
     private final BundleContext bundleContext;
@@ -192,10 +188,7 @@ public class FileServlet extends AuditServlet {
             throw new ServletException(REQUEST_PATH_INFO_NOT_FOUND);
         }
 
-        if (reqPathInfo.startsWith("/deploy")) {
-            KuraRemoteServiceServlet.requirePermissions(req, Mode.ALL, new String[] { KuraPermission.PACKAGES_ADMIN });
-            doPostDeploy(req);
-        } else if (reqPathInfo.equals("/configuration/snapshot")) {
+        if (reqPathInfo.equals("/configuration/snapshot")) {
             KuraRemoteServiceServlet.requirePermissions(req, Mode.ALL, new String[] { KuraPermission.ADMIN });
             doPostConfigurationSnapshot(req);
         } else if (reqPathInfo.equals("/command") && supportedFeatures.isCommandServiceAvailable()) {
@@ -595,191 +588,6 @@ public class FileServlet extends AuditServlet {
         }
         return configs.getConfigs().stream().map(c -> new ComponentConfigurationImpl(c.getPid(), null,
                 DTOUtil.dtosToConfigurationProperties(c.getProperties()))).collect(Collectors.toList());
-    }
-
-    private void doPostDeployUpload(HttpServletRequest req, HttpSession session) throws ServletException, IOException {
-        ServiceLocator locator = ServiceLocator.getInstance();
-        DeploymentAgentService deploymentAgentService;
-        try {
-            deploymentAgentService = locator.getService(DeploymentAgentService.class);
-        } catch (GwtKuraException e) {
-            logger.error("Error locating DeploymentAgentService");
-            throw new ServletException("Error locating DeploymentAgentService", e);
-        }
-
-        // Check that we have a file upload request
-        boolean isMultipart = JakartaServletFileUpload.isMultipartContent(req);
-        if (!isMultipart) {
-            logger.error("Not a file upload request");
-            throw new ServletException("Not a file upload request");
-        }
-
-        UploadRequest upload = new UploadRequest(this.diskFileItemFactory);
-
-        try {
-            upload.parse(req);
-        } catch (FileUploadException e) {
-            logger.error(ERROR_PARSING_THE_FILE_UPLOAD_REQUEST);
-            throw new ServletException(ERROR_PARSING_THE_FILE_UPLOAD_REQUEST, e);
-        }
-
-        // BEGIN XSRF - Servlet dependent code
-        Map<String, String> formFields = upload.getFormFields();
-
-        try {
-            GwtXSRFToken token = new GwtXSRFToken(formFields.get(XSRF_TOKEN));
-            KuraRemoteServiceServlet.checkXSRFToken(req, token);
-        } catch (Exception e) {
-            throw new ServletException("Security error: please retry this operation correctly.", e);
-        }
-        // END XSRF security check
-
-        List<DiskFileItem> fileItems = null;
-        InputStream is = null;
-        File localFile = null;
-        OutputStream os = null;
-        boolean successful = false;
-
-        try {
-            fileItems = upload.getFileItems();
-
-            int fileItemsSize = fileItems.size();
-            if (fileItemsSize != 1) {
-                logger.error(EXPECTED_1_FILE_PATTERN, fileItemsSize);
-                throw new ServletException("Wrong number of file items");
-            }
-
-            DiskFileItem item = fileItems.get(0);
-            String filename = item.getName();
-            is = item.getInputStream();
-
-            String filePath = System.getProperty(JAVA_IO_TMPDIR) + File.separator + UUID.randomUUID() + ".dp";
-
-            localFile = new File(filePath);
-            if (localFile.exists() && !localFile.delete()) {
-                logger.error("Cannot delete file: {}", filePath);
-                throw new ServletException("Cannot delete file: " + filePath);
-            }
-
-            try {
-                localFile.createNewFile();
-                localFile.deleteOnExit();
-            } catch (IOException e) {
-                logger.error("Cannot create file: {}", filePath);
-                throw new ServletException("Cannot create file: " + filePath);
-            }
-
-            try {
-                os = new FileOutputStream(localFile);
-            } catch (FileNotFoundException e) {
-                logger.error("Cannot find file: {}", filePath);
-                throw new ServletException("Cannot find file: " + filePath);
-            }
-
-            logger.info("Copying uploaded package file to file: {}", filePath);
-
-            try {
-                IOUtils.copy(is, os);
-            } catch (IOException e) {
-                logger.error("Failed to copy deployment package file: {}", filename);
-                throw new ServletException("Failed to copy deployment package file: " + filename);
-            }
-
-            try {
-                os.close();
-            } catch (IOException e) {
-                logger.warn(CANNOT_CLOSE_OUTPUT_STREAM, e);
-            }
-
-            URL url = localFile.toURI().toURL();
-            String sUrl = url.toString();
-
-            logger.info("Installing package...");
-            try {
-                deploymentAgentService.installDeploymentPackageAsync(sUrl);
-                successful = true;
-            } catch (Exception e) {
-                logger.error("Package installation failed");
-                throw new ServletException("Package installation failed", e);
-            }
-
-        } finally {
-            if (os != null) {
-                try {
-                    os.close();
-                } catch (IOException e) {
-                    logger.warn(CANNOT_CLOSE_OUTPUT_STREAM, e);
-                }
-            }
-            if (localFile != null && !successful) {
-                try {
-                    localFile.delete();
-                } catch (Exception e) {
-                    logger.warn("Cannot delete file");
-                }
-            }
-            if (is != null) {
-                try {
-                    is.close();
-                } catch (IOException e) {
-                    logger.warn(CANNOT_CLOSE_INPUT_STREAM, e);
-                }
-            }
-            if (fileItems != null) {
-                for (DiskFileItem fileItem : fileItems) {
-                    fileItem.delete();
-                }
-            }
-        }
-    }
-
-    private void doPostDeploy(HttpServletRequest req) throws ServletException, IOException {
-
-        ServiceLocator locator = ServiceLocator.getInstance();
-        DeploymentAgentService deploymentAgentService;
-        try {
-            deploymentAgentService = locator.getService(DeploymentAgentService.class);
-        } catch (GwtKuraException e) {
-            logger.error("Error locating DeploymentAgentService");
-            throw new ServletException("Error locating DeploymentAgentService", e);
-        }
-
-        HttpSession session = req.getSession(false);
-
-        String reqPathInfo = req.getPathInfo();
-        if (reqPathInfo.endsWith("url")) {
-
-            String packageDownloadUrl = req.getParameter("packageUrl");
-            if (packageDownloadUrl == null) {
-                logger.error("Deployment package URL parameter missing");
-                throw new ServletException("Deployment package URL parameter missing");
-            }
-
-            // BEGIN XSRF - Servlet dependent code
-            String tokenId = req.getParameter(XSRF_TOKEN);
-
-            try {
-                GwtXSRFToken token = new GwtXSRFToken(tokenId);
-                KuraRemoteServiceServlet.checkXSRFToken(req, token);
-            } catch (Exception e) {
-                throw new ServletException("Security error: please retry this operation correctly.", e);
-            }
-            // END XSRF security check
-
-            try {
-                logger.info("Installing package...");
-                deploymentAgentService.installDeploymentPackageAsync(packageDownloadUrl);
-            } catch (Exception e) {
-                logger.error("Failed to install package at URL {}", packageDownloadUrl);
-                throw new ServletException("Error installing deployment package", e);
-            }
-
-        } else if (reqPathInfo.endsWith("upload")) {
-            doPostDeployUpload(req, session);
-        } else {
-            logger.error("Unsupported package deployment request");
-            throw new ServletException("Unsupported package deployment request");
-        }
     }
 
     private void getZipUploadSizeMax() {
