@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2016, 2025 Eurotech and/or its affiliates and others
+ * Copyright (c) 2016, 2026 Eurotech and/or its affiliates and others
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -251,33 +251,133 @@ public final class GwtServerUtil {
         }
     }
 
+    private static final class ArrayDefaultParser {
+
+        final String value;
+        final List<String> result = new ArrayList<>();
+        final StringBuilder token = new StringBuilder();
+        int spaces = 0;
+        boolean escape = false;
+
+        public ArrayDefaultParser(final String value) {
+            this.value = value;
+        }
+
+        private void append(final char c) {
+            if (c == ' ') {
+                if (token.length() == 0) {
+                    return;
+                }
+
+                spaces++;
+            } else {
+                forceAppend(c);
+            }
+        }
+
+        private void forceAppend(final char c) {
+            if (spaces > 0) {
+                for (int i = 0; i < spaces; i++) {
+                    token.append(' ');
+                }
+            }
+            spaces = 0;
+            token.append(c);
+        }
+
+        private void commitToken() {
+            result.add(token.toString());
+            token.setLength(0);
+            spaces = 0;
+        }
+
+        public List<String> parse() {
+            for (int i = 0; i < value.length(); i++) {
+
+                final char current = value.charAt(i);
+
+                if (current == '\\') {
+                    escape = true;
+                    continue;
+                } else if (escape) {
+                    if (!(current == ' ' || current == '\\' || current == ',')) {
+                        forceAppend('\\');
+                    }
+                    forceAppend(current);
+                    escape = false;
+                } else if (current == ',') {
+                    commitToken();
+                } else {
+                    append(current);
+                }
+            }
+            commitToken();
+            return result;
+        }
+
+    }
+
     public static Object getUserDefinedObject(GwtConfigParameter param, Object currentObjValue) {
-        Object objValue;
 
         final int cardinality = param.getCardinality();
         if (cardinality == 0 || cardinality == 1 || cardinality == -1) {
-            String strValue = param.getValue();
-
-            if (currentObjValue instanceof Password && PASSWORD_PLACEHOLDER.equals(strValue)) {
-                objValue = currentObjValue;
-            } else {
-                objValue = getObjectValue(param);
-            }
+            return getUserDefinedObjectScalar(param, currentObjValue);
         } else {
-            String[] strValues = param.getValues();
+            return getUserDefinedObjectArray(param, currentObjValue);
+        }
+    }
+
+    private static Object getUserDefinedObjectScalar(GwtConfigParameter param, Object currentObjValue) {
+        String strValue = param.getValue();
+
+        if (param.getType() == GwtConfigParameterType.PASSWORD && PASSWORD_PLACEHOLDER.equals(strValue)) {
+
+            if (currentObjValue instanceof Password) {
+                return currentObjValue;
+            }
+
+            if (param.isRequired()) {
+                final String defaultValue = param.getDefault();
+
+                if (defaultValue != null && !defaultValue.trim().isEmpty()) {
+                    final GwtConfigParameter cloned = new GwtConfigParameter(param);
+                    cloned.setValue(defaultValue);
+                    return getObjectValue(cloned);
+                }
+            }
+        }
+
+        return getObjectValue(param);
+    }
+
+    private static Object getUserDefinedObjectArray(GwtConfigParameter param, Object currentObjValue) {
+        String[] strValues = param.getValues();
+
+        if (param.getType() == GwtConfigParameterType.PASSWORD) {
+
+            Optional<List<String>> current = Optional.empty();
 
             if (currentObjValue instanceof Password[]) {
-                Password[] currentPasswordValue = (Password[]) currentObjValue;
-                for (int i = 0; i < strValues.length; i++) {
-                    if (PASSWORD_PLACEHOLDER.equals(strValues[i])) {
-                        strValues[i] = new String(currentPasswordValue[i].getPassword());
-                    }
+                current = Optional.of(Arrays.stream((Password[]) currentObjValue).map(p -> new String(p.getPassword()))
+                        .collect(Collectors.toList()));
+            } else if (param.isRequired()) {
+                final String defaultValue = param.getDefault();
+
+                if (defaultValue != null && !defaultValue.trim().isEmpty()) {
+                    current = Optional.of(new ArrayDefaultParser(defaultValue).parse());
                 }
             }
 
-            objValue = getObjectValues(param, strValues);
+            if (current.isPresent()) {
+                for (int i = 0; i < strValues.length; i++) {
+                    if (PASSWORD_PLACEHOLDER.equals(strValues[i]) && i < current.get().size()) {
+                        strValues[i] = current.get().get(i);
+                    }
+                }
+            }
         }
-        return objValue;
+
+        return getObjectValues(param, strValues);
     }
 
     /**
