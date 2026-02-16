@@ -15,18 +15,18 @@
 -->
 <target name="kura-management-ui-target-definition">
     <locations>
-        <location includeDependencyDepth="direct" includeDependencyScopes="compile,test" 
+        <location includeDependencyDepth="direct" includeDependencyScopes="compile,test"
             includeSource="true" missingManifest="ignore" type="Maven">
             <dependencies>
-               <dependency>
+                <dependency>
                     <groupId>org.eclipse.kura</groupId>
-                    <artifactId>target-platform-tycho-deps</artifactId>
+                    <artifactId>target-platform-pde-deps</artifactId>
                     <version>6.0.0-SNAPSHOT</version>
                     <type>pom</type>
                 </dependency>
                 <dependency>
                     <groupId>org.eclipse.kura</groupId>
-                    <artifactId>kura-tycho-deps</artifactId>
+                    <artifactId>kura-pde-deps</artifactId>
                     <version>6.0.0-SNAPSHOT</version>
                     <type>pom</type>
                 </dependency>
