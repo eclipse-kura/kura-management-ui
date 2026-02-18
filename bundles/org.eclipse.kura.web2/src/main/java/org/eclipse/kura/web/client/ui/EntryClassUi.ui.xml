@@ -184,6 +184,7 @@
                                         <b:AnchorListItem icon="CUBE"
                                             iconFixedWidth="true" text="{msgs.driversAndAssetsServices}"
                                             ui:field="driversAndAssetsServices" />
+                                     
                                         <b:AnchorListItem icon="SITEMAP"
                                             addStyleNames="{style.rotateImg}" iconFixedWidth="true"
                                             text="{msgs.wires}" ui:field="wires" />

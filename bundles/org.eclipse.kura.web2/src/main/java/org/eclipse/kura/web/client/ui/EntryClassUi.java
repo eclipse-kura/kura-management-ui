@@ -234,7 +234,7 @@ public class EntryClassUi extends Composite implements ServicesUi.Listener {
 
     private final StatusPanelUi statusBinder = GWT.create(StatusPanelUi.class);
     private final DevicePanelUi deviceBinder;
-    private final PackagesPanelUi packagesBinder = GWT.create(PackagesPanelUi.class);
+    private final PackagesPanelUi packagesBinder;
     private final SettingsPanelUi settingsBinder = GWT.create(SettingsPanelUi.class);
     private final SecurityPanelUi securityBinder;
     private final UsersPanelUi usersBinder = GWT.create(UsersPanelUi.class);
@@ -298,6 +298,12 @@ public class EntryClassUi extends Composite implements ServicesUi.Listener {
         this.securityBinder = new SecurityPanelUi(gwtUserData, securityCapabilities);
         this.driversAndTwinsBinder = new DriversAndAssetsUi(supportedFeatures);
         this.deviceBinder = new DevicePanelUi(supportedFeatures);
+
+        if (supportedFeatures.isPackagesServiceAvailable()) {
+            this.packagesBinder = new PackagesPanelUi();
+        } else {
+            this.packagesBinder = null;
+        }
 
         setFooter(session);
         initSystemPanel(session, supportedFeatures);
@@ -561,7 +567,15 @@ public class EntryClassUi extends Composite implements ServicesUi.Listener {
     }
 
     private void initPackagesPanel() {
-        if (!this.userData.checkPermission(KuraPermission.PACKAGES_ADMIN)) {
+
+        /*
+         * Hide the Packages menu entry when:
+         *  - packagesBinder is null, meaning the packages service (for example, the
+         *    kura-deployment addon) is not available/installed, or
+         *  - the packages service is available but the current user lacks
+         *    PACKAGES_ADMIN permission to access it.
+         */
+        if (this.packagesBinder == null || !this.userData.checkPermission(KuraPermission.PACKAGES_ADMIN)) {
             this.packages.setVisible(false);
             return;
         }

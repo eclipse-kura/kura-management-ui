@@ -60,6 +60,7 @@ import org.eclipse.kura.web.server.servlet.ChannelServlet;
 import org.eclipse.kura.web.server.servlet.DeviceSnapshotsServlet;
 import org.eclipse.kura.web.server.servlet.FileServlet;
 import org.eclipse.kura.web.server.servlet.LogServlet;
+import org.eclipse.kura.web.server.servlet.PackagesExtendedFileServlet;
 import org.eclipse.kura.web.server.servlet.RedirectServlet;
 import org.eclipse.kura.web.server.servlet.SendStatusServlet;
 import org.eclipse.kura.web.server.servlet.SkinServlet;
@@ -513,8 +514,10 @@ public class Console implements SelfConfiguringComponent {
                 sessionContextName);
         registerServlet("componentService", DENALI_MODULE_PATH + "/component", new GwtComponentServiceImpl(),
                 sessionContextName);
-        registerServlet("packageService", DENALI_MODULE_PATH + "/package",
-                new GwtPackageServiceImpl(this.sslManagerService::get), sessionContextName);
+        if (supportedFeatures.isPackagesServiceAvailable()) {
+                registerServlet("packageService", DENALI_MODULE_PATH + "/package",
+                    new GwtPackageServiceImpl(this.sslManagerService::get), sessionContextName);
+        }
         registerServlet("snapshotServiceImpl", DENALI_MODULE_PATH + "/snapshot", new GwtSnapshotServiceImpl(),
                 sessionContextName);
         registerServlet("certificateService", DENALI_MODULE_PATH + "/certificate", new GwtCertificatesServiceImpl(),
@@ -523,8 +526,14 @@ public class Console implements SelfConfiguringComponent {
                 sessionContextName);
         registerServlet("usersService", DENALI_MODULE_PATH + "/users", new GwtUserServiceImpl(this.userManager),
                 sessionContextName);
-        registerServlet("fileServlet", DENALI_MODULE_PATH + "/file/*", new FileServlet(supportedFeatures),
-                sessionContextName);
+        if (supportedFeatures.isPackagesServiceAvailable()) {
+                registerServlet("packagesExtendedFileServlet", DENALI_MODULE_PATH + "/file/*",
+                    new PackagesExtendedFileServlet(supportedFeatures),
+                        sessionContextName);
+        } else {
+                registerServlet("fileServlet", DENALI_MODULE_PATH + "/file/*", new FileServlet(supportedFeatures),
+                    sessionContextName);
+        }
         registerServlet("deviceSnapshotsServlet", DENALI_MODULE_PATH + "/device_snapshots",
                 new DeviceSnapshotsServlet(), sessionContextName);
         if (supportedFeatures.isAssetAvailable()) {

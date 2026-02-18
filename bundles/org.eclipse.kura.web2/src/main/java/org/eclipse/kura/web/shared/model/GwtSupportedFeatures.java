@@ -20,6 +20,7 @@ public class GwtSupportedFeatures extends GwtBaseModel implements Serializable {
     private static final String DRIVER_SERVICES_AVAILABLE = "driverServicesAvailable";
     private static final String WIRES_SERVICES_AVAILABLE = "wiresServicesAvailable";
     private static final String COMMAND_SERVICE_AVAILABLE = "commandServiceAvailable";
+    private static final String PACKAGES_SERVICE_AVAILABLE = "packagesServiceAvailable";
 
     private static final long serialVersionUID = 8446416262929849486L;
 
@@ -39,6 +40,10 @@ public class GwtSupportedFeatures extends GwtBaseModel implements Serializable {
         return getBooleanProperty(COMMAND_SERVICE_AVAILABLE);
     }
 
+    public boolean isPackagesServiceAvailable() {
+        return getBooleanProperty(PACKAGES_SERVICE_AVAILABLE);
+    }
+
     public void setDriverServicesAvailable(final boolean available) {
         set(DRIVER_SERVICES_AVAILABLE, available);
     }
@@ -53,6 +58,10 @@ public class GwtSupportedFeatures extends GwtBaseModel implements Serializable {
 
     public void setCommandServiceAvailable(final boolean available) {
         set(COMMAND_SERVICE_AVAILABLE, available);
+    }
+
+    public void setPackagesServiceAvailable(final boolean available) {
+        set(PACKAGES_SERVICE_AVAILABLE, available);
     }
 
     private boolean getBooleanProperty(final String key) {
