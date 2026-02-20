@@ -41,6 +41,7 @@ import org.eclipse.kura.core.configuration.ComponentConfigurationImpl;
 import org.eclipse.kura.core.configuration.XmlComponentConfigurations;
 import org.eclipse.kura.core.configuration.metatype.Tad;
 import org.eclipse.kura.core.configuration.metatype.Tocd;
+import org.eclipse.kura.core.configuration.util.StringUtil;
 import org.eclipse.kura.driver.descriptor.DriverDescriptor;
 import org.eclipse.kura.driver.descriptor.DriverDescriptorService;
 import org.eclipse.kura.identity.LoginBannerService;
@@ -251,72 +252,6 @@ public final class GwtServerUtil {
         }
     }
 
-    private static final class ArrayDefaultParser {
-
-        final String value;
-        final List<String> result = new ArrayList<>();
-        final StringBuilder token = new StringBuilder();
-        int spaces = 0;
-        boolean escape = false;
-
-        public ArrayDefaultParser(final String value) {
-            this.value = value;
-        }
-
-        private void append(final char c) {
-            if (c == ' ') {
-                if (token.length() == 0) {
-                    return;
-                }
-
-                spaces++;
-            } else {
-                forceAppend(c);
-            }
-        }
-
-        private void forceAppend(final char c) {
-            if (spaces > 0) {
-                for (int i = 0; i < spaces; i++) {
-                    token.append(' ');
-                }
-            }
-            spaces = 0;
-            token.append(c);
-        }
-
-        private void commitToken() {
-            result.add(token.toString());
-            token.setLength(0);
-            spaces = 0;
-        }
-
-        public List<String> parse() {
-            for (int i = 0; i < value.length(); i++) {
-
-                final char current = value.charAt(i);
-
-                if (current == '\\') {
-                    escape = true;
-                    continue;
-                } else if (escape) {
-                    if (!(current == ' ' || current == '\\' || current == ',')) {
-                        forceAppend('\\');
-                    }
-                    forceAppend(current);
-                    escape = false;
-                } else if (current == ',') {
-                    commitToken();
-                } else {
-                    append(current);
-                }
-            }
-            commitToken();
-            return result;
-        }
-
-    }
-
     public static Object getUserDefinedObject(GwtConfigParameter param, Object currentObjValue) {
 
         final int cardinality = param.getCardinality();
@@ -355,23 +290,23 @@ public final class GwtServerUtil {
 
         if (param.getType() == GwtConfigParameterType.PASSWORD) {
 
-            Optional<List<String>> current = Optional.empty();
+            Optional<String[]> current = Optional.empty();
 
             if (currentObjValue instanceof Password[]) {
                 current = Optional.of(Arrays.stream((Password[]) currentObjValue).map(p -> new String(p.getPassword()))
-                        .collect(Collectors.toList()));
+                        .collect(Collectors.toList()).toArray(new String[] {}));
             } else if (param.isRequired()) {
                 final String defaultValue = param.getDefault();
 
                 if (defaultValue != null && !defaultValue.trim().isEmpty()) {
-                    current = Optional.of(new ArrayDefaultParser(defaultValue).parse());
+                    current = Optional.of(StringUtil.splitValues(defaultValue));
                 }
             }
 
             if (current.isPresent()) {
                 for (int i = 0; i < strValues.length; i++) {
-                    if (PASSWORD_PLACEHOLDER.equals(strValues[i]) && i < current.get().size()) {
-                        strValues[i] = current.get().get(i);
+                    if (PASSWORD_PLACEHOLDER.equals(strValues[i]) && i < current.get().length) {
+                        strValues[i] = current.get()[i];
                     }
                 }
             }
