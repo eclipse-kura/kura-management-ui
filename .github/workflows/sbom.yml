@@ -21,7 +21,7 @@ permissions:
 
 jobs:
   call-workflow-in-public-repo:
-    uses: eclipse-kura/.github/.github/workflows/_shared-sbom-cdxgen.yml@main
+    uses: eclipse-kura/.github/.github/workflows/_shared-sbom-cyclonedx.yml@main
     with:
       # The parent project UUID the uploaded SBOM should be associated with.
       # Refer to https://sbom.eclipse.org/ to retrieve the UUID.
