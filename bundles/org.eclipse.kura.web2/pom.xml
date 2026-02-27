@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
 
-    Copyright (c) 2011, 2025 Eurotech and/or its affiliates and others
+    Copyright (c) 2011, 2026 Eurotech and/or its affiliates and others
 
     This program and the accompanying materials are made
     available under the terms of the Eclipse Public License 2.0
@@ -76,26 +76,14 @@
                         <configuration>
                             <outputDirectory>${project.basedir}/lib</outputDirectory>
                             <stripVersion>true</stripVersion>
-                            <artifactItems>
-                                <artifactItem>
-                                    <groupId>org.gwtbootstrap3</groupId>
-                                    <artifactId>gwtbootstrap3</artifactId>
-                                    <version>1.0.1</version>
-                                </artifactItem>
-                                <artifactItem>
-                                    <groupId>org.gwtproject</groupId>
-                                    <artifactId>gwt-user</artifactId>
-                                    <version>${gwt.version}</version>
-                                </artifactItem>
-                                <artifactItem>
-                                    <groupId>org.gwtproject</groupId>
-                                    <artifactId>gwt-servlet-jakarta</artifactId>
-                                    <version>${gwt.version}</version>
-                                </artifactItem>
-                            </artifactItems>
+                            <includeArtifactIds>
+                                gwtbootstrap3,
+                                gwt-user,
+                                gwt-servlet-jakarta
+                            </includeArtifactIds>
                         </configuration>
                         <goals>
-                            <goal>copy</goal>
+                            <goal>copy-dependencies</goal>
                         </goals>
                     </execution>
                 </executions>
