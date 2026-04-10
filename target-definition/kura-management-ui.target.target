@@ -38,6 +38,18 @@
                 </dependency>
                 <dependency>
                     <groupId>org.eclipse.kura</groupId>
+                    <artifactId>org.eclipse.kura.core.net</artifactId>
+                    <version>3.0.0-SNAPSHOT</version>
+                    <type>jar</type>
+                </dependency>
+                <dependency>
+                    <groupId>org.eclipse.kura</groupId>
+                    <artifactId>org.eclipse.kura.net.configuration</artifactId>
+                    <version>3.0.0-SNAPSHOT</version>
+                    <type>jar</type>
+                </dependency>
+                <dependency>
+                    <groupId>org.eclipse.kura</groupId>
                     <artifactId>org.eclipse.kura.linux.net</artifactId>
                     <version>3.0.0-SNAPSHOT</version>
                     <type>jar</type>
