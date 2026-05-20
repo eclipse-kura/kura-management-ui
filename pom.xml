@@ -37,8 +37,8 @@
     </build>
 
     <modules>
+        <module>target-definition</module>
         <module>bundles</module>
         <module>distrib</module>
-	    <module>target-definition</module>
     </modules>
 </project>
