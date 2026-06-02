@@ -41,7 +41,7 @@ public class PreventModemPasswordPlaceholderTest {
     private Map<String, Object> result;
 
     @Test
-    public void placeholderPasswordWithModemOldConfigUsesOldPassword() {
+    public void placeholderPasswordWithModemOldConfigUsesOldPassword() throws GwtKuraException {
         givenModemConfigWithPassword(GwtServerUtil.PASSWORD_PLACEHOLDER);
         givenOldModemConfigWithPassword("oldSecretPassword");
 
@@ -51,7 +51,7 @@ public class PreventModemPasswordPlaceholderTest {
     }
 
     @Test
-    public void placeholderPasswordWithNonModemOldConfigDoesNotStorePassword() {
+    public void placeholderPasswordWithNonModemOldConfigDoesNotStorePassword() throws GwtKuraException {
         givenModemConfigWithPassword(GwtServerUtil.PASSWORD_PLACEHOLDER);
         givenOldWifiConfig();
 
@@ -61,7 +61,7 @@ public class PreventModemPasswordPlaceholderTest {
     }
 
     @Test
-    public void realPasswordIsStoredAsIsWithNonModemOldConfig() {
+    public void realPasswordIsStoredAsIsWithNonModemOldConfig() throws GwtKuraException {
         givenModemConfigWithPassword("myRealPassword");
         givenOldWifiConfig();
 
@@ -71,7 +71,7 @@ public class PreventModemPasswordPlaceholderTest {
     }
 
     @Test
-    public void realPasswordIsStoredAsIsWithModemOldConfig() {
+    public void realPasswordIsStoredAsIsWithModemOldConfig() throws GwtKuraException {
         givenModemConfigWithPassword("myRealPassword");
         givenOldModemConfigWithPassword("oldPassword");
 
