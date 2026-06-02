@@ -280,6 +280,8 @@ public final class GwtServerUtil {
                     return getObjectValue(cloned);
                 }
             }
+
+            return new Password("");
         }
 
         return getObjectValue(param);
@@ -308,6 +310,12 @@ public final class GwtServerUtil {
                     if (PASSWORD_PLACEHOLDER.equals(strValues[i]) && i < current.get().length) {
                         strValues[i] = current.get()[i];
                     }
+                }
+            }
+
+            for (int i = 0; i < strValues.length; i++) {
+                if (PASSWORD_PLACEHOLDER.equals(strValues[i])) {
+                    strValues[i] = "";
                 }
             }
         }
@@ -359,9 +367,8 @@ public final class GwtServerUtil {
         } else {
             final Map<String, Object> backupConfigProp = backupCC.getConfigurationProperties();
             for (final GwtConfigParameter gwtConfigParam : config.getParameters()) {
-                final Map<String, Object> currentConfigProp = currentCC.getConfigurationProperties();
                 properties.put(gwtConfigParam.getId(),
-                        getUserDefinedObject(gwtConfigParam, currentConfigProp.get(gwtConfigParam.getName())));
+                        getUserDefinedObject(gwtConfigParam, backupConfigProp.get(gwtConfigParam.getId())));
             }
 
             // Force kura.service.pid into properties, if originally present
