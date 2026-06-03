@@ -367,6 +367,5 @@
 
     <modules>
         <module>org.eclipse.kura.web2</module>
-        <module>org.eclipse.kura.web2.test</module>
     </modules>
 </project>
