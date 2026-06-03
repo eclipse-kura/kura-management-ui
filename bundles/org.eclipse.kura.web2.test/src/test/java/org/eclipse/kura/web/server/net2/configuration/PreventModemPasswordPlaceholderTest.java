@@ -91,6 +91,12 @@ public class PreventModemPasswordPlaceholderTest {
         modemConfig.setPassword(password);
         modemConfig.setUsername("testUser");
         modemConfig.setDialString("testDial");
+        modemConfig.setResetTimeout(0);
+        modemConfig.setHoldoff(0);
+        modemConfig.setPppNum(0);
+        modemConfig.setMaxFail(0);
+        modemConfig.setLcpEchoInterval(0);
+        modemConfig.setLcpEchoFailure(0);
     }
 
     private void givenOldModemConfigWithPassword(String password) {
