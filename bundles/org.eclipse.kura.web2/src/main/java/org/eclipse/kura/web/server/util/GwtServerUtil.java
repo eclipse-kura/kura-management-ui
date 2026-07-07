@@ -34,15 +34,12 @@ import org.eclipse.kura.configuration.ComponentConfiguration;
 import org.eclipse.kura.configuration.ConfigurationService;
 import org.eclipse.kura.configuration.Password;
 import org.eclipse.kura.configuration.metatype.AD;
-import org.eclipse.kura.configuration.metatype.Icon;
 import org.eclipse.kura.configuration.metatype.OCD;
 import org.eclipse.kura.configuration.metatype.OCDService;
-import org.eclipse.kura.configuration.metatype.Option;
 import org.eclipse.kura.core.configuration.ComponentConfigurationImpl;
 import org.eclipse.kura.core.configuration.XmlComponentConfigurations;
 import org.eclipse.kura.core.configuration.metatype.Tad;
 import org.eclipse.kura.core.configuration.metatype.Tocd;
-import org.eclipse.kura.core.configuration.util.StringUtil;
 import org.eclipse.kura.driver.descriptor.DriverDescriptor;
 import org.eclipse.kura.driver.descriptor.DriverDescriptorService;
 import org.eclipse.kura.identity.LoginBannerService;
@@ -73,7 +70,6 @@ import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.framework.ServiceReference;
 import org.osgi.service.cm.ConfigurationAdmin;
 import org.osgi.service.component.runtime.ServiceComponentRuntime;
-import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.gson.Gson;
@@ -125,38 +121,37 @@ public final class GwtServerUtil {
 
         if (gwtType == GwtConfigParameterType.STRING) {
             objValue = strValue;
+        } else if (strValue != null && gwtType == GwtConfigParameterType.PASSWORD) {
+            objValue = new Password(strValue.trim());
         } else if (strValue != null && !strValue.trim().isEmpty()) {
             final String trimmedValue = strValue.trim();
             switch (gwtType) {
-            case LONG:
-                objValue = Long.parseLong(trimmedValue);
-                break;
-            case DOUBLE:
-                objValue = Double.parseDouble(trimmedValue);
-                break;
-            case FLOAT:
-                objValue = Float.parseFloat(trimmedValue);
-                break;
-            case INTEGER:
-                objValue = Integer.parseInt(trimmedValue);
-                break;
-            case SHORT:
-                objValue = Short.parseShort(trimmedValue);
-                break;
-            case BYTE:
-                objValue = Byte.parseByte(trimmedValue);
-                break;
-            case BOOLEAN:
-                objValue = Boolean.parseBoolean(trimmedValue);
-                break;
-            case PASSWORD:
-                objValue = new Password(trimmedValue);
-                break;
-            case CHAR:
-                objValue = Character.valueOf(trimmedValue.charAt(0));
-                break;
-            default:
-                break;
+                case LONG:
+                    objValue = Long.parseLong(trimmedValue);
+                    break;
+                case DOUBLE:
+                    objValue = Double.parseDouble(trimmedValue);
+                    break;
+                case FLOAT:
+                    objValue = Float.parseFloat(trimmedValue);
+                    break;
+                case INTEGER:
+                    objValue = Integer.parseInt(trimmedValue);
+                    break;
+                case SHORT:
+                    objValue = Short.parseShort(trimmedValue);
+                    break;
+                case BYTE:
+                    objValue = Byte.parseByte(trimmedValue);
+                    break;
+                case BOOLEAN:
+                    objValue = Boolean.parseBoolean(trimmedValue);
+                    break;
+                case CHAR:
+                    objValue = Character.valueOf(trimmedValue.charAt(0));
+                    break;
+                default:
+                    break;
             }
         }
         return objValue;
@@ -169,87 +164,87 @@ public final class GwtServerUtil {
         List<String> trimmedValues = Stream.of(defaultValues).map(String::trim).collect(Collectors.toList());
 
         switch (type) {
-        case BOOLEAN:
-            for (String value : trimmedValues) {
-                if (!value.isEmpty()) {
-                    values.add(Boolean.valueOf(value));
+            case BOOLEAN:
+                for (String value : trimmedValues) {
+                    if (!value.isEmpty()) {
+                        values.add(Boolean.valueOf(value));
+                    }
                 }
-            }
-            return values.toArray(new Boolean[] {});
+                return values.toArray(new Boolean[] {});
 
-        case BYTE:
-            for (String value : trimmedValues) {
-                if (!value.isEmpty()) {
-                    values.add(Byte.valueOf(value));
+            case BYTE:
+                for (String value : trimmedValues) {
+                    if (!value.isEmpty()) {
+                        values.add(Byte.valueOf(value));
+                    }
                 }
-            }
-            return values.toArray(new Byte[] {});
+                return values.toArray(new Byte[] {});
 
-        case CHAR:
-            for (String value : trimmedValues) {
-                if (!value.isEmpty()) {
-                    values.add(new Character(value.charAt(0)));
+            case CHAR:
+                for (String value : trimmedValues) {
+                    if (!value.isEmpty()) {
+                        values.add(new Character(value.charAt(0)));
+                    }
                 }
-            }
-            return values.toArray(new Character[] {});
+                return values.toArray(new Character[] {});
 
-        case DOUBLE:
-            for (String value : trimmedValues) {
-                if (!value.isEmpty()) {
-                    values.add(Double.valueOf(value));
+            case DOUBLE:
+                for (String value : trimmedValues) {
+                    if (!value.isEmpty()) {
+                        values.add(Double.valueOf(value));
+                    }
                 }
-            }
-            return values.toArray(new Double[] {});
+                return values.toArray(new Double[] {});
 
-        case FLOAT:
-            for (String value : trimmedValues) {
-                if (!value.isEmpty()) {
-                    values.add(Float.valueOf(value));
+            case FLOAT:
+                for (String value : trimmedValues) {
+                    if (!value.isEmpty()) {
+                        values.add(Float.valueOf(value));
+                    }
                 }
-            }
-            return values.toArray(new Float[] {});
+                return values.toArray(new Float[] {});
 
-        case INTEGER:
-            for (String value : trimmedValues) {
-                if (!value.isEmpty()) {
-                    values.add(Integer.valueOf(value));
+            case INTEGER:
+                for (String value : trimmedValues) {
+                    if (!value.isEmpty()) {
+                        values.add(Integer.valueOf(value));
+                    }
                 }
-            }
-            return values.toArray(new Integer[] {});
+                return values.toArray(new Integer[] {});
 
-        case LONG:
-            for (String value : trimmedValues) {
-                if (!value.isEmpty()) {
-                    values.add(Long.valueOf(value));
+            case LONG:
+                for (String value : trimmedValues) {
+                    if (!value.isEmpty()) {
+                        values.add(Long.valueOf(value));
+                    }
                 }
-            }
-            return values.toArray(new Long[] {});
+                return values.toArray(new Long[] {});
 
-        case SHORT:
-            for (String value : trimmedValues) {
-                if (!value.isEmpty()) {
-                    values.add(Short.valueOf(value));
+            case SHORT:
+                for (String value : trimmedValues) {
+                    if (!value.isEmpty()) {
+                        values.add(Short.valueOf(value));
+                    }
                 }
-            }
-            return values.toArray(new Short[] {});
+                return values.toArray(new Short[] {});
 
-        case PASSWORD:
-            for (String value : trimmedValues) {
-                if (!value.isEmpty()) {
-                    values.add(new Password(value));
+            case PASSWORD:
+                for (String value : trimmedValues) {
+                    if (!value.isEmpty()) {
+                        values.add(new Password(value));
+                    }
                 }
-            }
-            return values.toArray(new Password[] {});
+                return values.toArray(new Password[] {});
 
-        case STRING:
-            for (String value : trimmedValues) {
-                if (!value.isEmpty()) {
-                    values.add(value);
+            case STRING:
+                for (String value : trimmedValues) {
+                    if (!value.isEmpty()) {
+                        values.add(value);
+                    }
                 }
-            }
-            return values.toArray(new String[] {});
-        default:
-            return null;
+                return values.toArray(new String[] {});
+            default:
+                return null;
         }
     }
 
@@ -263,26 +258,34 @@ public final class GwtServerUtil {
         }
     }
 
+    /**
+     * A {@code null} value coming out of
+     * {@link #getUserDefinedObject(GwtConfigParameter, Object)} for a Password
+     * parameter means "the user did not provide a value for this field": the
+     * property must be left out of the
+     * properties map entirely, rather than explicitly set to {@code null}, so the
+     * configuration service can decide
+     * whether to keep the current value or apply the metatype default. For every
+     * other parameter type, a
+     * {@code null} value is an explicit user action (clearing the field) and must
+     * be applied as-is.
+     */
+    public static boolean isUnsetPasswordValue(GwtConfigParameterType type, Object value) {
+        return value == null && type == GwtConfigParameterType.PASSWORD;
+    }
+
     private static Object getUserDefinedObjectScalar(GwtConfigParameter param, Object currentObjValue) {
         String strValue = param.getValue();
 
         if (param.getType() == GwtConfigParameterType.PASSWORD && PASSWORD_PLACEHOLDER.equals(strValue)) {
-
-            if (currentObjValue instanceof Password) {
-                return currentObjValue;
-            }
-
-            if (param.isRequired()) {
-                final String defaultValue = param.getDefault();
-
-                if (defaultValue != null && !defaultValue.trim().isEmpty()) {
-                    final GwtConfigParameter cloned = new GwtConfigParameter(param);
-                    cloned.setValue(defaultValue);
-                    return getObjectValue(cloned);
-                }
-            }
-
-            return new Password("");
+            // the user did not touch this field: keep the currently stored password
+            // unchanged.
+            // If there is no currently stored password, leave the property unset rather
+            // than
+            // guessing a value here, so the configuration service can apply the metatype
+            // default
+            // only if the property is not already present in the configuration.
+            return currentObjValue instanceof Password ? currentObjValue : null;
         }
 
         return getObjectValue(param);
@@ -298,30 +301,31 @@ public final class GwtServerUtil {
             if (currentObjValue instanceof Password[]) {
                 current = Optional.of(Arrays.stream((Password[]) currentObjValue).map(p -> new String(p.getPassword()))
                         .collect(Collectors.toList()).toArray(new String[] {}));
-            } else if (param.isRequired()) {
-                final String defaultValue = param.getDefault();
-
-                if (defaultValue != null && !defaultValue.trim().isEmpty()) {
-                    current = Optional.of(StringUtil.splitValues(defaultValue));
-                }
             }
 
-            if (current.isPresent()) {
-                for (int i = 0; i < strValues.length; i++) {
-                    if (PASSWORD_PLACEHOLDER.equals(strValues[i]) && i < current.get().length) {
-                        strValues[i] = current.get()[i];
-                    }
-                }
-            }
-
-            for (int i = 0; i < strValues.length; i++) {
-                if (PASSWORD_PLACEHOLDER.equals(strValues[i])) {
-                    strValues[i] = "";
-                }
-            }
+            mergeCurrentPasswords(strValues, current);
+            replacePlaceholders(strValues);
         }
 
         return getObjectValues(param, strValues);
+    }
+
+    private static void mergeCurrentPasswords(String[] strValues, Optional<String[]> current) {
+        if (current.isPresent()) {
+            for (int i = 0; i < strValues.length; i++) {
+                if (PASSWORD_PLACEHOLDER.equals(strValues[i]) && i < current.get().length) {
+                    strValues[i] = current.get()[i];
+                }
+            }
+        }
+    }
+
+    private static void replacePlaceholders(String[] strValues) {
+        for (int i = 0; i < strValues.length; i++) {
+            if (PASSWORD_PLACEHOLDER.equals(strValues[i])) {
+                strValues[i] = "";
+            }
+        }
     }
 
     /**
@@ -363,13 +367,20 @@ public final class GwtServerUtil {
         final ComponentConfiguration backupCC = currentCC;
         if (backupCC == null) {
             for (final GwtConfigParameter gwtConfigParam : config.getParameters()) {
-                properties.put(gwtConfigParam.getId(), getUserDefinedObject(gwtConfigParam, null));
+                final Object objValue = getUserDefinedObject(gwtConfigParam, null);
+                if (!isUnsetPasswordValue(gwtConfigParam.getType(), objValue)) {
+                    properties.put(gwtConfigParam.getId(), objValue);
+                }
             }
         } else {
             final Map<String, Object> backupConfigProp = backupCC.getConfigurationProperties();
             for (final GwtConfigParameter gwtConfigParam : config.getParameters()) {
-                properties.put(gwtConfigParam.getId(),
-                        getUserDefinedObject(gwtConfigParam, backupConfigProp.get(gwtConfigParam.getId())));
+                final Map<String, Object> currentConfigProp = currentCC.getConfigurationProperties();
+                final Object objValue = getUserDefinedObject(gwtConfigParam,
+                        currentConfigProp.get(gwtConfigParam.getName()));
+                if (!isUnsetPasswordValue(gwtConfigParam.getType(), objValue)) {
+                    properties.put(gwtConfigParam.getId(), objValue);
+                }
             }
 
             // Force kura.service.pid into properties, if originally present
@@ -534,7 +545,9 @@ public final class GwtServerUtil {
             } else {
                 objValue = GwtServerUtil.getUserDefinedObject(gwtConfigParam, currentValue);
             }
-            properties.put(gwtConfigParam.getId(), objValue);
+            if (!isUnsetPasswordValue(gwtConfigParam.getType(), objValue)) {
+                properties.put(gwtConfigParam.getId(), objValue);
+            }
         }
 
         // Force kura.service.pid into properties, if originally present
