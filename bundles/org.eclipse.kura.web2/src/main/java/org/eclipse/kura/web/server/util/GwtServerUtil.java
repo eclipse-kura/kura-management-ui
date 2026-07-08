@@ -282,12 +282,9 @@ public final class GwtServerUtil {
 
         if (param.getType() == GwtConfigParameterType.PASSWORD && PASSWORD_PLACEHOLDER.equals(strValue)) {
             // the user did not touch this field: keep the currently stored password
-            // unchanged.
-            // If there is no currently stored password, leave the property unset rather
-            // than
-            // guessing a value here, so the configuration service can apply the metatype
-            // default
-            // only if the property is not already present in the configuration.
+            // unchanged. If there is no currently stored password, leave the property unset rather
+            // than guessing a value here, so the configuration service can apply the metatype
+            // default only if the property is not already present in the configuration.
             return currentObjValue instanceof Password ? currentObjValue : null;
         }
 
