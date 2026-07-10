@@ -14,7 +14,9 @@
 package org.eclipse.kura.web.server.util;
 
 import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -29,6 +31,8 @@ import org.junit.Test;
 
 public class GwtServerUtilPasswordTest {
 
+    private static final String PASSWORD = "password";
+    private static final String PASSWORD_UPPERCASE = "Password";
     private GwtConfigParameter passwordParam;
     private Object currentObjValue;
     private Object result;
@@ -37,24 +41,20 @@ public class GwtServerUtilPasswordTest {
     private ComponentConfigurationImpl currentCC;
     private Map<String, Object> fillResult;
 
-    // ----------------------------------------------------------------
-    // Scenarios — getUserDefinedObject (scalar placeholder handling)
-    // ----------------------------------------------------------------
-
     @Test
-    public void placeholderWithNullCurrentValueAndNotRequiredReturnsEmptyPassword() {
-        givenPasswordParam("password", false, null);
+    public void placeholderWithNullCurrentValueAndNotRequiredReturnsNull() {
+        givenPasswordParam(PASSWORD, false, null);
         givenParamValue(GwtServerUtil.PASSWORD_PLACEHOLDER);
         givenCurrentObjValue(null);
 
         whenGetUserDefinedObjectIsCalled();
 
-        thenResultIsEmptyPassword();
+        thenResultIsNull();
     }
 
     @Test
     public void placeholderWithExistingPasswordCurrentValuePreservesIt() {
-        givenPasswordParam("password", false, null);
+        givenPasswordParam(PASSWORD, false, null);
         givenParamValue(GwtServerUtil.PASSWORD_PLACEHOLDER);
         givenCurrentObjValue(new Password("secret"));
 
@@ -65,7 +65,7 @@ public class GwtServerUtilPasswordTest {
 
     @Test
     public void placeholderWithEmptyPasswordCurrentValuePreservesEmptyPassword() {
-        givenPasswordParam("password", false, null);
+        givenPasswordParam(PASSWORD, false, null);
         givenParamValue(GwtServerUtil.PASSWORD_PLACEHOLDER);
         givenCurrentObjValue(new Password(""));
 
@@ -75,30 +75,30 @@ public class GwtServerUtilPasswordTest {
     }
 
     @Test
-    public void placeholderWithNullCurrentValueAndRequiredUsesDefault() {
-        givenPasswordParam("password", true, "defaultpass");
+    public void placeholderWithNullCurrentValueAndRequiredIgnoresDefaultReturnsNull() {
+        givenPasswordParam(PASSWORD, true, "defaultpass");
         givenParamValue(GwtServerUtil.PASSWORD_PLACEHOLDER);
         givenCurrentObjValue(null);
 
         whenGetUserDefinedObjectIsCalled();
 
-        thenResultIsPasswordWithValue("defaultpass");
+        thenResultIsNull();
     }
 
     @Test
-    public void placeholderWithNullCurrentValueAndRequiredButNoDefaultReturnsEmptyPassword() {
-        givenPasswordParam("password", true, null);
+    public void placeholderWithNullCurrentValueAndRequiredButNoDefaultReturnsNull() {
+        givenPasswordParam(PASSWORD, true, null);
         givenParamValue(GwtServerUtil.PASSWORD_PLACEHOLDER);
         givenCurrentObjValue(null);
 
         whenGetUserDefinedObjectIsCalled();
 
-        thenResultIsEmptyPassword();
+        thenResultIsNull();
     }
 
     @Test
     public void nonPlaceholderPasswordValueIsUsedDirectly() {
-        givenPasswordParam("password", false, null);
+        givenPasswordParam(PASSWORD, false, null);
         givenParamValue("newpassword");
         givenCurrentObjValue(null);
 
@@ -107,32 +107,28 @@ public class GwtServerUtilPasswordTest {
         thenResultIsPasswordWithValue("newpassword");
     }
 
-    // ----------------------------------------------------------------
-    // Scenarios — fillPropertiesFromConfiguration (getName vs getId bug)
-    // ----------------------------------------------------------------
-
     @Test
-    public void fillPropertiesUsesIdNotNameForPasswordLookup() {
-        givenGwtConfigWithPasswordParam("password", "Password");
-        givenCurrentCCWithPassword("password", new Password("stored"));
+    public void fillPropertiesUsesNameForPasswordLookup() {
+        givenGwtConfigWithPasswordParam(PASSWORD, PASSWORD_UPPERCASE);
+        givenCurrentCCWithPassword(PASSWORD_UPPERCASE, new Password("stored"));
 
         whenFillPropertiesFromConfigurationIsCalled();
 
-        thenFillResultPasswordHasValue("password", "stored");
+        thenFillResultPasswordHasValue(PASSWORD, "stored");
     }
 
     @Test
-    public void fillPropertiesWithNullCurrentCCReturnsEmptyPasswordForPlaceholder() {
-        givenGwtConfigWithPasswordParam("password", "Password");
+    public void fillPropertiesWithNullCurrentCCOmitsPasswordForPlaceholder() {
+        givenGwtConfigWithPasswordParam(PASSWORD, PASSWORD_UPPERCASE);
 
         whenFillPropertiesFromConfigurationWithNullCCIsCalled();
 
-        thenFillResultPasswordIsEmpty("password");
+        thenFillResultHasNoPasswordEntry(PASSWORD);
     }
 
-    // ----------------------------------------------------------------
-    // Steps
-    // ----------------------------------------------------------------
+    /*
+     * Given
+     */
 
     private void givenPasswordParam(String id, boolean required, String defaultValue) {
         this.passwordParam = new GwtConfigParameter();
@@ -175,6 +171,10 @@ public class GwtServerUtilPasswordTest {
         this.currentCC = new ComponentConfigurationImpl("test.pid", null, props);
     }
 
+    /*
+     * When
+     */
+
     private void whenGetUserDefinedObjectIsCalled() {
         this.result = GwtServerUtil.getUserDefinedObject(this.passwordParam, this.currentObjValue);
     }
@@ -187,9 +187,17 @@ public class GwtServerUtilPasswordTest {
         this.fillResult = GwtServerUtil.fillPropertiesFromConfiguration(this.gwtConfig, null);
     }
 
+    /*
+     * Then
+     */
+
     private void thenResultIsEmptyPassword() {
         assertNotNull("result must not be null", this.result);
         assertArrayEquals("password must be empty", new char[0], ((Password) this.result).getPassword());
+    }
+
+    private void thenResultIsNull() {
+        assertNull("result must be null", this.result);
     }
 
     private void thenResultIsPasswordWithValue(String expected) {
@@ -197,11 +205,9 @@ public class GwtServerUtilPasswordTest {
         assertArrayEquals("password value mismatch", expected.toCharArray(), ((Password) this.result).getPassword());
     }
 
-    private void thenFillResultPasswordIsEmpty(String key) {
+    private void thenFillResultHasNoPasswordEntry(String key) {
         assertNotNull("fill result must not be null", this.fillResult);
-        Object value = this.fillResult.get(key);
-        assertNotNull("password entry must be present", value);
-        assertArrayEquals("password must be empty", new char[0], ((Password) value).getPassword());
+        assertFalse("password entry must not be present", this.fillResult.containsKey(key));
     }
 
     private void thenFillResultPasswordHasValue(String key, String expected) {
