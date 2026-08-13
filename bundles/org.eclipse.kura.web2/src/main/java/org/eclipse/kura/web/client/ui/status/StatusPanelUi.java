@@ -223,6 +223,8 @@ public class StatusPanelUi extends Composite {
     // byte-matches GwtStatusServiceImpl#formatDateTime (server side): same pattern, same UTC-offset
     // rendering (zero offset -> "+00:00"), so the tick is indistinguishable from a server-rendered value
     private static String formatClockValue(long epochMillis, int offsetMillis, String zoneId) {
+        // the negation is required: offsetMillis is positive east of UTC (java.time convention),
+        // while GWT's TimeZone.createTimeZone takes minutes WEST of UTC (JS getTimezoneOffset convention)
         String datePart = CLOCK_DATE_FORMAT.format(new Date(epochMillis),
                 TimeZone.createTimeZone(-(offsetMillis / 60000)));
 
