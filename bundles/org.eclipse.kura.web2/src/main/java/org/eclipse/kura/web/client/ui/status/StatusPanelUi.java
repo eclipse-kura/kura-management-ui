@@ -79,7 +79,8 @@ public class StatusPanelUi extends Composite {
             if ("Cloud Services".equals(row.getName()) || "Connection Name".equals(row.getName())
                     || "Ethernet Settings".equals(row.getName()) || "Wireless Settings".equals(row.getName())
                     || "Cellular Settings".equals(row.getName()) || "Position Status".equals(row.getName())
-                    || "Tamper Detection Status".equals(row.getName())) {
+                    || "Tamper Detection Status".equals(row.getName()) || "System Clock".equals(row.getName())
+                    || "システムクロック".equals(row.getName())) {
                 return "rowHeader";
             } else {
                 return " ";

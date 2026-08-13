@@ -19,15 +19,22 @@ import static java.util.Comparator.comparing;
 import static java.util.Comparator.naturalOrder;
 import static java.util.Comparator.nullsFirst;
 
+import java.time.Instant;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 
+import org.eclipse.kura.KuraException;
+import org.eclipse.kura.clock.ClockService;
 import org.eclipse.kura.cloud.CloudService;
 import org.eclipse.kura.cloudconnection.CloudConnectionManager;
 import org.eclipse.kura.cloudconnection.CloudEndpoint;
@@ -65,6 +72,7 @@ public class GwtStatusServiceImpl extends OsgiRemoteServiceServlet implements Gw
     private static final String MODE = "Mode: ";
     private static final String SUBNET_MASK = "Subnet Mask: ";
     private static final String POSITION_STATUS = "positionStatus";
+    private static final String CLOCK_STATUS = "clockStatus";
     private static final Logger logger = LoggerFactory.getLogger(GwtStatusServiceImpl.class);
     private static final long serialVersionUID = 8256280782910423734L;
     private static final String KURA_SERVICE_PID = ConfigurationService.KURA_SERVICE_PID;
@@ -89,6 +97,7 @@ public class GwtStatusServiceImpl extends OsgiRemoteServiceServlet implements Gw
         }
         pairs.addAll(getPositionStatus());
         pairs.addAll(getTamperDetectionStatus());
+        pairs.addAll(getClockStatus());
 
         return new ArrayList<>(pairs);
     }
@@ -553,5 +562,56 @@ public class GwtStatusServiceImpl extends OsgiRemoteServiceServlet implements Gw
         });
 
         return pairs;
+    }
+
+    private List<GwtGroupedNVPair> getClockStatus() {
+        final List<GwtGroupedNVPair> pairs = new ArrayList<>();
+
+        pairs.add(new GwtGroupedNVPair(CLOCK_STATUS, "System Date/Time (YYYY-MM-DD)",
+                "<span id=\"status-clock-datetime\">"
+                        + formatDateTime(System.currentTimeMillis(), ZoneId.systemDefault()) + "</span>"));
+
+        try {
+            ServiceLocator.applyToServiceOptionally(ClockService.class, clockService -> {
+                if (clockService != null) {
+                    pairs.add(new GwtGroupedNVPair(CLOCK_STATUS, "Last Clock Sync (YYYY-MM-DD)",
+                            "<span id=\"status-clock-lastsync\">"
+                                    + formatLastSync(clockService, ZoneId.systemDefault()) + "</span>"));
+                }
+                return null;
+            });
+        } catch (final GwtKuraException e) {
+            // ClockService can be legitimately absent (e.g. Docker deployments); the unconditional
+            // row above must still be returned, so a lookup failure here is not user-facing.
+            logger.debug("failed to get clock sync status", e);
+        }
+
+        return pairs;
+    }
+
+    static String formatDateTime(long epochMillis, ZoneId zone) {
+        // Locale.ROOT keeps the pattern digit-only (no month names, no locale-dependent separators),
+        // since this value is rendered verbatim without any client-side localization.
+        final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss", Locale.ROOT);
+        final ZonedDateTime zonedDateTime = Instant.ofEpochMilli(epochMillis).atZone(zone);
+        final String offsetId = zonedDateTime.getOffset().getId();
+        // ZoneOffset#getId() returns "Z" for a zero offset; normalize to "+00:00" for a uniform UTC±HH:MM display.
+        final String offset = "Z".equals(offsetId) ? "+00:00" : offsetId;
+
+        return zonedDateTime.format(formatter) + " (UTC" + offset + ", " + zone.getId() + ")";
+    }
+
+    static String formatLastSync(ClockService clockService, ZoneId zone) {
+        try {
+            final Date lastSync = clockService.getLastSync();
+
+            if (lastSync == null) {
+                return "never (since startup)";
+            }
+
+            return formatDateTime(lastSync.getTime(), zone);
+        } catch (final KuraException e) {
+            return "sync disabled";
+        }
     }
 }
