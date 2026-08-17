@@ -591,12 +591,9 @@ public class GwtStatusServiceImpl extends OsgiRemoteServiceServlet implements Gw
     }
 
     static String formatDateTime(long epochMillis, ZoneId zone) {
-        // Locale.ROOT keeps the pattern digit-only (no month names, no locale-dependent separators),
-        // since this value is rendered verbatim without any client-side localization.
         final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss", Locale.ROOT);
         final ZonedDateTime zonedDateTime = Instant.ofEpochMilli(epochMillis).atZone(zone);
         final String offsetId = zonedDateTime.getOffset().getId();
-        // ZoneOffset#getId() returns "Z" for a zero offset; normalize to "+00:00" for a uniform UTC±HH:MM display.
         final String offset = "Z".equals(offsetId) ? "+00:00" : offsetId;
 
         return zonedDateTime.format(formatter) + " (UTC" + offset + ", " + zone.getId() + ")";

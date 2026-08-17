@@ -77,8 +77,6 @@ public class StatusPanelUi extends Composite {
     private static final String CLOCK_ENDPOINT_URL = Console.ADMIN_ROOT + '/' + GWT.getModuleName() + "/clock";
     private static final int CLOCK_TICK_INTERVAL_MS = 1000;
     private static final int CLOCK_POLL_INTERVAL_MS = 2000;
-    // ASCII-digit numeric pattern: identical output from Locale.ROOT (server) and both compiled
-    // UI locales en/ja (client), which is what keeps the tick byte-matching the server render (ADR-0002).
     private static final DateTimeFormat CLOCK_DATE_FORMAT = DateTimeFormat.getFormat("yyyy-MM-dd HH:mm:ss");
 
     private final GwtStatusServiceAsync gwtStatusService = GWT.create(GwtStatusService.class);
@@ -177,7 +175,6 @@ public class StatusPanelUi extends Composite {
         super.onUnload();
     }
 
-    // zero server traffic while the page is hidden/detached, per the feature's traffic cost ceiling
     private void pollClock() {
         if (!isVisible() || !isAttached()) {
             return;
@@ -220,8 +217,6 @@ public class StatusPanelUi extends Composite {
         updateClockRow(formatClockValue(displayedEpoch, this.clockSeedOffsetMillis, this.clockSeedZoneId));
     }
 
-    // byte-matches GwtStatusServiceImpl#formatDateTime (server side): same pattern, same UTC-offset
-    // rendering (zero offset -> "+00:00"), so the tick is indistinguishable from a server-rendered value
     private static String formatClockValue(long epochMillis, int offsetMillis, String zoneId) {
         // the negation is required: offsetMillis is positive east of UTC (java.time convention),
         // while GWT's TimeZone.createTimeZone takes minutes WEST of UTC (JS getTimezoneOffset convention)
@@ -240,7 +235,6 @@ public class StatusPanelUi extends Composite {
         return value < 10 ? "0" + value : String.valueOf(value);
     }
 
-    // row-scoped update only: never a full-table redraw and never a server call from the tick
     private void updateClockRow(String wrappedHtml) {
         List<GwtGroupedNVPair> list = this.statusGridProvider.getList();
         for (int i = 0; i < list.size(); i++) {
