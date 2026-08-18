@@ -36,6 +36,8 @@ import java.util.Optional;
 
 import org.eclipse.kura.KuraException;
 import org.eclipse.kura.clock.ClockService;
+import org.eclipse.kura.clock.ClockSyncState;
+import org.eclipse.kura.clock.ClockSyncStatus;
 import org.eclipse.kura.cloud.CloudService;
 import org.eclipse.kura.cloudconnection.CloudConnectionManager;
 import org.eclipse.kura.cloudconnection.CloudEndpoint;
@@ -49,6 +51,7 @@ import org.eclipse.kura.security.tamper.detection.TamperStatus;
 import org.eclipse.kura.type.TypedValue;
 import org.eclipse.kura.web.server.util.ServiceLocator;
 import org.eclipse.kura.web.shared.GwtKuraException;
+import org.eclipse.kura.web.shared.GwtSafeHtmlUtils;
 import org.eclipse.kura.web.shared.model.GwtCloudConnectionInfo;
 import org.eclipse.kura.web.shared.model.GwtGroupedNVPair;
 import org.eclipse.kura.web.shared.model.GwtModemInterfaceConfig;
@@ -578,6 +581,7 @@ public class GwtStatusServiceImpl extends OsgiRemoteServiceServlet implements Gw
                     pairs.add(new GwtGroupedNVPair(CLOCK_STATUS, "Last Clock Sync (YYYY-MM-DD)",
                             "<span id=\"status-clock-lastsync\">"
                                     + formatLastSync(clockService, ZoneId.systemDefault()) + "</span>"));
+                    addSyncHealthRows(pairs, clockService);
                 }
                 return null;
             });
@@ -610,6 +614,42 @@ public class GwtStatusServiceImpl extends OsgiRemoteServiceServlet implements Gw
             return formatDateTime(lastSync.getTime(), zone);
         } catch (final KuraException e) {
             return "sync disabled";
+        }
+    }
+
+    static void addSyncHealthRows(List<GwtGroupedNVPair> pairs, ClockService clockService) {
+        final ClockSyncStatus syncStatus;
+        try {
+            syncStatus = clockService.getSyncStatus();
+        } catch (final KuraException e) {
+            // deliberately byte-matches formatLastSync's failure rendering: the linux
+            // ClockServiceImpl throws SERVICE_UNAVAILABLE from both getLastSync() and
+            // getSyncStatus() when NTP sync is disabled, so the two rows must agree.
+            pairs.add(new GwtGroupedNVPair(CLOCK_STATUS, "Clock Sync Status",
+                    "<span id=\"status-clock-syncstatus\">sync disabled</span>"));
+            return;
+        }
+
+        pairs.add(new GwtGroupedNVPair(CLOCK_STATUS, "Clock Sync Status",
+                "<span id=\"status-clock-syncstatus\">" + formatSyncState(syncStatus.getState()) + "</span>"));
+
+        if (syncStatus.getSyncProvider() != null) {
+            // the value column renders as trusted HTML client-side; the provider string
+            // originates from device configuration (clock.provider), so it is escaped.
+            pairs.add(new GwtGroupedNVPair(CLOCK_STATUS, "Clock Sync Provider",
+                    "<span id=\"status-clock-syncprovider\">"
+                            + GwtSafeHtmlUtils.htmlEscape(syncStatus.getSyncProvider()) + "</span>"));
+        }
+    }
+
+    static String formatSyncState(ClockSyncState state) {
+        switch (state) {
+        case SYNCED:
+            return "synced";
+        case NOT_SYNCED:
+            return "not synced";
+        default:
+            return "unknown";
         }
     }
 }

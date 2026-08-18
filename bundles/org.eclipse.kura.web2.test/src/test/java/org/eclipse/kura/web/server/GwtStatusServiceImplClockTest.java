@@ -17,11 +17,16 @@ import static org.junit.Assert.assertEquals;
 
 import java.time.Instant;
 import java.time.ZoneId;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 import org.eclipse.kura.KuraErrorCode;
 import org.eclipse.kura.KuraException;
 import org.eclipse.kura.clock.ClockService;
+import org.eclipse.kura.clock.ClockSyncState;
+import org.eclipse.kura.clock.ClockSyncStatus;
+import org.eclipse.kura.web.shared.model.GwtGroupedNVPair;
 import org.junit.Test;
 
 public class GwtStatusServiceImplClockTest {
@@ -30,6 +35,8 @@ public class GwtStatusServiceImplClockTest {
     private ZoneId zone;
     private ClockService clockService;
     private String result;
+    private ClockSyncState syncState;
+    private List<GwtGroupedNVPair> pairs;
 
     @Test
     public void formatDateTimeRendersFixedOffsetZone() {
@@ -81,6 +88,101 @@ public class GwtStatusServiceImplClockTest {
         thenResultIs("sync disabled");
     }
 
+    @Test
+    public void addSyncHealthRowsWithSyncedStateAndNullProviderAppendsOnlyStatusRow() {
+        givenClockServiceReturningSyncStatus(ClockSyncState.SYNCED, null);
+
+        whenAddSyncHealthRowsIsCalled();
+
+        thenPairsCountIs(1);
+        thenPairHasGroupNameValue(0, "clockStatus", "Clock Sync Status",
+                "<span id=\"status-clock-syncstatus\">synced</span>");
+    }
+
+    @Test
+    public void addSyncHealthRowsWithNotSyncedStateAppendsNotSyncedStatusRow() {
+        givenClockServiceReturningSyncStatus(ClockSyncState.NOT_SYNCED, null);
+
+        whenAddSyncHealthRowsIsCalled();
+
+        thenPairsCountIs(1);
+        thenPairHasGroupNameValue(0, "clockStatus", "Clock Sync Status",
+                "<span id=\"status-clock-syncstatus\">not synced</span>");
+    }
+
+    @Test
+    public void addSyncHealthRowsWithUnknownStateAppendsUnknownStatusRow() {
+        givenClockServiceReturningSyncStatus(ClockSyncState.UNKNOWN, null);
+
+        whenAddSyncHealthRowsIsCalled();
+
+        thenPairsCountIs(1);
+        thenPairHasGroupNameValue(0, "clockStatus", "Clock Sync Status",
+                "<span id=\"status-clock-syncstatus\">unknown</span>");
+    }
+
+    @Test
+    public void addSyncHealthRowsWithNonNullProviderAppendsProviderRow() {
+        givenClockServiceReturningSyncStatus(ClockSyncState.SYNCED, "java-ntp");
+
+        whenAddSyncHealthRowsIsCalled();
+
+        thenPairsCountIs(2);
+        thenPairHasGroupNameValue(0, "clockStatus", "Clock Sync Status",
+                "<span id=\"status-clock-syncstatus\">synced</span>");
+        thenPairHasGroupNameValue(1, "clockStatus", "Clock Sync Provider",
+                "<span id=\"status-clock-syncprovider\">java-ntp</span>");
+    }
+
+    @Test
+    public void addSyncHealthRowsWithHtmlMetacharactersInProviderEscapesProviderValue() {
+        givenClockServiceReturningSyncStatus(ClockSyncState.SYNCED, "a<b>&\"c");
+
+        whenAddSyncHealthRowsIsCalled();
+
+        thenPairsCountIs(2);
+        thenPairHasGroupNameValue(1, "clockStatus", "Clock Sync Provider",
+                "<span id=\"status-clock-syncprovider\">a&lt;b&gt;&amp;&quot;c</span>");
+    }
+
+    @Test
+    public void addSyncHealthRowsWithKuraExceptionAppendsSyncDisabledRowOnly() {
+        givenClockServiceSyncStatusThrowing();
+
+        whenAddSyncHealthRowsIsCalled();
+
+        thenPairsCountIs(1);
+        thenPairHasGroupNameValue(0, "clockStatus", "Clock Sync Status",
+                "<span id=\"status-clock-syncstatus\">sync disabled</span>");
+    }
+
+    @Test
+    public void formatSyncStateMapsSyncedToSyncedLiteral() {
+        givenSyncState(ClockSyncState.SYNCED);
+
+        whenFormatSyncStateIsCalled();
+
+        thenResultIs("synced");
+    }
+
+    @Test
+    public void formatSyncStateMapsNotSyncedToNotSyncedLiteral() {
+        givenSyncState(ClockSyncState.NOT_SYNCED);
+
+        whenFormatSyncStateIsCalled();
+
+        thenResultIs("not synced");
+    }
+
+    @Test
+    public void formatSyncStateMapsUnknownToUnknownLiteral() {
+        givenSyncState(ClockSyncState.UNKNOWN);
+
+        whenFormatSyncStateIsCalled();
+
+        thenResultIs("unknown");
+    }
+
     /*
      * Given
      */
@@ -103,6 +205,40 @@ public class GwtStatusServiceImplClockTest {
         };
     }
 
+    private void givenClockServiceReturningSyncStatus(ClockSyncState state, String syncProvider) {
+        this.clockService = new ClockService() {
+
+            @Override
+            public Date getLastSync() {
+                return null;
+            }
+
+            @Override
+            public ClockSyncStatus getSyncStatus() {
+                return new ClockSyncStatus(state, null, syncProvider);
+            }
+        };
+    }
+
+    private void givenClockServiceSyncStatusThrowing() {
+        this.clockService = new ClockService() {
+
+            @Override
+            public Date getLastSync() {
+                return null;
+            }
+
+            @Override
+            public ClockSyncStatus getSyncStatus() throws KuraException {
+                throw new KuraException(KuraErrorCode.UNAVAILABLE_DEVICE);
+            }
+        };
+    }
+
+    private void givenSyncState(ClockSyncState state) {
+        this.syncState = state;
+    }
+
     /*
      * When
      */
@@ -115,11 +251,32 @@ public class GwtStatusServiceImplClockTest {
         this.result = GwtStatusServiceImpl.formatLastSync(this.clockService, this.zone);
     }
 
+    private void whenAddSyncHealthRowsIsCalled() {
+        this.pairs = new ArrayList<>();
+        GwtStatusServiceImpl.addSyncHealthRows(this.pairs, this.clockService);
+    }
+
+    private void whenFormatSyncStateIsCalled() {
+        this.result = GwtStatusServiceImpl.formatSyncState(this.syncState);
+    }
+
     /*
      * Then
      */
 
     private void thenResultIs(String expected) {
         assertEquals(expected, this.result);
+    }
+
+    private void thenPairsCountIs(int expectedCount) {
+        assertEquals(expectedCount, this.pairs.size());
+    }
+
+    private void thenPairHasGroupNameValue(int index, String expectedGroup, String expectedName,
+            String expectedValue) {
+        GwtGroupedNVPair pair = this.pairs.get(index);
+        assertEquals(expectedGroup, pair.getGroup());
+        assertEquals(expectedName, pair.getName());
+        assertEquals(expectedValue, pair.getValue());
     }
 }
