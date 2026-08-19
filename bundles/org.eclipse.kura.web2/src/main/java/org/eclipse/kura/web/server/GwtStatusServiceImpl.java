@@ -622,9 +622,6 @@ public class GwtStatusServiceImpl extends OsgiRemoteServiceServlet implements Gw
         try {
             syncStatus = clockService.getSyncStatus();
         } catch (final KuraException e) {
-            // deliberately byte-matches formatLastSync's failure rendering: the linux
-            // ClockServiceImpl throws SERVICE_UNAVAILABLE from both getLastSync() and
-            // getSyncStatus() when NTP sync is disabled, so the two rows must agree.
             pairs.add(new GwtGroupedNVPair(CLOCK_STATUS, "Clock Sync Status",
                     "<span id=\"status-clock-syncstatus\">sync disabled</span>"));
             return;
@@ -634,8 +631,6 @@ public class GwtStatusServiceImpl extends OsgiRemoteServiceServlet implements Gw
                 "<span id=\"status-clock-syncstatus\">" + formatSyncState(syncStatus.getState()) + "</span>"));
 
         if (syncStatus.getSyncProvider() != null) {
-            // the value column renders as trusted HTML client-side; the provider string
-            // originates from device configuration (clock.provider), so it is escaped.
             pairs.add(new GwtGroupedNVPair(CLOCK_STATUS, "Clock Sync Provider",
                     "<span id=\"status-clock-syncprovider\">"
                             + GwtSafeHtmlUtils.htmlEscape(syncStatus.getSyncProvider()) + "</span>"));

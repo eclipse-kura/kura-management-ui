@@ -26,12 +26,6 @@ import jakarta.servlet.http.HttpServletResponse;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 
-/**
- * Read-only time source for the Status page's live clock. No XSRF token is
- * required by design: the endpoint has no side effects and is polled at
- * 0.5 Hz; session authentication is enforced by the whiteboard context this
- * servlet is registered under, not by this class.
- */
 public class ClockServlet extends HttpServlet {
 
     private static final long serialVersionUID = 1L;
