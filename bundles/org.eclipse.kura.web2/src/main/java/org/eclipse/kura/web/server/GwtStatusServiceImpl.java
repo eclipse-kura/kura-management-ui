@@ -106,6 +106,23 @@ public class GwtStatusServiceImpl extends OsgiRemoteServiceServlet implements Gw
         return new ArrayList<>(pairs);
     }
 
+    @Override
+    public ArrayList<GwtGroupedNVPair> getClockHealth(GwtXSRFToken xsrfToken) throws GwtKuraException {
+        checkXSRFToken(xsrfToken);
+        final ArrayList<GwtGroupedNVPair> pairs = new ArrayList<>();
+        try {
+            ServiceLocator.applyToServiceOptionally(ClockService.class, clockService -> {
+                if (clockService != null) {
+                    addClockSyncRows(pairs, clockService);
+                }
+                return null;
+            });
+        } catch (final GwtKuraException e) {
+            logger.debug("failed to get clock sync status", e);
+        }
+        return pairs;
+    }
+
     private List<GwtGroupedNVPair> getTamperDetectionStatus() {
         final List<GwtGroupedNVPair> result = new ArrayList<>();
 
@@ -578,10 +595,7 @@ public class GwtStatusServiceImpl extends OsgiRemoteServiceServlet implements Gw
         try {
             ServiceLocator.applyToServiceOptionally(ClockService.class, clockService -> {
                 if (clockService != null) {
-                    pairs.add(new GwtGroupedNVPair(CLOCK_STATUS, "Last Clock Sync (YYYY-MM-DD)",
-                            "<span id=\"status-clock-lastsync\">"
-                                    + formatLastSync(clockService, ZoneId.systemDefault()) + "</span>"));
-                    addSyncHealthRows(pairs, clockService);
+                    addClockSyncRows(pairs, clockService);
                 }
                 return null;
             });
@@ -617,6 +631,13 @@ public class GwtStatusServiceImpl extends OsgiRemoteServiceServlet implements Gw
         }
     }
 
+    static void addClockSyncRows(List<GwtGroupedNVPair> pairs, ClockService clockService) {
+        pairs.add(new GwtGroupedNVPair(CLOCK_STATUS, "Last Clock Sync (YYYY-MM-DD)",
+                "<span id=\"status-clock-lastsync\">" + formatLastSync(clockService, ZoneId.systemDefault())
+                        + "</span>"));
+        addSyncHealthRows(pairs, clockService);
+    }
+
     static void addSyncHealthRows(List<GwtGroupedNVPair> pairs, ClockService clockService) {
         final ClockSyncStatus syncStatus;
         try {
@@ -627,8 +648,22 @@ public class GwtStatusServiceImpl extends OsgiRemoteServiceServlet implements Gw
             return;
         }
 
+        final String statusSpanTag = syncStatus.getState() == ClockSyncState.FAILED
+                ? "<span id=\"status-clock-syncstatus\" class=\"text-danger\">"
+                : "<span id=\"status-clock-syncstatus\">";
         pairs.add(new GwtGroupedNVPair(CLOCK_STATUS, "Clock Sync Status",
-                "<span id=\"status-clock-syncstatus\">" + formatSyncState(syncStatus.getState()) + "</span>"));
+                statusSpanTag + formatSyncState(syncStatus.getState()) + "</span>"));
+
+        if (syncStatus.getFailureReason() != null) {
+            pairs.add(new GwtGroupedNVPair(CLOCK_STATUS, "Clock Sync Failure",
+                    "<span id=\"status-clock-failurereason\">"
+                            + GwtSafeHtmlUtils.htmlEscape(syncStatus.getFailureReason()) + "</span>"));
+        }
+
+        if (syncStatus.getRetryCount() != null) {
+            pairs.add(new GwtGroupedNVPair(CLOCK_STATUS, "Clock Sync Retries",
+                    "<span id=\"status-clock-retrycount\">" + syncStatus.getRetryCount() + "</span>"));
+        }
 
         if (syncStatus.getSyncProvider() != null) {
             pairs.add(new GwtGroupedNVPair(CLOCK_STATUS, "Clock Sync Provider",
@@ -643,6 +678,8 @@ public class GwtStatusServiceImpl extends OsgiRemoteServiceServlet implements Gw
             return "synced";
         case NOT_SYNCED:
             return "not synced";
+        case FAILED:
+            return "failed";
         default:
             return "unknown";
         }

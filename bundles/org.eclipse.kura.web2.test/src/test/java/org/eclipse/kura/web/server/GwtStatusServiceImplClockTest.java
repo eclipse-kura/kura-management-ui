@@ -157,6 +157,113 @@ public class GwtStatusServiceImplClockTest {
     }
 
     @Test
+    public void addSyncHealthRowsWithFailedStateAppendsStatusRowWithDangerClass() {
+        givenClockServiceReturningSyncStatus(ClockSyncState.FAILED, null);
+
+        whenAddSyncHealthRowsIsCalled();
+
+        thenPairsCountIs(1);
+        thenPairHasGroupNameValue(0, "clockStatus", "Clock Sync Status",
+                "<span id=\"status-clock-syncstatus\" class=\"text-danger\">failed</span>");
+    }
+
+    @Test
+    public void addSyncHealthRowsWithNonNullFailureReasonAppendsFailureRow() {
+        givenClockServiceReturningSyncStatus(ClockSyncState.SYNCED, null, "ntp timeout", null);
+
+        whenAddSyncHealthRowsIsCalled();
+
+        thenPairsCountIs(2);
+        thenPairHasGroupNameValue(1, "clockStatus", "Clock Sync Failure",
+                "<span id=\"status-clock-failurereason\">ntp timeout</span>");
+    }
+
+    @Test
+    public void addSyncHealthRowsWithNullFailureReasonOmitsFailureRow() {
+        givenClockServiceReturningSyncStatus(ClockSyncState.NOT_SYNCED, null, null, null);
+
+        whenAddSyncHealthRowsIsCalled();
+
+        thenPairsCountIs(1);
+        thenPairHasGroupNameValue(0, "clockStatus", "Clock Sync Status",
+                "<span id=\"status-clock-syncstatus\">not synced</span>");
+    }
+
+    @Test
+    public void addSyncHealthRowsWithHtmlMetacharactersInFailureReasonEscapesFailureValue() {
+        givenClockServiceReturningSyncStatus(ClockSyncState.SYNCED, null, "a<b>&\"c", null);
+
+        whenAddSyncHealthRowsIsCalled();
+
+        thenPairsCountIs(2);
+        thenPairHasGroupNameValue(1, "clockStatus", "Clock Sync Failure",
+                "<span id=\"status-clock-failurereason\">a&lt;b&gt;&amp;&quot;c</span>");
+    }
+
+    @Test
+    public void addSyncHealthRowsWithRetryCountThreeAppendsRetriesRow() {
+        givenClockServiceReturningSyncStatus(ClockSyncState.SYNCED, null, null, Integer.valueOf(3));
+
+        whenAddSyncHealthRowsIsCalled();
+
+        thenPairsCountIs(2);
+        thenPairHasGroupNameValue(1, "clockStatus", "Clock Sync Retries",
+                "<span id=\"status-clock-retrycount\">3</span>");
+    }
+
+    @Test
+    public void addSyncHealthRowsWithZeroRetryCountAppendsRetriesRowWithZero() {
+        givenClockServiceReturningSyncStatus(ClockSyncState.SYNCED, null, null, Integer.valueOf(0));
+
+        whenAddSyncHealthRowsIsCalled();
+
+        thenPairsCountIs(2);
+        thenPairHasGroupNameValue(1, "clockStatus", "Clock Sync Retries",
+                "<span id=\"status-clock-retrycount\">0</span>");
+    }
+
+    @Test
+    public void addSyncHealthRowsWithNullRetryCountOmitsRetriesRow() {
+        givenClockServiceReturningSyncStatus(ClockSyncState.NOT_SYNCED, null, null, null);
+
+        whenAddSyncHealthRowsIsCalled();
+
+        thenPairsCountIs(1);
+        thenPairHasGroupNameValue(0, "clockStatus", "Clock Sync Status",
+                "<span id=\"status-clock-syncstatus\">not synced</span>");
+    }
+
+    @Test
+    public void addSyncHealthRowsWithAllOptionalFieldsPresentOrdersRowsStatusFailureRetriesProvider() {
+        givenClockServiceReturningSyncStatus(ClockSyncState.FAILED, "java-ntp", "ntp timeout", Integer.valueOf(5));
+
+        whenAddSyncHealthRowsIsCalled();
+
+        thenPairsCountIs(4);
+        thenPairHasGroupNameValue(0, "clockStatus", "Clock Sync Status",
+                "<span id=\"status-clock-syncstatus\" class=\"text-danger\">failed</span>");
+        thenPairHasGroupNameValue(1, "clockStatus", "Clock Sync Failure",
+                "<span id=\"status-clock-failurereason\">ntp timeout</span>");
+        thenPairHasGroupNameValue(2, "clockStatus", "Clock Sync Retries",
+                "<span id=\"status-clock-retrycount\">5</span>");
+        thenPairHasGroupNameValue(3, "clockStatus", "Clock Sync Provider",
+                "<span id=\"status-clock-syncprovider\">java-ntp</span>");
+    }
+
+    @Test
+    public void addClockSyncRowsWithNullLastSyncPrependsNeverSinceStartupRowThenSyncHealthRows() {
+        givenClockServiceReturningSyncStatus(ClockSyncState.SYNCED, null);
+
+        whenAddClockSyncRowsIsCalled();
+
+        thenPairsCountIs(2);
+        thenPairHasNameValue(0, "Last Clock Sync (YYYY-MM-DD)",
+                "<span id=\"status-clock-lastsync\">never (since startup)</span>");
+        thenPairHasGroupNameValue(1, "clockStatus", "Clock Sync Status",
+                "<span id=\"status-clock-syncstatus\">synced</span>");
+    }
+
+    @Test
     public void formatSyncStateMapsSyncedToSyncedLiteral() {
         givenSyncState(ClockSyncState.SYNCED);
 
@@ -183,6 +290,15 @@ public class GwtStatusServiceImplClockTest {
         thenResultIs("unknown");
     }
 
+    @Test
+    public void formatSyncStateMapsFailedToFailedLiteral() {
+        givenSyncState(ClockSyncState.FAILED);
+
+        whenFormatSyncStateIsCalled();
+
+        thenResultIs("failed");
+    }
+
     /*
      * Given
      */
@@ -206,6 +322,11 @@ public class GwtStatusServiceImplClockTest {
     }
 
     private void givenClockServiceReturningSyncStatus(ClockSyncState state, String syncProvider) {
+        givenClockServiceReturningSyncStatus(state, syncProvider, null, null);
+    }
+
+    private void givenClockServiceReturningSyncStatus(ClockSyncState state, String syncProvider,
+            String failureReason, Integer retryCount) {
         this.clockService = new ClockService() {
 
             @Override
@@ -215,7 +336,7 @@ public class GwtStatusServiceImplClockTest {
 
             @Override
             public ClockSyncStatus getSyncStatus() {
-                return new ClockSyncStatus(state, null, syncProvider);
+                return new ClockSyncStatus(state, null, syncProvider, failureReason, retryCount);
             }
         };
     }
@@ -256,6 +377,11 @@ public class GwtStatusServiceImplClockTest {
         GwtStatusServiceImpl.addSyncHealthRows(this.pairs, this.clockService);
     }
 
+    private void whenAddClockSyncRowsIsCalled() {
+        this.pairs = new ArrayList<>();
+        GwtStatusServiceImpl.addClockSyncRows(this.pairs, this.clockService);
+    }
+
     private void whenFormatSyncStateIsCalled() {
         this.result = GwtStatusServiceImpl.formatSyncState(this.syncState);
     }
@@ -276,6 +402,14 @@ public class GwtStatusServiceImplClockTest {
             String expectedValue) {
         GwtGroupedNVPair pair = this.pairs.get(index);
         assertEquals(expectedGroup, pair.getGroup());
+        assertEquals(expectedName, pair.getName());
+        assertEquals(expectedValue, pair.getValue());
+    }
+
+    // Group is intentionally unasserted here: the contract does not state the
+    // group name for the "Last Clock Sync" row.
+    private void thenPairHasNameValue(int index, String expectedName, String expectedValue) {
+        GwtGroupedNVPair pair = this.pairs.get(index);
         assertEquals(expectedName, pair.getName());
         assertEquals(expectedValue, pair.getValue());
     }
