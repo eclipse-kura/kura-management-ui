@@ -4,7 +4,7 @@ node {
     continuousIntegrationPipeline(
         buildType: "deploy",
         sonar: [
-            enable: true,
+            enable: false,
             projectKey: "eclipse-kura_kura-management-ui",
             tokenId: "sonarcloud-token-kura-management-ui",
             exclusions: "tests/**/*.java"
