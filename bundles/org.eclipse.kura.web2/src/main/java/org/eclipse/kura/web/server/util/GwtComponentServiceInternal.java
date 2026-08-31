@@ -545,7 +545,7 @@ public class GwtComponentServiceInternal {
         return gwtParams;
     }
 
-    private static List<GwtConfigParameter> getADProperties(ComponentConfiguration config) {
+    static List<GwtConfigParameter> getADProperties(ComponentConfiguration config) {
         List<GwtConfigParameter> gwtParams = new ArrayList<>();
         OCD ocd = config.getDefinition();
         for (AD ad : ocd.getAD()) {
@@ -556,6 +556,7 @@ public class GwtComponentServiceInternal {
             gwtParam.setType(GwtConfigParameterType.valueOf(ad.getType().name()));
             gwtParam.setRequired(ad.isRequired());
             gwtParam.setCardinality(ad.getCardinality());
+            gwtParam.setDefault(ad.getDefault());
             if (ad.getOption() != null && !ad.getOption().isEmpty()) {
                 Map<String, String> options = new HashMap<>();
                 for (Option option : ad.getOption()) {
