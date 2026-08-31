@@ -545,7 +545,6 @@ public class GwtComponentServiceInternal {
         return gwtParams;
     }
 
-    // package-private for testing
     static List<GwtConfigParameter> getADProperties(ComponentConfiguration config) {
         List<GwtConfigParameter> gwtParams = new ArrayList<>();
         OCD ocd = config.getDefinition();
