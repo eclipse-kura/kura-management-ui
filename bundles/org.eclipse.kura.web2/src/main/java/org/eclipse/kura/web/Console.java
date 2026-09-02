@@ -58,6 +58,7 @@ import org.eclipse.kura.web.server.GwtStatusServiceImpl;
 import org.eclipse.kura.web.server.GwtUserServiceImpl;
 import org.eclipse.kura.web.server.GwtWireGraphServiceImpl;
 import org.eclipse.kura.web.server.servlet.ChannelServlet;
+import org.eclipse.kura.web.server.servlet.ClockServlet;
 import org.eclipse.kura.web.server.servlet.DeviceSnapshotsServlet;
 import org.eclipse.kura.web.server.servlet.FileServlet;
 import org.eclipse.kura.web.server.servlet.LogServlet;
@@ -544,6 +545,7 @@ public class Console implements SelfConfiguringComponent {
                     sessionContextName);
         }
         registerServlet("logServlet", DENALI_MODULE_PATH + "/log", new LogServlet(), sessionContextName);
+        registerServlet("clockServlet", DENALI_MODULE_PATH + "/clock", new ClockServlet(), sessionContextName);
         registerServlet("skinServlet", DENALI_MODULE_PATH + "/skin/*", new SkinServlet(), resourceContextName);
         registerServlet("cloudServices", DENALI_MODULE_PATH + "/cloudservices", new GwtCloudConnectionServiceImpl(),
                 sessionContextName);
