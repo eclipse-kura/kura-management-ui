@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2025 Eurotech and/or its affiliates and others
+ * Copyright (c) 2025, 2026 Eurotech and/or its affiliates and others
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -13,6 +13,8 @@
 package org.eclipse.kura.web.shared.model;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
 public class GwtSupportedFeatures extends GwtBaseModel implements Serializable {
 
@@ -72,5 +74,32 @@ public class GwtSupportedFeatures extends GwtBaseModel implements Serializable {
         } else {
             return false;
         }
+    }
+
+    @Override
+    public String toString() {
+        final List<String> availableFeatures = new ArrayList<>();
+        
+        if (this.isAssetAvailable()) {
+            availableFeatures.add("assets");
+        }
+        
+        if (this.isPackagesServiceAvailable()) {
+            availableFeatures.add("packages");
+        }
+
+        if (this.areWiresServicesAvailable()) {
+            availableFeatures.add("wires");
+        }
+        
+        if (this.areDriverServicesAvailable()) {
+            availableFeatures.add("drivers");
+        }
+        
+        if (this.isCommandServiceAvailable()) {
+            availableFeatures.add("command");
+        }
+
+        return this.getClass().getSimpleName() + " " + availableFeatures.toString();
     }
 }
