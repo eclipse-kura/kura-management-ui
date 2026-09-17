@@ -22,10 +22,8 @@ import java.util.SortedSet;
 import java.util.TreeSet;
 import java.util.concurrent.TimeUnit;
 
-import org.eclipse.kura.KuraErrorCode;
 import org.eclipse.kura.KuraException;
 import org.eclipse.kura.KuraProcessExecutionErrorException;
-import org.eclipse.kura.command.PasswordCommandService;
 import org.eclipse.kura.container.orchestration.ContainerInstanceDescriptor;
 import org.eclipse.kura.container.orchestration.ContainerOrchestrationService;
 import org.eclipse.kura.container.orchestration.ImageInstanceDescriptor;
@@ -444,27 +442,6 @@ public class GwtDeviceServiceImpl extends OsgiRemoteServiceServlet implements Gw
         logger.error("Could not find bundle with ID: {}", bundleId);
         throw new GwtKuraException(GwtKuraErrorCode.INTERNAL_ERROR);
 
-    }
-
-    @Override
-    public String executeCommand(GwtXSRFToken xsrfToken, String cmd, String pwd) throws GwtKuraException {
-        checkXSRFToken(xsrfToken);
-
-        PasswordCommandService commandService = ServiceLocator.getInstance().getService(PasswordCommandService.class);
-        try {
-            return commandService.execute(cmd, pwd);
-        } catch (KuraException e) {
-            GwtKuraException gwtKuraException = null;
-            if (e.getCode() == KuraErrorCode.OPERATION_NOT_SUPPORTED) {
-                gwtKuraException = new GwtKuraException(GwtKuraErrorCode.SERVICE_NOT_ENABLED);
-            } else if (e.getCode() == KuraErrorCode.CONFIGURATION_ATTRIBUTE_INVALID) {
-                gwtKuraException = new GwtKuraException(GwtKuraErrorCode.ILLEGAL_ARGUMENT);
-            } else {
-                gwtKuraException = new GwtKuraException(GwtKuraErrorCode.INTERNAL_ERROR);
-            }
-
-            throw gwtKuraException;
-        }
     }
 
     @Override
