@@ -21,7 +21,6 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
-import java.util.Base64;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -319,7 +318,7 @@ public class FileServlet extends AuditServlet {
                 throw new ServletException("Uploaded zip exceeds maximum allowed size: " + tooBig);
             }
 
-            payload.setBody(Base64.getEncoder().encode(zipBytes));
+            payload.setBody(zipBytes);
         }
         
         final KuraPayload response = commandServiceExecute(payload);
