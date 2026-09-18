@@ -1,0 +1,18 @@
+Bundle-SymbolicName: ${project.artifactId};singleton:=true
+Bundle-Name: org.eclipse.kura.web2
+Bundle-Vendor: Eclipse Kura
+Bundle-License: Eclipse Public License v2.0
+Bundle-ActivationPolicy: lazy
+Bundle-ClassPath: .,\
+    lib/gwtbootstrap3.jar,\
+    lib/gwt-servlet-jakarta.jar,\
+    lib/gwt-user.jar
+-dsannotations-options: inherit,norequirements
+-includeresource: \
+    about.html,\
+    about_files=about_files/,\
+    lib/gwtbootstrap3.jar=lib/gwtbootstrap3.jar,\
+    lib/gwt-servlet-jakarta.jar=lib/gwt-servlet-jakarta.jar,\
+    lib/gwt-user.jar=lib/gwt-user.jar,\
+    www=${www.staging.dir}/
+-noimportjava: true

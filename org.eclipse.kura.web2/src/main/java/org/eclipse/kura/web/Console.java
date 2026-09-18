@@ -84,6 +84,14 @@ import org.osgi.framework.BundleContext;
 import org.osgi.framework.Constants;
 import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.component.ComponentContext;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.ConfigurationPolicy;
+import org.osgi.service.component.annotations.Deactivate;
+import org.osgi.service.component.annotations.Modified;
+import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.component.annotations.ReferenceCardinality;
+import org.osgi.service.component.annotations.ReferencePolicy;
 import org.osgi.service.event.Event;
 import org.osgi.service.event.EventAdmin;
 import org.osgi.service.event.EventProperties;
@@ -97,6 +105,10 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 
+@Component(name = "org.eclipse.kura.web.Console", immediate = true, service = SelfConfiguringComponent.class,
+        configurationPolicy = ConfigurationPolicy.OPTIONAL, property = {
+                "service.pid=org.eclipse.kura.web.Console", "kura.service.pid=org.eclipse.kura.web.Console",
+                "kura.ui.service.hide:Boolean=true" })
 public class Console implements SelfConfiguringComponent {
 
     private static final String SESSION_CONTEXT_NAME_PREFIX = "sessionContext-";
@@ -157,6 +169,8 @@ public class Console implements SelfConfiguringComponent {
     //
     // ----------------------------------------------------------------
 
+    @Reference(name = "SslManagerService", cardinality = ReferenceCardinality.OPTIONAL,
+            policy = ReferencePolicy.DYNAMIC, unbind = "unsetSslManagerService")
     public void setSslManagerService(SslManagerService sslManagerService) {
         this.sslManagerService.set(Optional.of(sslManagerService));
     }
@@ -174,14 +188,17 @@ public class Console implements SelfConfiguringComponent {
         });
     }
 
+    @Reference(name = "SystemService")
     public void setSystemService(SystemService systemService) {
         this.systemService = systemService;
     }
 
+    @Reference(name = "EventAdmin")
     public void setEventAdminService(EventAdmin eventAdmin) {
         this.eventAdmin = eventAdmin;
     }
 
+    @Reference(name = "IdentityService")
     public void setIdentityService(final IdentityService identityService) {
         this.identityService = identityService;
     }
@@ -192,6 +209,7 @@ public class Console implements SelfConfiguringComponent {
     //
     // ----------------------------------------------------------------
 
+    @Activate
     protected void activate(ComponentContext context, Map<String, Object> properties) {
 
         this.bundleContext = context.getBundleContext();
@@ -241,6 +259,7 @@ public class Console implements SelfConfiguringComponent {
         this.componentContext = context;
     }
 
+    @Modified
     protected void updated(Map<String, Object> properties) {
         boolean webEnabled = Boolean.parseBoolean(this.systemService.getKuraWebEnabled());
         if (!webEnabled) {
@@ -279,6 +298,7 @@ public class Console implements SelfConfiguringComponent {
 
     }
 
+    @Deactivate
     protected void deactivate() {
         logger.info("deactivate...");
 
