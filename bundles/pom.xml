@@ -56,7 +56,7 @@
         <kura.target.definition.version>6.0.0-SNAPSHOT</kura.target.definition.version>
         <maven.compiler.release>21</maven.compiler.release>
         
-        <gwt.version>2.12.1</gwt.version>
+        <gwt.version>2.13.1</gwt.version>
     </properties>
 
     <build>
