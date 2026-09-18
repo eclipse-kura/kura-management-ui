@@ -22,13 +22,13 @@ public class KuraExceptionHandler {
         // utility class, not meant to be instantiated
     }
 
-    private static final Logger s_logger = LoggerFactory.getLogger(KuraExceptionHandler.class);
+    private static final Logger logger = LoggerFactory.getLogger(KuraExceptionHandler.class);
 
     public static void handle(Throwable t) throws GwtKuraException {
         t.printStackTrace();
 
         // all others => log and throw internal error code
-        s_logger.warn("RPC service non-application error", t);
+        logger.warn("RPC service non-application error", t);
         throw GwtKuraException.internalError(t, t.getLocalizedMessage());
     }
 }
