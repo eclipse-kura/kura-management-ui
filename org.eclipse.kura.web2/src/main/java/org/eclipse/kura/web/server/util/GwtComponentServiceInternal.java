@@ -527,8 +527,7 @@ public class GwtComponentServiceInternal {
             Object value = entry.getValue();
 
             // this could be an array value
-            if (value instanceof Object[]) {
-                Object[] objValues = (Object[]) value;
+            if (value instanceof Object[] objValues) {
                 List<String> strValues = new ArrayList<>();
                 for (Object v : objValues) {
                     if (v != null) {
@@ -579,8 +578,7 @@ public class GwtComponentServiceInternal {
                     }
                 } else {
                     // this could be an array value
-                    if (value instanceof Object[]) {
-                        Object[] objValues = (Object[]) value;
+                    if (value instanceof Object[] objValues) {
                         List<String> strValues = new ArrayList<>();
                         for (Object v : objValues) {
                             if (v != null) {
@@ -683,10 +681,10 @@ public class GwtComponentServiceInternal {
         final NodeList nl = dom.getElementsByTagName("property");
         for (int i = 0; i < nl.getLength(); i++) {
             final Node n = nl.item(i);
-            if (n instanceof Element) {
-                final String name = ((Element) n).getAttribute("name");
+            if (n instanceof Element element) {
+                final String name = element.getAttribute("name");
                 if ("service.pid".equals(name)) {
-                    final String factoryPid = ((Element) n).getAttribute("value");
+                    final String factoryPid = element.getAttribute("value");
                     if (contents.toString().contains(PATTERN_SERVICE_PROVIDE_DRIVER)) {
                         driverFactoriesPids.add(factoryPid);
                     }
