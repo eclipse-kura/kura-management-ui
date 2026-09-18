@@ -190,6 +190,7 @@ public class SelfConfiguringComponentProperty<T> {
         return this.cryptoService.get();
     }
 
+    @SuppressWarnings("unchecked")
     private Optional<T> extractDefault(final AD ad) {
 
         final String defaultValue = ad.getDefault();
