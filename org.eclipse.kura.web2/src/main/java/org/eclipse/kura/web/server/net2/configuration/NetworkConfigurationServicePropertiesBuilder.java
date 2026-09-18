@@ -102,9 +102,9 @@ public class NetworkConfigurationServicePropertiesBuilder {
     private void setCommonProperties() {
         this.properties.setType(this.ifname, this.gwtConfig.getHwType());
 
-        if (this.gwtConfig instanceof GwtWifiNetInterfaceConfig) {
+        if (this.gwtConfig instanceof GwtWifiNetInterfaceConfig config) {
             String wifiMode = EnumsParser
-                    .getWifiMode(Optional.ofNullable(((GwtWifiNetInterfaceConfig) this.gwtConfig).getWirelessMode()));
+                    .getWifiMode(Optional.ofNullable(config.getWirelessMode()));
             this.properties.setWifiMode(this.ifname, wifiMode);
         }
     }
@@ -210,9 +210,9 @@ public class NetworkConfigurationServicePropertiesBuilder {
     }
 
     private void setWifiProperties() throws GwtKuraException {
-        if (this.gwtConfig instanceof GwtWifiNetInterfaceConfig) {
+        if (this.gwtConfig instanceof GwtWifiNetInterfaceConfig config) {
             String wifiMode = EnumsParser
-                    .getWifiMode(Optional.ofNullable(((GwtWifiNetInterfaceConfig) this.gwtConfig).getWirelessMode()));
+                    .getWifiMode(Optional.ofNullable(config.getWirelessMode()));
 
             this.properties.setWifiMode(this.ifname, wifiMode);
 
@@ -293,8 +293,7 @@ public class NetworkConfigurationServicePropertiesBuilder {
             String password8021x = this.gwtConfig.get8021xConfig().getPassword();
 
             if (GwtServerUtil.PASSWORD_PLACEHOLDER.equals(password8021x)
-                    && this.oldGwtNetInterfaceConfig instanceof GwtWifiNetInterfaceConfig) {
-                GwtWifiNetInterfaceConfig gwtWifiNetInterfaceConfig = (GwtWifiNetInterfaceConfig) this.oldGwtNetInterfaceConfig;
+                    && this.oldGwtNetInterfaceConfig instanceof GwtWifiNetInterfaceConfig gwtWifiNetInterfaceConfig) {
 
                 Gwt8021xConfig gwt8021xConfig = gwtWifiNetInterfaceConfig.get8021xConfig();
 
@@ -340,8 +339,7 @@ public class NetworkConfigurationServicePropertiesBuilder {
 
         if (gwtWifiConfig.getPassword() != null) {
             if (GwtServerUtil.PASSWORD_PLACEHOLDER.equals(gwtWifiConfig.getPassword())
-                    && this.oldGwtNetInterfaceConfig instanceof GwtWifiNetInterfaceConfig) {
-                GwtWifiNetInterfaceConfig gwtWifiNetInterfaceConfig = (GwtWifiNetInterfaceConfig) this.oldGwtNetInterfaceConfig;
+                    && this.oldGwtNetInterfaceConfig instanceof GwtWifiNetInterfaceConfig gwtWifiNetInterfaceConfig) {
                 gwtWifiNetInterfaceConfig.setUnescaped(true);
 
                 GwtWifiConfig gwtStationConfig = gwtWifiNetInterfaceConfig.getStationWifiConfig();
@@ -389,8 +387,7 @@ public class NetworkConfigurationServicePropertiesBuilder {
     }
 
     private void setModemProperties() {
-        if (this.gwtConfig instanceof GwtModemInterfaceConfig) {
-            GwtModemInterfaceConfig gwtModemConfig = (GwtModemInterfaceConfig) this.gwtConfig;
+        if (this.gwtConfig instanceof GwtModemInterfaceConfig gwtModemConfig) {
 
             this.properties.setModemAuthType(this.ifname,
                     EnumsParser.getAuthType(Optional.ofNullable(gwtModemConfig.getAuthType())));
@@ -399,8 +396,7 @@ public class NetworkConfigurationServicePropertiesBuilder {
 
             if (gwtModemConfig.getPassword() != null) {
                 if (GwtServerUtil.PASSWORD_PLACEHOLDER.equals(gwtModemConfig.getPassword())) {
-                    if (this.oldGwtNetInterfaceConfig instanceof GwtModemInterfaceConfig) {
-                        GwtModemInterfaceConfig gwtModemInterfaceConfig = (GwtModemInterfaceConfig) this.oldGwtNetInterfaceConfig;
+                    if (this.oldGwtNetInterfaceConfig instanceof GwtModemInterfaceConfig gwtModemInterfaceConfig) {
                         gwtModemInterfaceConfig.setUnescaped(true);
                         this.properties.setModemPassword(this.ifname, gwtModemInterfaceConfig.getPassword());
                     }
@@ -426,8 +422,7 @@ public class NetworkConfigurationServicePropertiesBuilder {
     }
 
     private void setModemGpsProperties() {
-        if (this.gwtConfig instanceof GwtModemInterfaceConfig) {
-            GwtModemInterfaceConfig gwtModemConfig = (GwtModemInterfaceConfig) this.gwtConfig;
+        if (this.gwtConfig instanceof GwtModemInterfaceConfig gwtModemConfig) {
 
             this.properties.setModemGpsEnabled(this.ifname, gwtModemConfig.isGpsEnabled());
             this.properties.setModemGpsMode(this.ifname, gwtModemConfig.getGpsMode());

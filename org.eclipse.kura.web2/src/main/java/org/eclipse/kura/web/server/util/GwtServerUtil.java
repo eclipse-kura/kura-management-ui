@@ -300,8 +300,8 @@ public final class GwtServerUtil {
 
             Optional<String[]> current = Optional.empty();
 
-            if (currentObjValue instanceof Password[]) {
-                current = Optional.of(Arrays.stream((Password[]) currentObjValue).map(p -> new String(p.getPassword()))
+            if (currentObjValue instanceof Password[] passwords) {
+                current = Optional.of(Arrays.stream(passwords).map(p -> new String(p.getPassword()))
                         .collect(Collectors.toList()).toArray(new String[] {}));
             }
 
@@ -441,8 +441,7 @@ public final class GwtServerUtil {
                 }
             } else {
                 // this could be an array value
-                if (value instanceof Object[]) {
-                    Object[] objValues = (Object[]) value;
+                if (value instanceof Object[] objValues) {
                     List<String> strValues = new ArrayList<>();
                     for (Object v : objValues) {
                         if (v != null) {
@@ -506,19 +505,17 @@ public final class GwtServerUtil {
     }
 
     public static GwtConfigComponent toGwtConfigComponent(String pid, Object descriptor) {
-        if (!(descriptor instanceof List<?>)) {
+        if (!(descriptor instanceof List<?> ads)) {
             return null;
         }
-
-        final List<?> ads = (List<?>) descriptor;
 
         final Tocd ocd = new Tocd();
         ocd.setId(pid);
         for (final Object ad : ads) {
-            if (!(ad instanceof Tad)) {
+            if (!(ad instanceof Tad tad)) {
                 return null;
             }
-            ocd.addAD((Tad) ad);
+            ocd.addAD(tad);
         }
 
         return GwtServerUtil.toGwtConfigComponent(new ComponentConfigurationImpl(pid, ocd, null));
@@ -666,8 +663,8 @@ public final class GwtServerUtil {
 
                                 final Optional<String> factoryPid;
 
-                                if (rawFactoryPid instanceof String) {
-                                    factoryPid = Optional.of((String) rawFactoryPid);
+                                if (rawFactoryPid instanceof String pidValue) {
+                                    factoryPid = Optional.of(pidValue);
                                 } else {
                                     factoryPid = Optional.empty();
                                 }
@@ -710,10 +707,10 @@ public final class GwtServerUtil {
 
                 final Set<String> providedInterfaces;
 
-                if (rawProvidedInterfaces instanceof String) {
-                    providedInterfaces = Collections.singleton((String) rawProvidedInterfaces);
-                } else if (rawProvidedInterfaces instanceof String[]) {
-                    providedInterfaces = Arrays.asList((String[]) rawProvidedInterfaces).stream()
+                if (rawProvidedInterfaces instanceof String providedInterface) {
+                    providedInterfaces = Collections.singleton(providedInterface);
+                } else if (rawProvidedInterfaces instanceof String[] strings) {
+                    providedInterfaces = Arrays.asList(strings).stream()
                             .collect(Collectors.toSet());
                 } else {
                     providedInterfaces = Collections.emptySet();
@@ -826,8 +823,7 @@ public final class GwtServerUtil {
     public static List<GwtNetInterfaceConfig> replaceNetworkConfigListSensitivePasswordsWithPlaceholder(
             List<GwtNetInterfaceConfig> gwtNetworkConfigList) {
         for (GwtNetInterfaceConfig netConfig : gwtNetworkConfigList) {
-            if (netConfig instanceof GwtWifiNetInterfaceConfig) {
-                GwtWifiNetInterfaceConfig wifiConfig = (GwtWifiNetInterfaceConfig) netConfig;
+            if (netConfig instanceof GwtWifiNetInterfaceConfig wifiConfig) {
                 GwtWifiConfig gwtAPWifiConfig = wifiConfig.getAccessPointWifiConfig();
                 if (gwtAPWifiConfig != null && gwtAPWifiConfig.getPassword() != null
                         && !gwtAPWifiConfig.getPassword().isEmpty()) {
@@ -845,8 +841,7 @@ public final class GwtServerUtil {
                     gwt8021xConfig.setPassword(PASSWORD_PLACEHOLDER);
                 }
 
-            } else if (netConfig instanceof GwtModemInterfaceConfig) {
-                GwtModemInterfaceConfig modemConfig = (GwtModemInterfaceConfig) netConfig;
+            } else if (netConfig instanceof GwtModemInterfaceConfig modemConfig) {
                 modemConfig.setPassword(PASSWORD_PLACEHOLDER);
             }
         }
