@@ -188,9 +188,6 @@
     </dependencies>
 
     <build>
-        <!-- Tycho copied every non-Java file of the source folders into the bundle: the
-            UiBinder templates of the GWT client live next to their Java class and are
-            kept in the jar for parity with the previous artifact. -->
         <resources>
             <resource>
                 <directory>src/main/resources</directory>
