@@ -7,6 +7,60 @@ Bundle-ClassPath: .,\
     lib/gwtbootstrap3.jar,\
     lib/gwt-servlet-jakarta.jar,\
     lib/gwt-user.jar
+# The add-ons the console integrates with are not always installed on a
+# gateway, so their packages are imported optionally, as the hand-written
+# manifest did.
+#
+# The GWT jars on the Bundle-ClassPath are build-time libraries: bnd analyses
+# them as well, and the references of the compiler and of the HtmlUnit based
+# tooling would become mandatory imports, leaving the bundle UNRESOLVED on a
+# gateway. Only what the console itself uses is imported.
+Import-Package: \
+    org.eclipse.kura.asset.provider;resolution:=optional,\
+    org.eclipse.kura.core.net;resolution:=optional,\
+    org.eclipse.kura.core.net.util;resolution:=optional,\
+    org.eclipse.kura.deployment.agent;resolution:=optional,\
+    org.eclipse.kura.internal.wire.asset;resolution:=optional,\
+    org.eclipse.kura.net.admin;resolution:=optional,\
+    org.eclipse.kura.net.admin.ipv6;resolution:=optional,\
+    !android.*,\
+    !com.gargoylesoftware.*,\
+    !com.google.appengine.*,\
+    !com.google.apphosting.*,\
+    !com.google.debugging.*,\
+    !com.google.errorprone.*,\
+    !com.google.gwt.core.ext.*,\
+    !com.google.gwt.core.linker.*,\
+    !com.google.gwt.dev.*,\
+    !com.google.gwt.util.*,\
+    !com.ibm.icu.*,\
+    !com.thoughtworks.*,\
+    !javax.annotation.*,\
+    !javax.crypto.*,\
+    !javax.imageio.*,\
+    !javax.jdo.*,\
+    !javax.lang.model.*,\
+    !javax.naming.*,\
+    !javax.persistence,\
+    !javax.security.*,\
+    !javax.servlet.*,\
+    !javax.tools,\
+    !javax.validation.*,\
+    !jsinterop.annotations,\
+    !junit.framework,\
+    !net.sourceforge.*,\
+    !org.apache.commons.logging,\
+    !org.apache.tapestry.*,\
+    !org.checkerframework.*,\
+    !org.eclipse.jetty.*,\
+    !org.hibernate.*,\
+    !org.jspecify.*,\
+    !org.kohsuke.*,\
+    !org.w3c.css.*,\
+    !org.xml.sax.ext,\
+    !org.xml.sax.helpers,\
+    !sun.misc,\
+    *
 -dsannotations-options: inherit,norequirements
 -includeresource: \
     about.html,\
