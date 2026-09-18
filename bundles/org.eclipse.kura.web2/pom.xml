@@ -112,6 +112,18 @@
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>gwt-maven-plugin</artifactId>
                 <version>2.10.0</version>
+                <dependencies>
+                    <dependency>
+                        <groupId>org.gwtproject</groupId>
+                        <artifactId>gwt-dev</artifactId>
+                        <version>${gwt.version}</version>
+                    </dependency>
+                    <dependency>
+                        <groupId>org.gwtproject</groupId>
+                        <artifactId>gwt-user</artifactId>
+                        <version>${gwt.version}</version>
+                    </dependency>
+                </dependencies>
                 <executions>
                     <execution>
                         <goals>
@@ -126,7 +138,7 @@
                     <style>OBF</style> <!-- DETAILED https://support.google.com/code/answer/55203?topic=10212 -->
                     <failOnError>true</failOnError>
                     <extraJvmArgs>-Xmx2048M -Xss1024k -XX:+UseParallelGC</extraJvmArgs>
-                    <!-- gwt-maven-plugin supports languages feature only up to java 11-->
+                    <!-- gwt-maven-plugin supports languages feature only up to java 17-->
                     <sourceLevel>auto</sourceLevel>
                     <localWorkers>2</localWorkers>
                     <runTarget>denali.html</runTarget>
