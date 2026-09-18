@@ -169,7 +169,7 @@ public class GwtDeviceServiceImpl extends OsgiRemoteServiceServlet implements Gw
                     if (thread != null) {
 
                         StringBuilder sbThreadName = new StringBuilder();
-                        sbThreadName.append(thread.getId()).append('/').append(thread.getName());
+                        sbThreadName.append(thread.threadId()).append('/').append(thread.getName());
 
                         StringBuilder sbThreadValue = new StringBuilder();
                         sbThreadValue.append("priority=");
