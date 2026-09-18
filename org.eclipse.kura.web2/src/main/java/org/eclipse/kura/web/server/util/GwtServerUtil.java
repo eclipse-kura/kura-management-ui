@@ -188,7 +188,7 @@ public final class GwtServerUtil {
             case CHAR:
                 for (String value : trimmedValues) {
                     if (!value.isEmpty()) {
-                        values.add(new Character(value.charAt(0)));
+                        values.add(Character.valueOf(value.charAt(0)));
                     }
                 }
                 return values.toArray(new Character[] {});
