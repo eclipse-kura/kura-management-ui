@@ -96,6 +96,11 @@
         </dependency>
         <dependency>
             <groupId>org.osgi</groupId>
+            <artifactId>org.osgi.service.component.annotations</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.osgi</groupId>
             <artifactId>org.osgi.service.event</artifactId>
         </dependency>
         <dependency>
@@ -381,27 +386,6 @@
                 </executions>
                 <configuration>
                     <includeClassesDir>true</includeClassesDir>
-                    <bnd><![CDATA[
-                        Bundle-SymbolicName: ${project.artifactId};singleton:=true
-                        Bundle-Name: org.eclipse.kura.web2
-                        Bundle-Vendor: Eclipse Kura
-                        Bundle-License: Eclipse Public License v2.0
-                        Bundle-ActivationPolicy: lazy
-                        Bundle-ClassPath: .,\
-                            lib/gwtbootstrap3.jar,\
-                            lib/gwt-servlet-jakarta.jar,\
-                            lib/gwt-user.jar
-                        Service-Component: OSGI-INF/*.xml
-                        -includeresource: \
-                            about.html,\
-                            about_files=about_files/,\
-                            OSGI-INF=OSGI-INF/,\
-                            lib/gwtbootstrap3.jar=lib/gwtbootstrap3.jar,\
-                            lib/gwt-servlet-jakarta.jar=lib/gwt-servlet-jakarta.jar,\
-                            lib/gwt-user.jar=lib/gwt-user.jar,\
-                            www=${www.staging.dir}/
-                        -noimportjava: true
-                        ]]></bnd>
                 </configuration>
             </plugin>
 
