@@ -11,3 +11,6 @@ RemoteSystemsTempFiles
 .settings
 .vscode
 javaConfig.json
+.flattened-pom.xml
+.tycho-consumer-pom.xml
+generated/

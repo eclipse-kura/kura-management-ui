@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+
+<!DOCTYPE suppressions PUBLIC "-//Puppy Crawl//DTD Suppressions 1.1//EN" "http://checkstyle.sourceforge.net/dtds/suppressions_1_1.dtd">
+
+
+<suppressions>
+    <suppress checks="LineLength" files="ConsoleOptions.java"/>
+    <suppress checks=".*" files="[\\/]org[\\/]eclipse[\\/]kura[\\/]web[\\/]client[\\/]"/>
+    <suppress checks=".*" files="[\\/]org[\\/]eclipse[\\/]kura[\\/]web[\\/]shared[\\/]"/>
+</suppressions>
