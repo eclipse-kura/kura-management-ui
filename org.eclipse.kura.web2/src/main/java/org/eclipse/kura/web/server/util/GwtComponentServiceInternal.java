@@ -555,7 +555,7 @@ public class GwtComponentServiceInternal {
             gwtParam.setType(GwtConfigParameterType.valueOf(ad.getType().name()));
             gwtParam.setRequired(ad.isRequired());
             gwtParam.setCardinality(ad.getCardinality());
-            gwtParam.setDefault(ad.getDefault());
+            gwtParam.setDefault(GwtServerUtil.getDefaultValue(ad));
             if (ad.getOption() != null && !ad.getOption().isEmpty()) {
                 Map<String, String> options = new HashMap<>();
                 for (Option option : ad.getOption()) {
