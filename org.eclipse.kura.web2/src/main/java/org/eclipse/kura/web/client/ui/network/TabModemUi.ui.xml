@@ -68,6 +68,43 @@
                                 </g:FlowPanel>
                             </b:FormGroup>
 
+                            <b:FormGroup ui:field="groupAllowedModes">
+                                <b:FormLabel for="allowed-modes"
+                                    ui:field="labelAllowedModes" />
+                                <util:HelpButton
+                                    ui:field="allowedModesHelp" />
+                                <b:HelpBlock color="red"
+                                    ui:field="helpAllowedModes" />
+                                <g:FlowPanel ui:field="allowedModesPanel"
+                                    addStyleNames="modem-mode-chips" />
+                            </b:FormGroup>
+
+                            <b:FormGroup>
+                                <b:FormLabel for="preferred-mode-override"
+                                    ui:field="labelPreferredModeOverride" />
+                                <util:HelpButton
+                                    ui:field="preferredModeOverrideHelp" />
+                                <g:FlowPanel>
+                                    <b:InlineRadio name="preferred-mode-override"
+                                        formValue="true" ui:field="radioOverrideOn" />
+                                    <b:InlineRadio name="preferred-mode-override"
+                                        formValue="false" ui:field="radioOverrideOff" />
+                                </g:FlowPanel>
+                            </b:FormGroup>
+
+                            <b:FormGroup>
+                                <b:FormLabel for="preferred-mode"
+                                    ui:field="labelPreferredMode" />
+                                <util:HelpButton
+                                    ui:field="preferredModeHelp" />
+                                <b:FormControlStatic
+                                    b:id="preferred-mode-auto" ui:field="preferredModeAuto" />
+                                <g:FlowPanel ui:field="preferredModePanel">
+                                    <b:ListBox b:id="preferred-mode"
+                                        ui:field="preferredMode" />
+                                </g:FlowPanel>
+                            </b:FormGroup>
+
                             <b:FormGroup>
                                 <b:FormLabel for="service"
                                     ui:field="labelService" />

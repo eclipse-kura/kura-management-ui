@@ -1214,3 +1214,12 @@ div.headerLogo {
 .failure-handler-stack-trace-container {
 	max-height: 50vh;
 }
+.modem-mode-chips {
+	margin-top: 3px;
+}
+
+.modem-mode-chips .modem-mode-chip {
+	border-radius: 12px;
+	margin: 0 6px 6px 0;
+	min-width: 56px;
+}

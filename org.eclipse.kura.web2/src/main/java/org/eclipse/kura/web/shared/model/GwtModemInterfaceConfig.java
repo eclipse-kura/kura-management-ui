@@ -200,6 +200,22 @@ public class GwtModemInterfaceConfig extends GwtNetInterfaceConfig {
         return get("networkTechnology");
     }
 
+    public void setAllowedModemModes(List<String> allowedModemModes) {
+        set("allowedModemModes", allowedModemModes);
+    }
+
+    public List<String> getAllowedModemModes() {
+        return get("allowedModemModes");
+    }
+
+    public void setPreferredModemMode(String preferredModemMode) {
+        set("preferredModemMode", preferredModemMode);
+    }
+
+    public String getPreferredModemMode() {
+        return get("preferredModemMode");
+    }
+
     public void setConnectionType(String connectionType) {
         set("connectionType", connectionType);
     }
