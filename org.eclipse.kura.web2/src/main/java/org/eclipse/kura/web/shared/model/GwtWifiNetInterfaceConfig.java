@@ -19,16 +19,16 @@ public class GwtWifiNetInterfaceConfig extends GwtNetInterfaceConfig {
 
     private static final long serialVersionUID = -7509149975400963837L;
 
-    private GwtWifiConfig m_adhocWifiConfig;
-    private GwtWifiConfig m_stationWifiConfig;
-    private GwtWifiConfig m_accessPointWifiConfig;
+    private GwtWifiConfig adhocWifiConfig;
+    private GwtWifiConfig stationWifiConfig;
+    private GwtWifiConfig accessPointWifiConfig;
 
     public GwtWifiNetInterfaceConfig() {
         super();
 
-        this.m_adhocWifiConfig = new GwtWifiConfig();
-        this.m_stationWifiConfig = new GwtWifiConfig();
-        this.m_accessPointWifiConfig = new GwtWifiConfig();
+        this.adhocWifiConfig = new GwtWifiConfig();
+        this.stationWifiConfig = new GwtWifiConfig();
+        this.accessPointWifiConfig = new GwtWifiConfig();
 
         setWirelessMode(GwtWifiWirelessMode.netWifiWirelessModeStation.name());
     }
@@ -37,64 +37,64 @@ public class GwtWifiNetInterfaceConfig extends GwtNetInterfaceConfig {
             GwtWifiConfig accessPointConfig) {
         super();
 
-        this.m_adhocWifiConfig = adhocConfig;
-        this.m_stationWifiConfig = stationConfig;
-        this.m_accessPointWifiConfig = accessPointConfig;
+        this.adhocWifiConfig = adhocConfig;
+        this.stationWifiConfig = stationConfig;
+        this.accessPointWifiConfig = accessPointConfig;
 
         setWirelessMode(GwtWifiWirelessMode.netWifiWirelessModeStation.name());
     }
 
     public void setAdhocWifiConfig(GwtWifiConfig adhocConfig) {
-        this.m_adhocWifiConfig = adhocConfig;
+        this.adhocWifiConfig = adhocConfig;
     }
 
     public void setAdhocWifiConfig(Map<String, Object> properties) {
-        this.m_adhocWifiConfig = new GwtWifiConfig();
-        this.m_adhocWifiConfig.setProperties(properties);
+        this.adhocWifiConfig = new GwtWifiConfig();
+        this.adhocWifiConfig.setProperties(properties);
     }
 
     public GwtWifiConfig getAdhocWifiConfig() {
-        return this.m_adhocWifiConfig;
+        return this.adhocWifiConfig;
     }
 
     public Map<String, Object> getAdhocWifiConfigProps() {
-        return this.m_adhocWifiConfig.getProperties();
+        return this.adhocWifiConfig.getProperties();
     }
 
     public void setStationWifiConfig(GwtWifiConfig stationConfig) {
-        this.m_stationWifiConfig = stationConfig;
+        this.stationWifiConfig = stationConfig;
     }
 
     public void setStationWifiConfig(Map<String, Object> properties) {
-        this.m_stationWifiConfig = new GwtWifiConfig();
-        this.m_stationWifiConfig.setProperties(properties);
+        this.stationWifiConfig = new GwtWifiConfig();
+        this.stationWifiConfig.setProperties(properties);
     }
 
     public GwtWifiConfig getStationWifiConfig() {
-        return this.m_stationWifiConfig;
+        return this.stationWifiConfig;
     }
 
     public Map<String, Object> getStationWifiConfigProps() {
 
-        return this.m_stationWifiConfig.getProperties();
+        return this.stationWifiConfig.getProperties();
     }
 
     public void setAccessPointWifiConfig(GwtWifiConfig accessPointConfig) {
-        this.m_accessPointWifiConfig = accessPointConfig;
+        this.accessPointWifiConfig = accessPointConfig;
     }
 
     public void setAccessPointWifiConfig(Map<String, Object> properties) {
-        this.m_accessPointWifiConfig = new GwtWifiConfig();
-        this.m_accessPointWifiConfig.setProperties(properties);
+        this.accessPointWifiConfig = new GwtWifiConfig();
+        this.accessPointWifiConfig.setProperties(properties);
     }
 
     public GwtWifiConfig getAccessPointWifiConfig() {
-        return this.m_accessPointWifiConfig;
+        return this.accessPointWifiConfig;
     }
 
     public Map<String, Object> getAccessPointWifiConfigProps() {
 
-        return this.m_accessPointWifiConfig.getProperties();
+        return this.accessPointWifiConfig.getProperties();
     }
 
     public void setWifiConfig(GwtWifiConfig wifiConfig) {
@@ -115,11 +115,11 @@ public class GwtWifiNetInterfaceConfig extends GwtNetInterfaceConfig {
         activeConfig.setWirelessMode(wifiMode.name());
 
         if (wifiMode.equals(GwtWifiWirelessMode.netWifiWirelessModeAccessPoint)) {
-            activeConfig = this.m_accessPointWifiConfig;
+            activeConfig = this.accessPointWifiConfig;
         } else if (wifiMode.equals(GwtWifiWirelessMode.netWifiWirelessModeAdHoc)) {
-            activeConfig = this.m_adhocWifiConfig;
+            activeConfig = this.adhocWifiConfig;
         } else if (wifiMode.equals(GwtWifiWirelessMode.netWifiWirelessModeStation)) {
-            activeConfig = this.m_stationWifiConfig;
+            activeConfig = this.stationWifiConfig;
         }
 
         return activeConfig;
