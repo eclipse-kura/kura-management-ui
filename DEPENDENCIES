@@ -39,8 +39,8 @@ maven/mavencentral/org.eclipse.platform/org.eclipse.equinox.io/1.1.300, EPL-2.0,
 maven/mavencentral/org.eclipse.platform/org.eclipse.osgi.util/3.7.300, EPL-2.0, approved, eclipse.platform
 maven/mavencentral/org.eclipse.platform/org.eclipse.osgi/3.21.0, EPL-2.0, approved, eclipse.platform
 maven/mavencentral/org.gwtbootstrap3/gwtbootstrap3/1.0.1, Apache-2.0 AND MIT AND OFL-1.1, approved, #2020
-maven/mavencentral/org.gwtproject/gwt-servlet-jakarta/2.13.1, , restricted, clearlydefined
-maven/mavencentral/org.gwtproject/gwt-user/2.13.1, , restricted, clearlydefined
+maven/mavencentral/org.gwtproject/gwt-servlet-jakarta/2.13.1, Apache-2.0, approved, #31217
+maven/mavencentral/org.gwtproject/gwt-user/2.13.1, Apache-2.0 AND CC0-1.0, approved, #31218
 maven/mavencentral/org.hamcrest/hamcrest-core/1.3, BSD-2-Clause, approved, CQ11429
 maven/mavencentral/org.osgi/org.osgi.namespace.extender/1.0.1, Apache-1.1 AND Apache-2.0, approved, #17638
 maven/mavencentral/org.osgi/org.osgi.namespace.implementation/1.0.0, Apache-1.1 AND Apache-2.0, approved, #17650
