@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
 
-    Copyright (c) 2025 Eurotech and/or its affiliates and others
+    Copyright (c) 2025, 2026 Eurotech and/or its affiliates and others
 
     This program and the accompanying materials are made
     available under the terms of the Eclipse Public License 2.0
@@ -21,9 +21,8 @@
 
     <parent>
         <groupId>org.eclipse.kura</groupId>
-        <artifactId>kura-management-ui.parent</artifactId>
+        <artifactId>kura-management-ui</artifactId>
         <version>3.0.0-SNAPSHOT</version>
-        <relativePath>../bundles/pom.xml</relativePath>
     </parent>
 
     <artifactId>kura-management-ui.distrib</artifactId>
@@ -173,7 +172,7 @@
                             <goal>copy</goal>
                         </goals>
                         <configuration>
-                            <sourceFile>${project.basedir}/../bundles/${web2.jar.name}/target/${web2.jar.name}-${project.version}.jar</sourceFile>
+                            <sourceFile>${project.basedir}/../${web2.jar.name}/target/${web2.jar.name}-${project.version}.jar</sourceFile>
                             <destinationFile>target/input_files/${web2.jar.name}_${project.version}.jar</destinationFile>
                         </configuration>
                     </execution>
