@@ -18,11 +18,8 @@ on:
 permissions:
   contents: read
   packages: read
+  id-token: write
 
 jobs:
   call-workflow-in-public-repo:
-    uses: eclipse-kura/.github/.github/workflows/_shared-sbom-cyclonedx.yml@9d1e7eeace32039d48c03cd8a511c057787d2d76
-    with:
-      # The parent project UUID the uploaded SBOM should be associated with.
-      # Refer to https://sbom.eclipse.org/ to retrieve the UUID.
-      dependency-track-id: '8d96a073-6c64-4614-bd9c-156486762f5f'
+    uses: eclipse-kura/.github/.github/workflows/_shared-sbom-cyclonedx.yml@main
