@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2011, 2020 Eurotech and/or its affiliates and others
+ * Copyright (c) 2011, 2026 Eurotech and/or its affiliates and others
  * 
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -17,7 +17,6 @@ import java.util.Optional;
 import org.eclipse.kura.web.Console;
 import org.eclipse.kura.web.client.messages.Messages;
 import org.eclipse.kura.web.client.util.request.RequestQueue;
-import org.eclipse.kura.web.shared.GwtKuraErrorCode;
 import org.eclipse.kura.web.shared.model.GwtSession;
 import org.eclipse.kura.web.shared.service.GwtDeviceService;
 import org.eclipse.kura.web.shared.service.GwtDeviceServiceAsync;
@@ -77,7 +76,6 @@ public class CommandTabUi extends Composite {
     String command;
     String password;
     SafeHtmlBuilder safeHtml = new SafeHtmlBuilder();
-    Optional<AsyncCallback<Void>> requestCallback = Optional.empty();
 
     public CommandTabUi() {
         initWidget(uiBinder.createAndBindUi(this));
@@ -119,43 +117,6 @@ public class CommandTabUi extends Composite {
         this.execute.addClickHandler(
                 event -> RequestQueue.submit(c -> this.gwtXSRFService.generateSecurityToken(c.callback(token -> {
                     this.xsrfTokenField.setValue(token.getToken());
-
-                    requestCallback = Optional.of(c.callback(new AsyncCallback<Void>() {
-
-                        @Override
-                        public void onFailure(Throwable caught) {
-                            display(caught.getMessage());
-                        }
-
-                        @Override
-                        public void onSuccess(Void result) {
-                            CommandTabUi.this.gwtXSRFService.generateSecurityToken(
-                                    c.callback(t -> CommandTabUi.this.gwtDeviceService.executeCommand(t,
-                                            CommandTabUi.this.formExecute.getText(),
-                                            CommandTabUi.this.formPassword.getText(),
-                                            c.callback(new AsyncCallback<String>() {
-
-                                                @Override
-                                                public void onFailure(Throwable caught) {
-                                                    if (caught.getLocalizedMessage()
-                                                            .equals(GwtKuraErrorCode.SERVICE_NOT_ENABLED.toString())) {
-                                                        display(MSGS.error() + "\n" + MSGS.commandServiceNotEnabled());
-                                                    } else if (caught.getLocalizedMessage()
-                                                            .equals(GwtKuraErrorCode.ILLEGAL_ARGUMENT.toString())) {
-                                                        display(MSGS.error() + "\n" + MSGS.commandPasswordNotCorrect());
-                                                    } else {
-                                                        display(MSGS.error() + "\n" + caught.getLocalizedMessage());
-                                                    }
-                                                }
-
-                                                @Override
-                                                public void onSuccess(String result) {
-                                                    display(result);
-                                                }
-                                            }))));
-                        }
-                    }));
-
                     this.commandForm.submit();
                     this.formExecute.setFocus(true);
                 }))));
@@ -165,23 +126,13 @@ public class CommandTabUi extends Composite {
         this.commandForm.setAction(SERVLET_URL);
 
         this.commandForm.addSubmitCompleteHandler(event -> {
+            final String result = event.getResults();
 
-            if (!requestCallback.isPresent()) {
-                return;
-            }
-
-            final AsyncCallback<Void> callback = requestCallback.get();
-
-            String result = event.getResults();
-
-            if (result.contains("HTTP ERROR")) {
-                callback.onFailure(new IllegalStateException(MSGS.fileUploadFailure()));
+            if (result == null || result.contains("HTTP ERROR")) {
+                display(MSGS.fileUploadFailure());
             } else {
-                callback.onSuccess(null);
+                display(result);
             }
-
-            requestCallback = Optional.empty();
-
         });
 
         this.docPath.getElement().setAttribute("accept", ".sh,.zip");

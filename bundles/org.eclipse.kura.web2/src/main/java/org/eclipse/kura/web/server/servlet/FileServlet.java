@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2011, 2025 Eurotech and/or its affiliates and others
+ * Copyright (c) 2011, 2026 Eurotech and/or its affiliates and others
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -13,27 +13,19 @@
  *******************************************************************************/
 package org.eclipse.kura.web.server.servlet;
 
-import static java.util.Objects.isNull;
-
-import java.io.ByteArrayInputStream;
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipInputStream;
 
 import org.apache.commons.fileupload2.core.DiskFileItem;
 import org.apache.commons.fileupload2.core.DiskFileItemFactory;
@@ -50,6 +42,7 @@ import org.eclipse.kura.configuration.ConfigurationService;
 import org.eclipse.kura.core.configuration.ComponentConfigurationImpl;
 import org.eclipse.kura.core.configuration.XmlComponentConfigurations;
 import org.eclipse.kura.marshalling.Unmarshaller;
+import org.eclipse.kura.message.KuraPayload;
 import org.eclipse.kura.rest.configuration.api.ComponentConfigurationList;
 import org.eclipse.kura.rest.configuration.api.DTOUtil;
 import org.eclipse.kura.system.SystemService;
@@ -58,7 +51,6 @@ import org.eclipse.kura.web.server.KuraRemoteServiceServlet;
 import org.eclipse.kura.web.server.RequiredPermissions.Mode;
 import org.eclipse.kura.web.server.util.AssetConfigValidator;
 import org.eclipse.kura.web.server.util.ServiceLocator;
-import org.eclipse.kura.web.shared.GwtKuraErrorCode;
 import org.eclipse.kura.web.shared.GwtKuraException;
 import org.eclipse.kura.web.shared.KuraPermission;
 import org.eclipse.kura.web.shared.model.GwtConfigComponent;
@@ -96,6 +88,8 @@ public class FileServlet extends AuditServlet {
 
     protected static final String ERROR_PARSING_QUERY_STRING = "Error parsing query string.";
 
+    protected static final String ERROR_COMMAND_SERVICE_UNAVAILABLE = "Error: PasswordCommandService is not available.";
+
     protected static final String REQUEST_PATH_INFO_NOT_FOUND = "Request path info not found";
 
     private static final long serialVersionUID = -5016170117606322129L;
@@ -105,9 +99,7 @@ public class FileServlet extends AuditServlet {
     protected static final String JAVA_IO_TMPDIR = "java.io.tmpdir";
     protected static final String EXPECTED_1_FILE_PATTERN = "expected 1 file item but found {}";
 
-    private static final int BUFFER = 1024;
-    private static int tooBig = 0x6400000; // Max size of unzipped data, 100MB
-    private static int tooMany = 1024; // Max number of files
+    private static int tooBig = 0x6400000; // Max size of zipped data, 100MB
 
     protected DiskFileItemFactory diskFileItemFactory;
     private FileCleaningTracker fileCleaningTracker;
@@ -142,7 +134,6 @@ public class FileServlet extends AuditServlet {
         this.fileCleaningTracker = JakartaFileCleaner.getFileCleaningTracker(ctx);
 
         getZipUploadSizeMax();
-        getZipUploadCountMax();
 
         int sizeThreshold = getFileUploadInMemorySizeThreshold();
         File repository = new File(System.getProperty(JAVA_IO_TMPDIR));
@@ -193,7 +184,7 @@ public class FileServlet extends AuditServlet {
             doPostConfigurationSnapshot(req);
         } else if (reqPathInfo.equals("/command") && supportedFeatures.isCommandServiceAvailable()) {
             KuraRemoteServiceServlet.requirePermissions(req, Mode.ALL, new String[] { KuraPermission.DEVICE });
-            doPostCommand(req);
+            doPostCommand(req, resp);
         } else if (reqPathInfo.equals("/asset")) {
             KuraRemoteServiceServlet.requirePermissions(req, Mode.ALL, new String[] { KuraPermission.WIRES_ADMIN });
             doPostAsset(req, resp);
@@ -295,7 +286,8 @@ public class FileServlet extends AuditServlet {
         return qp;
     }
 
-    private void doPostCommand(HttpServletRequest req) throws ServletException, IOException {
+    private void doPostCommand(final HttpServletRequest req, final HttpServletResponse resp)
+            throws ServletException, IOException {
         UploadRequest upload = new UploadRequest(this.diskFileItemFactory);
 
         try {
@@ -305,120 +297,82 @@ public class FileServlet extends AuditServlet {
             throw new ServletException(ERROR_PARSING_THE_FILE_UPLOAD_REQUEST);
         }
 
-        // BEGIN XSRF - Servlet dependent code
-        Map<String, String> formFields = upload.getFormFields();
+        final Map<String, String> formFields = upload.getFormFields();
 
-        try {
-            GwtXSRFToken token = new GwtXSRFToken(formFields.get(XSRF_TOKEN));
-            KuraRemoteServiceServlet.checkXSRFToken(req, token);
-        } catch (Exception e) {
-            throw new ServletException("Security error: please retry this operation correctly.");
-        }
+        // BEGIN XSRF - Servlet dependent code
+        checkXSRFToken(req, formFields.get(XSRF_TOKEN));
         // END XSRF security check
 
+        final KuraPayload payload = new KuraPayload();
+        payload.addMetric("command.command", formFields.get("command"));
+        payload.addMetric("command.password", formFields.get("password"));
+
+        final List<DiskFileItem> fileItems = upload.getFileItems();
+
+        if (!fileItems.isEmpty()) {
+            final DiskFileItem fileItem = fileItems.get(0);
+            
+            final byte[] zipBytes = fileItem.getInputStream().readNBytes(tooBig + 1);
+
+            if (zipBytes.length > tooBig) {
+                throw new ServletException("Uploaded zip exceeds maximum allowed size: " + tooBig);
+            }
+
+            payload.setBody(zipBytes);
+        }
+        
+        final KuraPayload response = commandServiceExecute(payload);
+        resp.getWriter().write(buildResponseFrom(response));
+    }
+
+    private KuraPayload commandServiceExecute(final KuraPayload payload) throws ServletException {
         final ServiceReference<PasswordCommandService> commandServiceReference = this.bundleContext
                 .getServiceReference(PasswordCommandService.class);
 
-        String workingDir = (String) commandServiceReference.getProperty("command.working.directory");
-        if (isNull(workingDir) || workingDir.isEmpty() || !Files.isDirectory(Paths.get(workingDir))) {
-            workingDir = System.getProperty(JAVA_IO_TMPDIR, "/tmp");
+        if (commandServiceReference == null) {
+            logger.error(ERROR_COMMAND_SERVICE_UNAVAILABLE);
+            throw new ServletException(ERROR_COMMAND_SERVICE_UNAVAILABLE);
         }
 
-        List<DiskFileItem> fileItems = null;
-        InputStream is = null;
-        File localFolder = new File(workingDir);
-        OutputStream os = null;
-
         try {
-            fileItems = upload.getFileItems();
+            boolean isCommandEnabled = (boolean) commandServiceReference.getProperty("command.enable");
 
-            if (!fileItems.isEmpty()) {
-                DiskFileItem item = fileItems.get(0);
-                is = item.getInputStream();
-
-                byte[] bytes = IOUtils.toByteArray(is);
-                ZipInputStream zis = new ZipInputStream(new ByteArrayInputStream(bytes));
-
-                int entries = 0;
-                long total = 0;
-                ZipEntry ze = zis.getNextEntry();
-                while (ze != null) {
-                    byte[] buffer = new byte[BUFFER];
-
-                    String expectedFilePath = new StringBuilder(localFolder.getPath()).append(File.separator)
-                            .append(ze.getName()).toString();
-                    String fileName = validateFileName(expectedFilePath, localFolder.getPath());
-                    File newFile = new File(fileName);
-                    if (ze.isDirectory()) {
-                        newFile.mkdirs();
-                        ze = zis.getNextEntry();
-                        continue;
-                    }
-                    if (newFile.getParent() != null) {
-                        File parent = new File(newFile.getParent());
-                        parent.mkdirs();
-                    }
-
-                    FileOutputStream fos = new FileOutputStream(newFile);
-                    int len;
-                    while (total + BUFFER <= tooBig && (len = zis.read(buffer)) > 0) {
-                        fos.write(buffer, 0, len);
-                        total += len;
-                    }
-                    fos.flush();
-                    fos.close();
-
-                    entries++;
-                    if (entries > tooMany) {
-                        throw new IllegalStateException("Too many files to unzip.");
-                    }
-                    if (total > tooBig) {
-                        throw new IllegalStateException("File being unzipped is too big.");
-                    }
-
-                    ze = zis.getNextEntry();
-                }
-
-                zis.closeEntry();
-                zis.close();
+            if (!isCommandEnabled) {
+                logger.error(ERROR_COMMAND_SERVICE_UNAVAILABLE);
+                throw new ServletException(ERROR_COMMAND_SERVICE_UNAVAILABLE);
             }
-        } catch (GwtKuraException e) {
-            throw new ServletException("File is outside extraction target directory.");
+
+            final PasswordCommandService commandService = this.bundleContext.getService(commandServiceReference);
+
+            if (commandService == null) {
+                logger.error(ERROR_COMMAND_SERVICE_UNAVAILABLE);
+                throw new ServletException(ERROR_COMMAND_SERVICE_UNAVAILABLE);
+            }
+
+            return commandService.execute(payload);
+        } catch (Exception e) {
+            logger.error("Error executing command", e);
+            throw new ServletException(e);
         } finally {
-            if (os != null) {
-                try {
-                    os.close();
-                } catch (IOException e) {
-                    logger.warn(CANNOT_CLOSE_OUTPUT_STREAM, e);
-                }
-            }
-            if (is != null) {
-                try {
-                    is.close();
-                } catch (IOException e) {
-                    logger.warn(CANNOT_CLOSE_INPUT_STREAM, e);
-                }
-            }
-            if (fileItems != null) {
-                for (DiskFileItem fileItem : fileItems) {
-                    fileItem.delete();
-                }
-            }
+            this.bundleContext.ungetService(commandServiceReference);
         }
     }
 
-    private String validateFileName(String zipFileName, String intendedDir) throws IOException, GwtKuraException {
-        File zipFile = new File(zipFileName);
-        String filePath = zipFile.getCanonicalPath();
-
-        File iD = new File(intendedDir);
-        String canonicalID = iD.getCanonicalPath();
-
-        if (filePath.startsWith(canonicalID)) {
-            return filePath;
-        } else {
-            throw new GwtKuraException(GwtKuraErrorCode.ILLEGAL_ACCESS);
+    private static String buildResponseFrom(final KuraPayload response) {
+        final StringBuilder sb = new StringBuilder();
+        if ((String) response.getMetric("command.stdout") != null) {
+            sb.append((String) response.getMetric("command.stdout"));
         }
+
+        if ((String) response.getMetric("command.stderr") != null) {
+            sb.append((String) response.getMetric("command.stderr"));
+        }
+
+        if (sb.isEmpty()) {
+            sb.append("No Output");
+        }
+
+        return sb.toString();
     }
 
     private void doPostAsset(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
@@ -438,8 +392,7 @@ public class FileServlet extends AuditServlet {
         Map<String, String> formFields = upload.getFormFields();
         try {
             // BEGIN XSRF - Servlet dependent code
-            GwtXSRFToken token = new GwtXSRFToken(formFields.get(XSRF_TOKEN));
-            KuraRemoteServiceServlet.checkXSRFToken(req, token);
+            checkXSRFToken(req, formFields.get(XSRF_TOKEN));
             // END XSRF security check
 
             List<DiskFileItem> fileItems = upload.getFileItems();
@@ -464,10 +417,6 @@ public class FileServlet extends AuditServlet {
             config.setParameters(parametersFromCsv);
 
             session.setAttribute("kura.csv.config." + assetPid, config);
-
-        } catch (GwtKuraException e) {
-            logger.error("Error updating device configuration", e);
-            throw new ServletException(e);
         } catch (ServletException ex) {
             if (!errors.isEmpty()) {
                 StringBuilder sb = new StringBuilder();
@@ -502,13 +451,7 @@ public class FileServlet extends AuditServlet {
 
         // BEGIN XSRF - Servlet dependent code
         Map<String, String> formFields = upload.getFormFields();
-
-        try {
-            GwtXSRFToken token = new GwtXSRFToken(formFields.get(XSRF_TOKEN));
-            KuraRemoteServiceServlet.checkXSRFToken(req, token);
-        } catch (Exception e) {
-            throw new ServletException("Security error: please retry this operation correctly.", e);
-        }
+        checkXSRFToken(req, formFields.get(XSRF_TOKEN));
         // END XSRF security check
 
         List<DiskFileItem> fileItems = upload.getFileItems();
@@ -569,6 +512,15 @@ public class FileServlet extends AuditServlet {
         }
     }
 
+    private static void checkXSRFToken(final HttpServletRequest req, final String token)
+            throws ServletException {
+        try {
+            KuraRemoteServiceServlet.checkXSRFToken(req, new GwtXSRFToken(token));
+        } catch (Exception e) {
+            throw new ServletException("Security error: please retry this operation correctly.");
+        }
+    }
+
     private List<ComponentConfiguration> parseXmlSnapshot(String xmlString) throws ServletException {
         XmlComponentConfigurations xmlConfigs;
         try {
@@ -597,16 +549,6 @@ public class FileServlet extends AuditServlet {
             int sizeInMB = systemService.getFileCommandZipMaxUploadSize();
             int sizeInBytes = sizeInMB * 1024 * 1024;
             tooBig = sizeInBytes;
-        } catch (GwtKuraException e) {
-            logger.error(SYSTEM_SERVICE_ERROR_MESSAGE, e);
-        }
-    }
-
-    private void getZipUploadCountMax() {
-        ServiceLocator locator = ServiceLocator.getInstance();
-        try {
-            SystemService systemService = locator.getService(SystemService.class);
-            tooMany = systemService.getFileCommandZipMaxUploadNumber();
         } catch (GwtKuraException e) {
             logger.error(SYSTEM_SERVICE_ERROR_MESSAGE, e);
         }
