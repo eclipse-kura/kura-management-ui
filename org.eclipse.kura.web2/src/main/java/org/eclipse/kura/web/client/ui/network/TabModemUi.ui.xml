@@ -92,11 +92,13 @@
                                 </g:FlowPanel>
                             </b:FormGroup>
 
-                            <b:FormGroup>
+                            <b:FormGroup ui:field="groupPreferredMode">
                                 <b:FormLabel for="preferred-mode"
                                     ui:field="labelPreferredMode" />
                                 <util:HelpButton
                                     ui:field="preferredModeHelp" />
+                                <b:HelpBlock color="red"
+                                    ui:field="helpPreferredMode" />
                                 <b:FormControlStatic
                                     b:id="preferred-mode-auto" ui:field="preferredModeAuto" />
                                 <g:FlowPanel ui:field="preferredModePanel">

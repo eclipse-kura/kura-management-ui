@@ -78,6 +78,22 @@ public class TabModemUi extends Composite implements NetworkTab {
     private static final List<GwtModemMode> SELECTABLE_MODES = Arrays.asList(GwtModemMode.ANY, GwtModemMode.CS,
             GwtModemMode.MODE_2G, GwtModemMode.MODE_3G, GwtModemMode.MODE_4G, GwtModemMode.MODE_5G);
 
+    /**
+     * The allowed modes combinations supported by the modem, each with the preferred modes it supports.
+     * {@link GwtModemMode#ANY} is always accepted, with no preferred mode, since it stands for every supported mode.
+     * <p>
+     * Mockup: these are hardcoded until the backend reports the modem supported modes.
+     */
+    private static final Map<Set<GwtModemMode>, List<GwtModemMode>> SUPPORTED_MODES = new LinkedHashMap<>();
+
+    static {
+        SUPPORTED_MODES.put(modeSet(GwtModemMode.ANY), Arrays.asList(GwtModemMode.NONE));
+        SUPPORTED_MODES.put(modeSet(GwtModemMode.MODE_3G), Arrays.asList(GwtModemMode.NONE));
+        SUPPORTED_MODES.put(modeSet(GwtModemMode.MODE_4G), Arrays.asList(GwtModemMode.NONE));
+        SUPPORTED_MODES.put(modeSet(GwtModemMode.MODE_3G, GwtModemMode.MODE_4G),
+                Arrays.asList(GwtModemMode.MODE_4G, GwtModemMode.MODE_3G));
+    }
+
     private final GwtSession session;
     private final TabIp4Ui tcpTab;
     private final NetworkTabsUi tabs;
@@ -106,6 +122,8 @@ public class TabModemUi extends Composite implements NetworkTab {
     FormGroup groupApn;
     @UiField
     FormGroup groupAllowedModes;
+    @UiField
+    FormGroup groupPreferredMode;
 
     @UiField
     FormLabel labelModel;
@@ -158,6 +176,8 @@ public class TabModemUi extends Composite implements NetworkTab {
     HelpBlock helpNumber;
     @UiField
     HelpBlock helpAllowedModes;
+    @UiField
+    HelpBlock helpPreferredMode;
 
     @UiField
     ListBox network;
@@ -295,6 +315,7 @@ public class TabModemUi extends Composite implements NetworkTab {
         if (this.groupNumber.getValidationState().equals(ValidationState.ERROR)
                 || this.groupApn.getValidationState().equals(ValidationState.ERROR)
                 || this.groupAllowedModes.getValidationState().equals(ValidationState.ERROR)
+                || this.groupPreferredMode.getValidationState().equals(ValidationState.ERROR)
                 || this.groupMaxfail.getValidationState().equals(ValidationState.ERROR)
                 || this.groupHoldoff.getValidationState().equals(ValidationState.ERROR)
                 || this.groupInterval.getValidationState().equals(ValidationState.ERROR)
@@ -457,7 +478,10 @@ public class TabModemUi extends Composite implements NetworkTab {
             }
         });
         this.preferredMode.addMouseOutHandler(event -> resetHelp());
-        this.preferredMode.addChangeHandler(event -> setDirty(true));
+        this.preferredMode.addChangeHandler(event -> {
+            setDirty(true);
+            validatePreferredMode();
+        });
 
         applyAllowedModes(null);
         refreshPreferredMode();
@@ -683,9 +707,11 @@ public class TabModemUi extends Composite implements NetworkTab {
         this.groupNumber.setValidationState(ValidationState.NONE);
         this.groupReset.setValidationState(ValidationState.NONE);
         this.groupAllowedModes.setValidationState(ValidationState.NONE);
+        this.groupPreferredMode.setValidationState(ValidationState.NONE);
 
         this.helpReset.setText("");
         this.helpAllowedModes.setText("");
+        this.helpPreferredMode.setText("");
         this.helpMaxfail.setText("");
         this.helpHoldoff.setText("");
         this.helpInterval.setText("");
@@ -777,10 +803,53 @@ public class TabModemUi extends Composite implements NetworkTab {
         if (this.selectedModes.isEmpty()) {
             this.helpAllowedModes.setText(MSGS.netModemInvalidAllowedModes());
             this.groupAllowedModes.setValidationState(ValidationState.ERROR);
+        } else if (!SUPPORTED_MODES.containsKey(this.selectedModes)) {
+            this.helpAllowedModes.setText(MSGS.netModemUnsupportedAllowedModes(getSupportedAllowedModesLabel()));
+            this.groupAllowedModes.setValidationState(ValidationState.ERROR);
         } else {
             this.helpAllowedModes.setText("");
             this.groupAllowedModes.setValidationState(ValidationState.NONE);
         }
+    }
+
+    /**
+     * Checks the preferred mode against the ones supported for the allowed modes. An unsupported allowed modes
+     * combination is already reported on its own field, so it is not reported again here.
+     */
+    private void validatePreferredMode() {
+        List<GwtModemMode> supportedPreferredModes = SUPPORTED_MODES.get(this.selectedModes);
+        GwtModemMode preferred = getEffectivePreferredMode();
+
+        if (supportedPreferredModes != null && !supportedPreferredModes.contains(preferred)) {
+            this.helpPreferredMode.setText(MSGS.netModemUnsupportedPreferredMode(getModeLabel(preferred),
+                    joinModeLabels(supportedPreferredModes, ", ")));
+            this.groupPreferredMode.setValidationState(ValidationState.ERROR);
+        } else {
+            this.helpPreferredMode.setText("");
+            this.groupPreferredMode.setValidationState(ValidationState.NONE);
+        }
+    }
+
+    private static String getSupportedAllowedModesLabel() {
+        List<String> combinations = new ArrayList<>();
+        for (Set<GwtModemMode> modes : SUPPORTED_MODES.keySet()) {
+            combinations.add(joinModeLabels(modes, " + "));
+        }
+
+        return String.join(", ", combinations);
+    }
+
+    private static String joinModeLabels(Iterable<GwtModemMode> modes, String separator) {
+        List<String> labels = new ArrayList<>();
+        for (GwtModemMode mode : modes) {
+            labels.add(getModeLabel(mode));
+        }
+
+        return String.join(separator, labels);
+    }
+
+    private static Set<GwtModemMode> modeSet(GwtModemMode... modes) {
+        return new LinkedHashSet<>(Arrays.asList(modes));
     }
 
     private List<String> getAllowedModes() {
@@ -826,14 +895,17 @@ public class TabModemUi extends Composite implements NetworkTab {
         this.preferredModeAuto.setText(MSGS.netModemPreferredModeAuto(getModeLabel(autoMode)));
         this.preferredModeAuto.setVisible(!override);
         this.preferredModePanel.setVisible(override);
+
+        validatePreferredMode();
     }
 
     /**
      * The preferred mode is the most recent technology among the allowed ones. It is meaningful only when the modem
-     * can pick among different technologies, so it is left to {@link GwtModemMode#NONE} when every mode is allowed.
+     * can pick among different technologies, so it is left to {@link GwtModemMode#NONE} when a single mode or every
+     * mode is allowed.
      */
     private GwtModemMode computeAutoPreferredMode() {
-        if (this.selectedModes.isEmpty() || this.selectedModes.contains(GwtModemMode.ANY)) {
+        if (this.selectedModes.size() < 2 || this.selectedModes.contains(GwtModemMode.ANY)) {
             return GwtModemMode.NONE;
         }
 
