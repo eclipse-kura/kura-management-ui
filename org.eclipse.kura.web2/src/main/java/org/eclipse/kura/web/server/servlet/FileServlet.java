@@ -61,6 +61,7 @@ import org.eclipse.kura.web.server.RequiredPermissions.Mode;
 import org.eclipse.kura.web.server.util.AssetConfigValidator;
 import org.eclipse.kura.web.server.util.ServiceLocator;
 import org.eclipse.kura.web.shared.GwtKuraException;
+import org.eclipse.kura.web.shared.GwtSafeHtmlUtils;
 import org.eclipse.kura.web.shared.KuraPermission;
 import org.eclipse.kura.web.shared.model.GwtConfigComponent;
 import org.eclipse.kura.web.shared.model.GwtConfigParameter;
@@ -192,7 +193,7 @@ public class FileServlet extends AuditServlet {
             doPostConfigurationSnapshot(req);
         } else if (reqPathInfo.equals("/command") && supportedFeatures.isCommandServiceAvailable()) {
             KuraRemoteServiceServlet.requirePermissions(req, Mode.ALL, new String[] { KuraPermission.DEVICE });
-            doPostCommand(req);
+            doPostCommand(req, resp);
         } else if (reqPathInfo.equals("/asset")) {
             KuraRemoteServiceServlet.requirePermissions(req, Mode.ALL, new String[] { KuraPermission.WIRES_ADMIN });
             doPostAsset(req, resp);
@@ -294,7 +295,7 @@ public class FileServlet extends AuditServlet {
         return qp;
     }
 
-    private void doPostCommand(HttpServletRequest req) throws ServletException, IOException {
+    private void doPostCommand(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         UploadRequest upload = new UploadRequest(this.diskFileItemFactory);
 
         try {
@@ -321,6 +322,8 @@ public class FileServlet extends AuditServlet {
             if (!fileItems.isEmpty()) {
                 unZipInCommandWorkingDirectory(fileItems.get(0));
             }
+        } catch (IOException | ServletException e) {
+            reportExtractionFailure(resp, e);
         } finally {
             for (DiskFileItem fileItem : fileItems) {
                 fileItem.delete();
@@ -338,7 +341,6 @@ public class FileServlet extends AuditServlet {
 
         if (isNull(commandServiceReference)
                 || !Boolean.TRUE.equals(commandServiceReference.getProperty(COMMAND_ENABLE))) {
-            logger.warn("Refusing to extract the uploaded archive: the command service is not enabled");
             throw new ServletException("The command service is not enabled");
         }
 
@@ -350,6 +352,16 @@ public class FileServlet extends AuditServlet {
         try (InputStream is = archive.getInputStream()) {
             UnZip.unZip(is, workingDir, commandExecutorService(commandServiceReference));
         }
+    }
+
+    // The command tab shows the body of the response as the reason why the upload failed
+    private static void reportExtractionFailure(HttpServletResponse resp, Exception e) throws IOException {
+        String reason = e.getMessage() != null ? e.getMessage() : e.toString();
+        logger.warn("Unable to extract the uploaded archive: {}", reason);
+
+        resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+        resp.setCharacterEncoding(StandardCharsets.UTF_8.name());
+        resp.getWriter().write(GwtSafeHtmlUtils.htmlEscape(reason));
     }
 
     private static CommandExecutorService commandExecutorService(
