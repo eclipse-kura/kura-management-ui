@@ -45,7 +45,6 @@ import org.gwtbootstrap3.client.ui.ListBox;
 import org.gwtbootstrap3.client.ui.PanelHeader;
 import org.gwtbootstrap3.client.ui.TextBox;
 import org.gwtbootstrap3.client.ui.constants.ButtonSize;
-import org.gwtbootstrap3.client.ui.constants.ButtonType;
 import org.gwtbootstrap3.client.ui.constants.ValidationState;
 import org.gwtbootstrap3.client.ui.html.Span;
 
@@ -769,8 +768,8 @@ public class TabModemUi extends Composite implements NetworkTab {
         for (GwtModemMode mode : SELECTABLE_MODES) {
             boolean selected = this.selectedModes.contains(mode);
             Button chip = this.modeChips.get(mode);
-            chip.setType(selected ? ButtonType.PRIMARY : ButtonType.DEFAULT);
             chip.setActive(selected);
+            chip.getElement().setAttribute("aria-pressed", String.valueOf(selected));
         }
     }
 
