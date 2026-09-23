@@ -331,10 +331,6 @@ public class FileServlet extends AuditServlet {
         }
     }
 
-    /**
-     * Extracts the uploaded archive in the working directory of the command service, with the permissions the command
-     * service runs commands with: those of the command user, unless privileged commands are enabled.
-     */
     private void unZipInCommandWorkingDirectory(DiskFileItem archive) throws ServletException, IOException {
         final ServiceReference<PasswordCommandService> commandServiceReference = this.bundleContext
                 .getServiceReference(PasswordCommandService.class);
