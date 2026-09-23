@@ -20,6 +20,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Supplier;
 
 import org.eclipse.kura.web.client.messages.Messages;
 import org.eclipse.kura.web.client.util.HelpButton;
@@ -49,6 +50,7 @@ import org.gwtbootstrap3.client.ui.constants.ValidationState;
 import org.gwtbootstrap3.client.ui.html.Span;
 
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.Composite;
@@ -79,7 +81,8 @@ public class TabModemUi extends Composite implements NetworkTab {
             GwtModemMode.MODE_2G, GwtModemMode.MODE_3G, GwtModemMode.MODE_4G, GwtModemMode.MODE_5G);
 
     /**
-     * The allowed modes combinations supported by the modem, each with the preferred modes it supports.
+     * The allowed modes combinations supported by the modem, each with the preferred modes it supports. It drives
+     * the validation and the supported modes table shown in the help.
      * {@link GwtModemMode#ANY} is always accepted, with no preferred mode, since it stands for every supported mode.
      * <p>
      * Mockup: these are hardcoded until the backend reports the modem supported modes.
@@ -402,8 +405,8 @@ public class TabModemUi extends Composite implements NetworkTab {
     // ----Private Methods----
     private void initHelpButtons() {
         this.networkHelp.setHelpText(MSGS.netModemToolTipNetworkTopology());
-        this.allowedModesHelp.setHelpText(MSGS.netModemToolTipAllowedModes());
-        this.preferredModeHelp.setHelpText(MSGS.netModemToolTipPreferredMode());
+        this.allowedModesHelp.setHelpTextProvider(this::getAllowedModesHelp);
+        this.preferredModeHelp.setHelpTextProvider(this::getPreferredModeHelp);
         this.modemHelp.setHelpText(MSGS.netModemToolTipModemIndentifier());
         this.numberHelp.setHelpText(MSGS.netModemToolTipModemInterfaceNumber());
         this.apnHelp.setHelpText(MSGS.netModemToolTipApn());
@@ -695,7 +698,7 @@ public class TabModemUi extends Composite implements NetworkTab {
 
     private void initModeChips() {
         for (GwtModemMode mode : SELECTABLE_MODES) {
-            Button chip = createModeChip(getModeLabel(mode), MSGS.netModemToolTipAllowedModes(),
+            Button chip = createModeChip(getModeLabel(mode), this::getAllowedModesHelp,
                     () -> onModeChipClicked(mode));
 
             this.modeChips.put(mode, chip);
@@ -703,14 +706,14 @@ public class TabModemUi extends Composite implements NetworkTab {
         }
     }
 
-    private Button createModeChip(String label, String helpMessage, Runnable onClick) {
+    private Button createModeChip(String label, Supplier<String> helpMessage, Runnable onClick) {
         Button chip = new Button(label);
         chip.setSize(ButtonSize.SMALL);
         chip.addStyleName(CHIP_STYLE);
         chip.addClickHandler(event -> onClick.run());
         chip.addMouseOverHandler(event -> {
             if (chip.isEnabled()) {
-                showHelp(helpMessage);
+                showHelp(helpMessage.get());
             }
         });
         chip.addMouseOutHandler(event -> resetHelp());
@@ -777,7 +780,7 @@ public class TabModemUi extends Composite implements NetworkTab {
             this.helpAllowedModes.setText(MSGS.netModemInvalidAllowedModes());
             this.groupAllowedModes.setValidationState(ValidationState.ERROR);
         } else if (!SUPPORTED_MODES.containsKey(this.selectedModes)) {
-            this.helpAllowedModes.setText(MSGS.netModemUnsupportedAllowedModes(getSupportedAllowedModesLabel()));
+            this.helpAllowedModes.setText(MSGS.netModemUnsupportedAllowedModes());
             this.groupAllowedModes.setValidationState(ValidationState.ERROR);
         } else {
             this.helpAllowedModes.setText("");
@@ -794,8 +797,7 @@ public class TabModemUi extends Composite implements NetworkTab {
         GwtModemMode preferred = getEffectivePreferredMode();
 
         if (supportedPreferredModes != null && !supportedPreferredModes.contains(preferred)) {
-            this.helpPreferredMode.setText(MSGS.netModemUnsupportedPreferredMode(getModeLabel(preferred),
-                    joinModeLabels(supportedPreferredModes, ", ")));
+            this.helpPreferredMode.setText(MSGS.netModemUnsupportedPreferredMode(getModeLabel(preferred)));
             this.groupPreferredMode.setValidationState(ValidationState.ERROR);
         } else {
             this.helpPreferredMode.setText("");
@@ -803,13 +805,33 @@ public class TabModemUi extends Composite implements NetworkTab {
         }
     }
 
-    private static String getSupportedAllowedModesLabel() {
-        List<String> combinations = new ArrayList<>();
-        for (Set<GwtModemMode> modes : SUPPORTED_MODES.keySet()) {
-            combinations.add(joinModeLabels(modes, " + "));
+    private String getAllowedModesHelp() {
+        return MSGS.netModemToolTipAllowedModes() + "<br><br>" + getSupportedModesHelp();
+    }
+
+    private String getPreferredModeHelp() {
+        return MSGS.netModemToolTipPreferredMode() + "<br><br>" + getSupportedModesHelp();
+    }
+
+    /**
+     * Renders the supported modes as a table for the help panel, highlighting the row of the current selection.
+     */
+    private String getSupportedModesHelp() {
+        StringBuilder html = new StringBuilder();
+        html.append("<b>").append(SafeHtmlUtils.htmlEscape(MSGS.netModemSupportedModes())).append("</b>");
+        html.append("<table class=\"table table-condensed table-bordered modem-supported-modes\">");
+        html.append("<thead><tr><th>").append(SafeHtmlUtils.htmlEscape(MSGS.netModemAllowedModes()));
+        html.append("</th><th>").append(SafeHtmlUtils.htmlEscape(MSGS.netModemPreferredMode()));
+        html.append("</th></tr></thead><tbody>");
+
+        for (Map.Entry<Set<GwtModemMode>, List<GwtModemMode>> entry : SUPPORTED_MODES.entrySet()) {
+            html.append(entry.getKey().equals(this.selectedModes) ? "<tr class=\"info\">" : "<tr>");
+            html.append("<td>").append(SafeHtmlUtils.htmlEscape(joinModeLabels(entry.getKey(), " + ")));
+            html.append("</td><td>").append(SafeHtmlUtils.htmlEscape(joinModeLabels(entry.getValue(), ", ")));
+            html.append("</td></tr>");
         }
 
-        return String.join(", ", combinations);
+        return html.append("</tbody></table>").toString();
     }
 
     private static String joinModeLabels(Iterable<GwtModemMode> modes, String separator) {
@@ -875,7 +897,7 @@ public class TabModemUi extends Composite implements NetworkTab {
     }
 
     private void addPreferredModeChip(String label, boolean selected, Runnable onSelect) {
-        Button chip = createModeChip(label, MSGS.netModemToolTipPreferredMode(), () -> {
+        Button chip = createModeChip(label, this::getPreferredModeHelp, () -> {
             setDirty(true);
             onSelect.run();
             refreshPreferredMode();
