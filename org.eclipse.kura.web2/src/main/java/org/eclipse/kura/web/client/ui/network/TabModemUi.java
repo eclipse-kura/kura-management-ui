@@ -102,6 +102,9 @@ public class TabModemUi extends Composite implements NetworkTab {
 
     private final Map<GwtModemMode, Button> modeChips = new LinkedHashMap<>();
     private final Set<GwtModemMode> selectedModes = new LinkedHashSet<>();
+    private final List<Button> preferredModeChips = new ArrayList<>();
+    private boolean preferredModeAuto = true;
+    private GwtModemMode manualPreferredMode;
 
     private final GwtSecurityTokenServiceAsync gwtXSRFService = GWT.create(GwtSecurityTokenService.class);
     private final GwtNetworkServiceAsync gwtNetworkService = GWT.create(GwtNetworkService.class);
@@ -133,8 +136,6 @@ public class TabModemUi extends Composite implements NetworkTab {
     FormLabel labelAllowedModes;
     @UiField
     FormLabel labelPreferredMode;
-    @UiField
-    FormLabel labelPreferredModeOverride;
     @UiField
     FormLabel labelService;
     @UiField
@@ -183,8 +184,6 @@ public class TabModemUi extends Composite implements NetworkTab {
     ListBox network;
     @UiField
     ListBox auth;
-    @UiField
-    ListBox preferredMode;
 
     @UiField
     FlowPanel allowedModesPanel;
@@ -215,7 +214,7 @@ public class TabModemUi extends Composite implements NetworkTab {
     @UiField
     FormControlStatic service;
     @UiField
-    FormControlStatic preferredModeAuto;
+    FormControlStatic preferredModeFixed;
 
     @UiField
     Input password;
@@ -224,10 +223,6 @@ public class TabModemUi extends Composite implements NetworkTab {
     InlineRadio radio1;
     @UiField
     InlineRadio radio2;
-    @UiField
-    InlineRadio radioOverrideOn;
-    @UiField
-    InlineRadio radioOverrideOff;
 
     @UiField
     PanelHeader helpTitle;
@@ -244,8 +239,6 @@ public class TabModemUi extends Composite implements NetworkTab {
     HelpButton allowedModesHelp;
     @UiField
     HelpButton preferredModeHelp;
-    @UiField
-    HelpButton preferredModeOverrideHelp;
     @UiField
     HelpButton modemHelp;
     @UiField
@@ -411,7 +404,6 @@ public class TabModemUi extends Composite implements NetworkTab {
         this.networkHelp.setHelpText(MSGS.netModemToolTipNetworkTopology());
         this.allowedModesHelp.setHelpText(MSGS.netModemToolTipAllowedModes());
         this.preferredModeHelp.setHelpText(MSGS.netModemToolTipPreferredMode());
-        this.preferredModeOverrideHelp.setHelpText(MSGS.netModemToolTipPreferredModeOverride());
         this.modemHelp.setHelpText(MSGS.netModemToolTipModemIndentifier());
         this.numberHelp.setHelpText(MSGS.netModemToolTipModemInterfaceNumber());
         this.apnHelp.setHelpText(MSGS.netModemToolTipApn());
@@ -451,37 +443,9 @@ public class TabModemUi extends Composite implements NetworkTab {
         this.allowedModesPanel.getElement().setId("allowed-modes");
         initModeChips();
 
-        // PREFERRED MODEM MODE OVERRIDE
-        this.labelPreferredModeOverride.setText(MSGS.netModemPreferredModeOverride());
-        this.radioOverrideOn.setText(MSGS.trueLabel());
-        this.radioOverrideOff.setText(MSGS.falseLabel());
-        this.radioOverrideOn.setValue(false);
-        this.radioOverrideOff.setValue(true);
-        this.radioOverrideOn.addMouseOverHandler(event -> showHelp(MSGS.netModemToolTipPreferredModeOverride()));
-        this.radioOverrideOn.addMouseOutHandler(event -> resetHelp());
-        this.radioOverrideOff.addMouseOverHandler(event -> showHelp(MSGS.netModemToolTipPreferredModeOverride()));
-        this.radioOverrideOff.addMouseOutHandler(event -> resetHelp());
-        this.radioOverrideOn.addValueChangeHandler(event -> {
-            setDirty(true);
-            refreshPreferredMode();
-        });
-        this.radioOverrideOff.addValueChangeHandler(event -> {
-            setDirty(true);
-            refreshPreferredMode();
-        });
-
         // PREFERRED MODEM MODE
         this.labelPreferredMode.setText(MSGS.netModemPreferredMode());
-        this.preferredMode.addMouseOverHandler(event -> {
-            if (TabModemUi.this.preferredMode.isEnabled()) {
-                showHelp(MSGS.netModemToolTipPreferredMode());
-            }
-        });
-        this.preferredMode.addMouseOutHandler(event -> resetHelp());
-        this.preferredMode.addChangeHandler(event -> {
-            setDirty(true);
-            validatePreferredMode();
-        });
+        this.preferredModePanel.getElement().setId("preferred-mode");
 
         applyAllowedModes(null);
         refreshPreferredMode();
@@ -731,20 +695,32 @@ public class TabModemUi extends Composite implements NetworkTab {
 
     private void initModeChips() {
         for (GwtModemMode mode : SELECTABLE_MODES) {
-            Button chip = new Button(getModeLabel(mode));
-            chip.setSize(ButtonSize.SMALL);
-            chip.addStyleName(CHIP_STYLE);
-            chip.addClickHandler(event -> onModeChipClicked(mode));
-            chip.addMouseOverHandler(event -> {
-                if (chip.isEnabled()) {
-                    showHelp(MSGS.netModemToolTipAllowedModes());
-                }
-            });
-            chip.addMouseOutHandler(event -> resetHelp());
+            Button chip = createModeChip(getModeLabel(mode), MSGS.netModemToolTipAllowedModes(),
+                    () -> onModeChipClicked(mode));
 
             this.modeChips.put(mode, chip);
             this.allowedModesPanel.add(chip);
         }
+    }
+
+    private Button createModeChip(String label, String helpMessage, Runnable onClick) {
+        Button chip = new Button(label);
+        chip.setSize(ButtonSize.SMALL);
+        chip.addStyleName(CHIP_STYLE);
+        chip.addClickHandler(event -> onClick.run());
+        chip.addMouseOverHandler(event -> {
+            if (chip.isEnabled()) {
+                showHelp(helpMessage);
+            }
+        });
+        chip.addMouseOutHandler(event -> resetHelp());
+
+        return chip;
+    }
+
+    private static void setChipSelected(Button chip, boolean selected) {
+        chip.setActive(selected);
+        chip.getElement().setAttribute("aria-pressed", String.valueOf(selected));
     }
 
     private void onModeChipClicked(GwtModemMode mode) {
@@ -792,10 +768,7 @@ public class TabModemUi extends Composite implements NetworkTab {
 
     private void refreshModeChips() {
         for (GwtModemMode mode : SELECTABLE_MODES) {
-            boolean selected = this.selectedModes.contains(mode);
-            Button chip = this.modeChips.get(mode);
-            chip.setActive(selected);
-            chip.getElement().setAttribute("aria-pressed", String.valueOf(selected));
+            setChipSelected(this.modeChips.get(mode), this.selectedModes.contains(mode));
         }
     }
 
@@ -867,36 +840,59 @@ public class TabModemUi extends Composite implements NetworkTab {
         return modes;
     }
 
-    private void refreshPreferredMode() {
-        refreshPreferredMode(null);
-    }
-
     /**
-     * Rebuilds the preferred mode selector so that it only offers the allowed modes. When the override is off the
-     * preferred mode simply follows the allowed ones and the selector is replaced by a read only summary.
+     * Rebuilds the preferred mode chips: "Automatic", that follows the allowed modes, followed by the preferred modes
+     * supported for them. A manual choice that is no longer offered falls back to "Automatic". When there is nothing
+     * to choose the chips are replaced by a read only summary.
      */
-    private void refreshPreferredMode(GwtModemMode requested) {
-        boolean override = this.radioOverrideOn.getValue();
+    private void refreshPreferredMode() {
+        List<GwtModemMode> options = getPreferredModeOptions();
+        if (!options.contains(this.manualPreferredMode)) {
+            this.preferredModeAuto = true;
+        }
+
         GwtModemMode autoMode = computeAutoPreferredMode();
-        List<GwtModemMode> selectableModes = getSelectablePreferredModes();
+        boolean fixed = options.size() <= 1;
+        this.preferredModeFixed.setText(MSGS.netModemPreferredModeFixed(getModeLabel(autoMode)));
+        this.preferredModeFixed.setVisible(fixed);
+        this.preferredModePanel.setVisible(!fixed);
 
-        GwtModemMode candidate = requested != null ? requested : parseMode(this.preferredMode.getSelectedValue());
-        GwtModemMode selected = override && candidate != null && selectableModes.contains(candidate) ? candidate
-                : autoMode;
-
-        this.preferredMode.clear();
-        for (GwtModemMode mode : selectableModes) {
-            this.preferredMode.addItem(getModeLabel(mode), mode.name());
-            if (mode == selected) {
-                this.preferredMode.setSelectedIndex(this.preferredMode.getItemCount() - 1);
+        this.preferredModePanel.clear();
+        this.preferredModeChips.clear();
+        if (!fixed) {
+            addPreferredModeChip(MSGS.netModemPreferredModeAuto(getModeLabel(autoMode)), this.preferredModeAuto,
+                    () -> this.preferredModeAuto = true);
+            for (GwtModemMode mode : options) {
+                addPreferredModeChip(getModeLabel(mode), !this.preferredModeAuto && mode == this.manualPreferredMode,
+                        () -> {
+                            this.preferredModeAuto = false;
+                            this.manualPreferredMode = mode;
+                        });
             }
         }
 
-        this.preferredModeAuto.setText(MSGS.netModemPreferredModeAuto(getModeLabel(autoMode)));
-        this.preferredModeAuto.setVisible(!override);
-        this.preferredModePanel.setVisible(override);
-
         validatePreferredMode();
+    }
+
+    private void addPreferredModeChip(String label, boolean selected, Runnable onSelect) {
+        Button chip = createModeChip(label, MSGS.netModemToolTipPreferredMode(), () -> {
+            setDirty(true);
+            onSelect.run();
+            refreshPreferredMode();
+        });
+        setChipSelected(chip, selected);
+
+        this.preferredModeChips.add(chip);
+        this.preferredModePanel.add(chip);
+    }
+
+    /**
+     * The preferred modes supported for the allowed ones. An unsupported allowed modes combination is already
+     * reported as an error, so in that case every allowed mode is offered.
+     */
+    private List<GwtModemMode> getPreferredModeOptions() {
+        List<GwtModemMode> supported = SUPPORTED_MODES.get(this.selectedModes);
+        return supported != null ? supported : getSelectablePreferredModes();
     }
 
     /**
@@ -934,14 +930,7 @@ public class TabModemUi extends Composite implements NetworkTab {
     }
 
     private GwtModemMode getEffectivePreferredMode() {
-        if (this.radioOverrideOn.getValue()) {
-            GwtModemMode selected = parseMode(this.preferredMode.getSelectedValue());
-            if (selected != null) {
-                return selected;
-            }
-        }
-
-        return computeAutoPreferredMode();
+        return this.preferredModeAuto ? computeAutoPreferredMode() : this.manualPreferredMode;
     }
 
     private static GwtModemMode parseMode(String value) {
@@ -977,11 +966,11 @@ public class TabModemUi extends Composite implements NetworkTab {
             applyAllowedModes(this.selectedNetIfConfig.getAllowedModemModes());
 
             GwtModemMode configuredPreferredMode = parseMode(this.selectedNetIfConfig.getPreferredModemMode());
-            boolean overridden = configuredPreferredMode != null
-                    && configuredPreferredMode != computeAutoPreferredMode();
-            this.radioOverrideOn.setValue(overridden);
-            this.radioOverrideOff.setValue(!overridden);
-            refreshPreferredMode(configuredPreferredMode);
+            // the configuration stores just the preferred mode: it is automatic when it matches the computed one
+            this.preferredModeAuto = configuredPreferredMode == null
+                    || configuredPreferredMode == computeAutoPreferredMode();
+            this.manualPreferredMode = configuredPreferredMode;
+            refreshPreferredMode();
 
             this.service.setText(this.selectedNetIfConfig.getConnectionType());
             this.modem.setText(this.selectedNetIfConfig.getModemId());
@@ -1023,9 +1012,9 @@ public class TabModemUi extends Composite implements NetworkTab {
         for (Button chip : this.modeChips.values()) {
             chip.setEnabled(true);
         }
-        this.radioOverrideOn.setEnabled(true);
-        this.radioOverrideOff.setEnabled(true);
-        this.preferredMode.setEnabled(true);
+        for (Button chip : this.preferredModeChips) {
+            chip.setEnabled(true);
+        }
         this.modem.setEnabled(true);
         this.number.setEnabled(false);
         this.apn.setEnabled(true);
@@ -1066,8 +1055,8 @@ public class TabModemUi extends Composite implements NetworkTab {
         this.model.setText(null);
         this.network.setSelectedIndex(0);
         applyAllowedModes(null);
-        this.radioOverrideOn.setValue(false);
-        this.radioOverrideOff.setValue(true);
+        this.preferredModeAuto = true;
+        this.manualPreferredMode = null;
         refreshPreferredMode();
         this.service.setText(null);
         this.modem.setText(null);
