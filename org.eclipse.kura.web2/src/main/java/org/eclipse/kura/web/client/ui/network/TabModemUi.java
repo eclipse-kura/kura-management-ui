@@ -286,6 +286,7 @@ public class TabModemUi extends Composite implements NetworkTab {
         if (this.tabs.getButtons() != null) {
             this.tabs.getButtons().setButtonsDirty(flag);
         }
+        refreshApplyButton();
     }
 
     @Override
@@ -308,17 +309,36 @@ public class TabModemUi extends Composite implements NetworkTab {
             this.groupFailure.setValidationState(ValidationState.ERROR);
         }
 
-        if (this.groupNumber.getValidationState().equals(ValidationState.ERROR)
+        return !hasValidationErrors();
+    }
+
+    private boolean hasValidationErrors() {
+        return this.groupNumber.getValidationState().equals(ValidationState.ERROR)
                 || this.groupApn.getValidationState().equals(ValidationState.ERROR)
                 || this.groupAllowedModes.getValidationState().equals(ValidationState.ERROR)
                 || this.groupPreferredMode.getValidationState().equals(ValidationState.ERROR)
+                || this.groupReset.getValidationState().equals(ValidationState.ERROR)
                 || this.groupMaxfail.getValidationState().equals(ValidationState.ERROR)
                 || this.groupHoldoff.getValidationState().equals(ValidationState.ERROR)
                 || this.groupInterval.getValidationState().equals(ValidationState.ERROR)
-                || this.groupFailure.getValidationState().equals(ValidationState.ERROR)) {
-            return false;
-        } else {
-            return true;
+                || this.groupFailure.getValidationState().equals(ValidationState.ERROR);
+    }
+
+    /**
+     * Keeps the "Apply" button disabled while a field of this tab is in error, and enables it back once the errors
+     * are fixed and there are changes to apply. Nothing is done when the modem tab is not displayed, so that a stale
+     * state of this tab does not affect the other interfaces.
+     */
+    private void refreshApplyButton() {
+        NetworkButtonBarUi buttons = this.tabs.getButtons();
+        if (buttons == null || !this.tabs.visibleTabs.contains(this.tabs.modemTabAnchorItem)) {
+            return;
+        }
+
+        if (hasValidationErrors()) {
+            buttons.apply.setEnabled(false);
+        } else if (this.dirty) {
+            buttons.apply.setEnabled(true);
         }
     }
 
@@ -547,6 +567,7 @@ public class TabModemUi extends Composite implements NetworkTab {
                 TabModemUi.this.helpReset.setText("");
                 TabModemUi.this.groupReset.setValidationState(ValidationState.NONE);
             }
+            refreshApplyButton();
         });
 
         // REOPEN CONNECTION ON TERMINATION
@@ -590,6 +611,7 @@ public class TabModemUi extends Composite implements NetworkTab {
                 TabModemUi.this.helpMaxfail.setText("");
                 TabModemUi.this.groupMaxfail.setValidationState(ValidationState.NONE);
             }
+            refreshApplyButton();
         });
 
         this.labelHoldoff.setText(MSGS.netModemHoldoff() + "*");
@@ -612,6 +634,7 @@ public class TabModemUi extends Composite implements NetworkTab {
                 TabModemUi.this.helpHoldoff.setText("");
                 TabModemUi.this.groupHoldoff.setValidationState(ValidationState.NONE);
             }
+            refreshApplyButton();
         });
 
         // LCP ECHO INTERVAL
@@ -633,6 +656,7 @@ public class TabModemUi extends Composite implements NetworkTab {
             } else {
                 TabModemUi.this.groupInterval.setValidationState(ValidationState.NONE);
             }
+            refreshApplyButton();
         });
 
         // LCP ECHO FAILURE
@@ -655,6 +679,7 @@ public class TabModemUi extends Composite implements NetworkTab {
                 TabModemUi.this.helpFailure.setText("");
                 TabModemUi.this.groupFailure.setValidationState(ValidationState.NONE);
             }
+            refreshApplyButton();
         });
 
         this.helpTitle.setText(MSGS.netHelpTitle());
@@ -786,6 +811,7 @@ public class TabModemUi extends Composite implements NetworkTab {
             this.helpAllowedModes.setText("");
             this.groupAllowedModes.setValidationState(ValidationState.NONE);
         }
+        refreshApplyButton();
     }
 
     /**
@@ -803,6 +829,7 @@ public class TabModemUi extends Composite implements NetworkTab {
             this.helpPreferredMode.setText("");
             this.groupPreferredMode.setValidationState(ValidationState.NONE);
         }
+        refreshApplyButton();
     }
 
     private String getAllowedModesHelp() {
