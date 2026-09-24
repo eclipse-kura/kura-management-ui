@@ -68,6 +68,30 @@
                                 </g:FlowPanel>
                             </b:FormGroup>
 
+                            <b:FormGroup ui:field="groupAllowedModes">
+                                <b:FormLabel for="allowed-modes"
+                                    ui:field="labelAllowedModes" />
+                                <util:HelpButton
+                                    ui:field="allowedModesHelp" />
+                                <b:HelpBlock color="red"
+                                    ui:field="helpAllowedModes" />
+                                <g:FlowPanel ui:field="allowedModesPanel"
+                                    addStyleNames="modem-mode-chips" />
+                            </b:FormGroup>
+
+                            <b:FormGroup ui:field="groupPreferredMode">
+                                <b:FormLabel for="preferred-mode"
+                                    ui:field="labelPreferredMode" />
+                                <util:HelpButton
+                                    ui:field="preferredModeHelp" />
+                                <b:HelpBlock color="red"
+                                    ui:field="helpPreferredMode" />
+                                <b:FormControlStatic
+                                    b:id="preferred-mode-fixed" ui:field="preferredModeFixed" />
+                                <g:FlowPanel ui:field="preferredModePanel"
+                                    addStyleNames="modem-mode-chips" />
+                            </b:FormGroup>
+
                             <b:FormGroup>
                                 <b:FormLabel for="service"
                                     ui:field="labelService" />
