@@ -47,8 +47,6 @@ import org.eclipse.kura.configuration.ComponentConfiguration;
 import org.eclipse.kura.configuration.ConfigurationService;
 import org.eclipse.kura.core.configuration.ComponentConfigurationImpl;
 import org.eclipse.kura.core.configuration.XmlComponentConfigurations;
-import org.eclipse.kura.executor.CommandExecutorService;
-import org.eclipse.kura.executor.PrivilegedExecutorService;
 import org.eclipse.kura.executor.UnprivilegedExecutorService;
 import org.eclipse.kura.marshalling.Unmarshaller;
 import org.eclipse.kura.rest.configuration.api.ComponentConfigurationList;
@@ -322,7 +320,7 @@ public class FileServlet extends AuditServlet {
             if (!fileItems.isEmpty()) {
                 unZipInCommandWorkingDirectory(fileItems.get(0));
             }
-        } catch (IOException | ServletException e) {
+        } catch (IOException | ServletException | IllegalStateException e) {
             reportExtractionFailure(resp, e);
         } finally {
             for (DiskFileItem fileItem : fileItems) {
@@ -346,7 +344,11 @@ public class FileServlet extends AuditServlet {
         }
 
         try (InputStream is = archive.getInputStream()) {
-            UnZip.unZip(is, workingDir, commandExecutorService(commandServiceReference));
+            if (Boolean.TRUE.equals(commandServiceReference.getProperty(PRIVILEGED_COMMAND_SERVICE_ENABLE))) {
+                UnZip.unZip(is, workingDir);
+            } else {
+                UnZip.unZip(is, workingDir, unprivilegedExecutorService());
+            }
         }
     }
 
@@ -360,15 +362,9 @@ public class FileServlet extends AuditServlet {
         resp.getWriter().write(GwtSafeHtmlUtils.htmlEscape(reason));
     }
 
-    private static CommandExecutorService commandExecutorService(
-            ServiceReference<PasswordCommandService> commandServiceReference) throws ServletException {
-        ServiceLocator locator = ServiceLocator.getInstance();
-
+    private static UnprivilegedExecutorService unprivilegedExecutorService() throws ServletException {
         try {
-            if (Boolean.TRUE.equals(commandServiceReference.getProperty(PRIVILEGED_COMMAND_SERVICE_ENABLE))) {
-                return locator.getService(PrivilegedExecutorService.class);
-            }
-            return locator.getService(UnprivilegedExecutorService.class);
+            return ServiceLocator.getInstance().getService(UnprivilegedExecutorService.class);
         } catch (GwtKuraException e) {
             throw new ServletException("Unable to locate the command executor service", e);
         }
