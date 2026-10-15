@@ -1214,3 +1214,41 @@ div.headerLogo {
 .failure-handler-stack-trace-container {
 	max-height: 50vh;
 }
+.modem-mode-chips {
+	margin-top: 3px;
+}
+
+.modem-mode-chips .modem-mode-chip {
+	border-radius: 12px;
+	margin: 0 6px 6px 0;
+	min-width: 56px;
+}
+
+/* The generic ".btn" rule paints every button the same way: chips need their own colors to show the selection */
+.modem-mode-chips .btn.modem-mode-chip {
+	background-color: white !important;
+	background-image: none;
+	border: 1px solid rgb(40, 96, 166);
+	box-shadow: none;
+	color: rgb(40, 96, 166) !important;
+	text-shadow: none;
+}
+
+.modem-mode-chips .btn.modem-mode-chip:hover,
+.modem-mode-chips .btn.modem-mode-chip:focus {
+	background-color: rgb(230, 238, 248) !important;
+}
+
+.modem-mode-chips .btn.modem-mode-chip.active {
+	background-color: rgb(40, 96, 166) !important;
+	color: white !important;
+}
+
+.modem-mode-chips .btn.modem-mode-chip.active:hover,
+.modem-mode-chips .btn.modem-mode-chip.active:focus {
+	background-color: rgb(30, 74, 130) !important;
+}
+
+.modem-supported-modes {
+	margin: 6px 0 0;
+}
