@@ -26,12 +26,10 @@ mvn clean install
 ```
 
 The reactor produces the bundle in `org.eclipse.kura.web2/target/` and the package in
-`distrib/target/deb/`. Checkstyle runs during `process-sources` with the Eclipse Kura ruleset,
-and the unit tests run with the bundle.
+`distrib/target/deb/`. 
 
 | Module | What it builds |
 | --- | --- |
-| `checkstyle-resources` | the suppressions this project adds to the Kura ruleset |
 | `bom` | the bill of materials of the project |
 | `org.eclipse.kura.web2` | the console bundle, GWT compilation included |
 | `distrib` | the `.deb` package |
