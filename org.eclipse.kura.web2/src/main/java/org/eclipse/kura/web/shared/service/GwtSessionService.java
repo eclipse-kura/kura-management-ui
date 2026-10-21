@@ -12,14 +12,13 @@
  *******************************************************************************/
 package org.eclipse.kura.web.shared.service;
 
+import com.google.gwt.user.client.rpc.RemoteService;
+import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
 import org.eclipse.kura.web.server.Audit;
 import org.eclipse.kura.web.shared.GwtKuraException;
 import org.eclipse.kura.web.shared.model.GwtPasswordStrenghtRequirements;
 import org.eclipse.kura.web.shared.model.GwtUserConfig;
 import org.eclipse.kura.web.shared.model.GwtXSRFToken;
-
-import com.google.gwt.user.client.rpc.RemoteService;
-import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
 
 @RemoteServiceRelativePath("session")
 public interface GwtSessionService extends RemoteService {

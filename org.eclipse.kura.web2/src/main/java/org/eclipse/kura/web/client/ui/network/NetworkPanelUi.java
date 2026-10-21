@@ -1,17 +1,23 @@
 /*******************************************************************************
  * Copyright (c) 2011, 2024 Eurotech and/or its affiliates and others
- * 
+ *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
  * which is available at https://www.eclipse.org/legal/epl-2.0/
- * 
+ *
  * SPDX-License-Identifier: EPL-2.0
- * 
+ *
  * Contributors:
  *  Eurotech
  *******************************************************************************/
 package org.eclipse.kura.web.client.ui.network;
 
+import com.google.gwt.core.client.GWT;
+import com.google.gwt.uibinder.client.UiBinder;
+import com.google.gwt.uibinder.client.UiField;
+import com.google.gwt.user.client.ui.Composite;
+import com.google.gwt.user.client.ui.HTMLPanel;
+import com.google.gwt.user.client.ui.Widget;
 import org.eclipse.kura.web.client.messages.Messages;
 import org.eclipse.kura.web.shared.model.GwtSession;
 import org.eclipse.kura.web.shared.service.GwtNetworkService;
@@ -21,20 +27,12 @@ import org.gwtbootstrap3.client.ui.Panel;
 import org.gwtbootstrap3.client.ui.PanelBody;
 import org.gwtbootstrap3.client.ui.html.Span;
 
-import com.google.gwt.core.client.GWT;
-import com.google.gwt.uibinder.client.UiBinder;
-import com.google.gwt.uibinder.client.UiField;
-import com.google.gwt.user.client.ui.Composite;
-import com.google.gwt.user.client.ui.HTMLPanel;
-import com.google.gwt.user.client.ui.Widget;
-
 public class NetworkPanelUi extends Composite {
 
     private static NetworkPanelUiUiBinder uiBinder = GWT.create(NetworkPanelUiUiBinder.class);
     private final GwtNetworkServiceAsync gwtNetworkService = GWT.create(GwtNetworkService.class);
 
-    interface NetworkPanelUiUiBinder extends UiBinder<Widget, NetworkPanelUi> {
-    }
+    interface NetworkPanelUiUiBinder extends UiBinder<Widget, NetworkPanelUi> {}
 
     private static final Messages MSGS = GWT.create(Messages.class);
 
@@ -42,10 +40,13 @@ public class NetworkPanelUi extends Composite {
 
     @UiField
     HTMLPanel networkIntro;
+
     @UiField
     Panel interfacesTable;
+
     @UiField
     PanelBody tabsPanel;
+
     @UiField
     Container buttonBar;
 
@@ -97,5 +98,4 @@ public class NetworkPanelUi extends Composite {
             this.tabs.setDirty(b);
         }
     }
-
 }

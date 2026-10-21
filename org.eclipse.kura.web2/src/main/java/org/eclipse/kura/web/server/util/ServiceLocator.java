@@ -1,12 +1,12 @@
 /*******************************************************************************
  * Copyright (c) 2011, 2026 Eurotech and/or its affiliates and others
- * 
+ *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
  * which is available at https://www.eclipse.org/legal/epl-2.0/
- * 
+ *
  * SPDX-License-Identifier: EPL-2.0
- * 
+ *
  * Contributors:
  *  Eurotech
  *  Red Hat Inc
@@ -16,7 +16,6 @@ package org.eclipse.kura.web.server.util;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-
 import org.eclipse.kura.web.shared.GwtKuraErrorCode;
 import org.eclipse.kura.web.shared.GwtKuraException;
 import org.osgi.framework.BundleContext;
@@ -62,7 +61,6 @@ public class ServiceLocator {
         } catch (InvalidSyntaxException e) {
             throw GwtKuraException.internalError("Getting service references failed.");
         }
-
     }
 
     public <T> T getService(Class<T> serviceClass) throws GwtKuraException {
@@ -165,8 +163,9 @@ public class ServiceLocator {
     }
 
     @SuppressWarnings("unchecked")
-    public static void withAllServiceReferences(String filter, final ServiceReferenceConsumer<Object> consumer,
-            final Class<?>... classes) throws GwtKuraException {
+    public static void withAllServiceReferences(
+            String filter, final ServiceReferenceConsumer<Object> consumer, final Class<?>... classes)
+            throws GwtKuraException {
 
         if (classes == null || classes.length == 0) {
             withAllServiceReferences(null, filter, consumer);
@@ -189,8 +188,8 @@ public class ServiceLocator {
      * @throws InvalidSyntaxException
      *             if the filter was not {@code null} and had an invalid syntax
      */
-    public static <T> void withAllServices(final Class<T> serviceClass, String filter,
-            final ServiceConsumer<T> consumer) throws GwtKuraException {
+    public static <T> void withAllServices(
+            final Class<T> serviceClass, String filter, final ServiceConsumer<T> consumer) throws GwtKuraException {
 
         withAllServiceReferences(serviceClass, filter, (ref, ctx) -> {
             final T service = ctx.getService(ref);
@@ -204,8 +203,9 @@ public class ServiceLocator {
     }
 
     @SuppressWarnings("unchecked")
-    public static <T> void withAllServiceReferences(final Class<T> serviceClass, String filter,
-            final ServiceReferenceConsumer<T> consumer) throws GwtKuraException {
+    public static <T> void withAllServiceReferences(
+            final Class<T> serviceClass, String filter, final ServiceReferenceConsumer<T> consumer)
+            throws GwtKuraException {
 
         final BundleContext ctx = FrameworkUtil.getBundle(ServiceLocator.class).getBundleContext();
 

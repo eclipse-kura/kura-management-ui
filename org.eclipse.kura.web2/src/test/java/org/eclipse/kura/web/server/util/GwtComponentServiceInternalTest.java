@@ -22,7 +22,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 import org.eclipse.kura.configuration.ComponentConfiguration;
 import org.eclipse.kura.configuration.metatype.AD;
 import org.eclipse.kura.configuration.metatype.Icon;
@@ -102,7 +101,7 @@ public class GwtComponentServiceInternalTest {
 
     private void whenGetADPropertiesIsCalled() {
         StubAD ad = new StubAD(AD_ID, this.adDefault);
-        StubOCD ocd = new StubOCD(Collections.<AD> singletonList(ad));
+        StubOCD ocd = new StubOCD(Collections.<AD>singletonList(ad));
         StubComponentConfiguration config = new StubComponentConfiguration(ocd, this.configurationProperties);
 
         this.result = GwtComponentServiceInternal.getADProperties(config);

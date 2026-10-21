@@ -1,28 +1,25 @@
 /*******************************************************************************
  * Copyright (c) 2021 Eurotech and/or its affiliates and others
- * 
+ *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
  * which is available at https://www.eclipse.org/legal/epl-2.0/
- * 
+ *
  * SPDX-License-Identifier: EPL-2.0
- * 
+ *
  * Contributors:
  *  Eurotech
  *******************************************************************************/
-
 package org.eclipse.kura.web.client.util;
 
+import com.google.gwt.core.client.GWT;
+import com.google.gwt.user.client.TakesValue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
 import org.eclipse.kura.web.client.messages.Messages;
 import org.eclipse.kura.web.shared.model.GwtConfigComponent;
 import org.eclipse.kura.web.shared.model.GwtConfigParameter;
 import org.eclipse.kura.web.shared.model.GwtConfigParameter.GwtConfigParameterType;
-
-import com.google.gwt.core.client.GWT;
-import com.google.gwt.user.client.TakesValue;
 
 public final class ValidationUtil {
 
@@ -34,8 +31,7 @@ public final class ValidationUtil {
     protected static final Messages MSGS = GWT.create(Messages.class);
     protected static final Logger errorLogger = Logger.getLogger("ErrorLogger");
 
-    private ValidationUtil() {
-    }
+    private ValidationUtil() {}
 
     public static void validateParameters(GwtConfigComponent componentConfig, ValidationErrorConsumer consumer) {
         for (final GwtConfigParameter param : componentConfig.getParameters()) {
@@ -64,48 +60,51 @@ public final class ValidationUtil {
 
         validateType(param.getType(), param, consumer, trimmedValue);
         validateType(param.getSubtype(), param, consumer, trimmedValue);
-
     }
 
-    private static void validateType(GwtConfigParameterType type, GwtConfigParameter param,
-            ValidationErrorConsumer consumer, String trimmedValue) {
+    private static void validateType(
+            GwtConfigParameterType type,
+            GwtConfigParameter param,
+            ValidationErrorConsumer consumer,
+            String trimmedValue) {
         if (type == null) {
             return;
         }
         try {
             switch (type) {
-            case BOOLEAN:
-                validateBoolean(trimmedValue, param, consumer);
-                break;
-            case CHAR:
-                validateChar(trimmedValue, param, consumer);
-                break;
-            case STRING:
-                validateString(trimmedValue, param, consumer);
-                break;
-            case FLOAT:
-                validateFloat(trimmedValue, param, consumer);
-                break;
-            case INTEGER:
-                validateInteger(trimmedValue, param, consumer);
-                break;
-            case SHORT:
-                validateShort(trimmedValue, param, consumer);
-                break;
-            case BYTE:
-                validateByte(trimmedValue, param, consumer);
-                break;
-            case LONG:
-                validateLong(trimmedValue, param, consumer);
-                break;
-            case DOUBLE:
-                validateDouble(trimmedValue, param, consumer);
-                break;
-            case PASSWORD:
-                break;
-            default:
-                consumer.addError("Unsupported data type: " + param.getType().toString());
-                break;
+                case BOOLEAN:
+                    validateBoolean(trimmedValue, param, consumer);
+                    break;
+                case CHAR:
+                    validateChar(trimmedValue, param, consumer);
+                    break;
+                case STRING:
+                    validateString(trimmedValue, param, consumer);
+                    break;
+                case FLOAT:
+                    validateFloat(trimmedValue, param, consumer);
+                    break;
+                case INTEGER:
+                    validateInteger(trimmedValue, param, consumer);
+                    break;
+                case SHORT:
+                    validateShort(trimmedValue, param, consumer);
+                    break;
+                case BYTE:
+                    validateByte(trimmedValue, param, consumer);
+                    break;
+                case LONG:
+                    validateLong(trimmedValue, param, consumer);
+                    break;
+                case DOUBLE:
+                    validateDouble(trimmedValue, param, consumer);
+                    break;
+                case PASSWORD:
+                    break;
+                default:
+                    consumer.addError(
+                            "Unsupported data type: " + param.getType().toString());
+                    break;
             }
         } catch (NumberFormatException e) {
             consumer.addError(MessageUtils.get(INVALID_VALUE, trimmedValue));
@@ -160,15 +159,15 @@ public final class ValidationUtil {
         return isValid.getValue();
     }
 
-    private static void validateBoolean(final String value, final GwtConfigParameter param,
-            final ValidationErrorConsumer consumer) {
+    private static void validateBoolean(
+            final String value, final GwtConfigParameter param, final ValidationErrorConsumer consumer) {
         if (!"true".equalsIgnoreCase(value) && !"false".equalsIgnoreCase(value)) {
             consumer.addError(MessageUtils.get(INVALID_BOOLEAN_VALUE, value));
         }
     }
 
-    private static void validateChar(final String value, final GwtConfigParameter param,
-            final ValidationErrorConsumer consumer) {
+    private static void validateChar(
+            final String value, final GwtConfigParameter param, final ValidationErrorConsumer consumer) {
         if (value.length() > 1) {
             consumer.addError(MessageUtils.get(INVALID_VALUE, value));
         }
@@ -180,8 +179,8 @@ public final class ValidationUtil {
         }
     }
 
-    private static void validateString(final String value, final GwtConfigParameter param,
-            final ValidationErrorConsumer consumer) {
+    private static void validateString(
+            final String value, final GwtConfigParameter param, final ValidationErrorConsumer consumer) {
         int configMinValue = 0;
         int configMaxValue = Integer.MAX_VALUE;
         try {
@@ -203,8 +202,8 @@ public final class ValidationUtil {
         }
     }
 
-    private static void validateLong(final String value, final GwtConfigParameter param,
-            final ValidationErrorConsumer consumer) {
+    private static void validateLong(
+            final String value, final GwtConfigParameter param, final ValidationErrorConsumer consumer) {
         final long asLong = Long.parseLong(value);
         if (param.getMin() != null && Long.parseLong(param.getMin()) > asLong) {
             consumer.addError(MessageUtils.get(CONFIG_MIN_VALUE, param.getMin()));
@@ -214,8 +213,8 @@ public final class ValidationUtil {
         }
     }
 
-    private static void validateDouble(final String value, final GwtConfigParameter param,
-            final ValidationErrorConsumer consumer) {
+    private static void validateDouble(
+            final String value, final GwtConfigParameter param, final ValidationErrorConsumer consumer) {
         final double asDouble = Double.parseDouble(value);
         if (param.getMin() != null && Double.parseDouble(param.getMin()) > asDouble) {
             consumer.addError(MessageUtils.get(CONFIG_MIN_VALUE, param.getMin()));
@@ -225,8 +224,8 @@ public final class ValidationUtil {
         }
     }
 
-    private static void validateByte(final String value, final GwtConfigParameter param,
-            final ValidationErrorConsumer consumer) {
+    private static void validateByte(
+            final String value, final GwtConfigParameter param, final ValidationErrorConsumer consumer) {
         final byte asByte = Byte.parseByte(value);
         if (param.getMin() != null && Byte.parseByte(param.getMin()) > asByte) {
             consumer.addError(MessageUtils.get(CONFIG_MIN_VALUE, param.getMin()));
@@ -236,8 +235,8 @@ public final class ValidationUtil {
         }
     }
 
-    private static void validateShort(final String value, final GwtConfigParameter param,
-            final ValidationErrorConsumer consumer) {
+    private static void validateShort(
+            final String value, final GwtConfigParameter param, final ValidationErrorConsumer consumer) {
         final short asShort = Short.parseShort(value);
         if (param.getMin() != null && Short.parseShort(param.getMin()) > asShort) {
             consumer.addError(MessageUtils.get(CONFIG_MIN_VALUE, param.getMin()));
@@ -247,8 +246,8 @@ public final class ValidationUtil {
         }
     }
 
-    private static void validateInteger(final String value, final GwtConfigParameter param,
-            final ValidationErrorConsumer consumer) {
+    private static void validateInteger(
+            final String value, final GwtConfigParameter param, final ValidationErrorConsumer consumer) {
         final int asInt = Integer.parseInt(value);
         if (param.getMin() != null && Integer.parseInt(param.getMin()) > asInt) {
             consumer.addError(MessageUtils.get(CONFIG_MIN_VALUE, param.getMin()));
@@ -258,8 +257,8 @@ public final class ValidationUtil {
         }
     }
 
-    private static void validateFloat(final String value, final GwtConfigParameter param,
-            final ValidationErrorConsumer consumer) {
+    private static void validateFloat(
+            final String value, final GwtConfigParameter param, final ValidationErrorConsumer consumer) {
         final float asFloat = Float.parseFloat(value);
         if (param.getMin() != null && Float.parseFloat(param.getMin()) > asFloat) {
             consumer.addError(MessageUtils.get(CONFIG_MIN_VALUE, param.getMin()));

@@ -1,16 +1,15 @@
 /*******************************************************************************
  * Copyright (c) 2017, 2020 Eurotech and/or its affiliates and others
- * 
+ *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
  * which is available at https://www.eclipse.org/legal/epl-2.0/
- * 
+ *
  * SPDX-License-Identifier: EPL-2.0
- * 
+ *
  * Contributors:
  *  Eurotech
  *******************************************************************************/
-
 package org.eclipse.kura.web.client.util;
 
 import com.google.gwt.core.client.JavaScriptObject;
@@ -25,8 +24,7 @@ public class DragSupport {
         attachNativeEventHandlers(e);
     }
 
-    private static native boolean isDragSupported(Element element)
-    /*-{
+    private static native boolean isDragSupported(Element element) /*-{
         return element['ondragstart'] !== undefined
     }-*/;
 
@@ -45,8 +43,7 @@ public class DragSupport {
         this.listener.onDragStart(new DragEvent(nativeObject));
     }
 
-    private native void attachNativeEventHandlers(Element element)
-    /*-{
+    private native void attachNativeEventHandlers(Element element) /*-{
         element.setAttribute('draggable', 'true')
         var self = this
         element.addEventListener('dragstart', function (event) {
@@ -57,7 +54,6 @@ public class DragSupport {
     public interface Listener {
 
         public void onDragStart(DragEvent event);
-
     }
 
     public void setListener(Listener listener) {
@@ -72,8 +68,7 @@ public class DragSupport {
             this.nativeDataTransfer = nativeDataTransfer;
         }
 
-        private native void setDataNative(JavaScriptObject nativeObject, String type, String data)
-        /*-{
+        private native void setDataNative(JavaScriptObject nativeObject, String type, String data) /*-{
             nativeObject.setData(type, data)
         }-*/;
 

@@ -22,8 +22,7 @@ public class GwtPasswordStrenghtRequirements extends GwtBaseModel implements Ser
     @SuppressWarnings("unused")
     private GwtBundleInfo unused;
 
-    public GwtPasswordStrenghtRequirements() {
-    }
+    public GwtPasswordStrenghtRequirements() {}
 
     public GwtPasswordStrenghtRequirements(final GwtPasswordStrenghtRequirements other) {
         setPasswordMinimumLength(other.getPasswordMinimumLength());
@@ -70,5 +69,4 @@ public class GwtPasswordStrenghtRequirements extends GwtBaseModel implements Ser
         setPasswordRequireSpecialChars(false);
         setPasswordRequireBothCases(false);
     }
-
 }

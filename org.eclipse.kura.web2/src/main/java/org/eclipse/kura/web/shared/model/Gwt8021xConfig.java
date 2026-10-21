@@ -1,12 +1,12 @@
 /*******************************************************************************
  * Copyright (c) 2023, 2026 Eurotech and/or its affiliates and others
- * 
+ *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
  * which is available at https://www.eclipse.org/legal/epl-2.0/
- * 
+ *
  * SPDX-License-Identifier: EPL-2.0
- * 
+ *
  * Contributors:
  *  Eurotech
  *******************************************************************************/
@@ -121,8 +121,10 @@ public class Gwt8021xConfig extends KuraBaseModel implements Serializable {
                 final Object newVal = otherProps.get(entry.getKey());
                 if (oldVal != null) {
                     if (!oldVal.equals(newVal)) {
-                        logger.log(Level.FINER, () -> "Values differ - Key: " + entry.getKey() + " oldVal: " + oldVal
-                                + ", newVal: " + newVal);
+                        logger.log(
+                                Level.FINER,
+                                () -> "Values differ - Key: " + entry.getKey() + " oldVal: " + oldVal + ", newVal: "
+                                        + newVal);
                         return false;
                     }
                 } else if (newVal != null) {

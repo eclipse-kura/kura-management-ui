@@ -1,20 +1,22 @@
 /*******************************************************************************
  * Copyright (c) 2025 Eurotech and/or its affiliates and others
- * 
+ *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
  * which is available at https://www.eclipse.org/legal/epl-2.0/
- * 
+ *
  * SPDX-License-Identifier: EPL-2.0
- * 
+ *
  * Contributors:
  *  Eurotech
  *******************************************************************************/
-
 package org.eclipse.kura.web.client.ui.settings;
 
+import com.google.gwt.core.client.GWT;
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.user.client.Window;
+import com.google.gwt.user.client.rpc.AsyncCallback;
 import java.util.List;
-
 import org.eclipse.kura.web.client.ui.EntryClassUi;
 import org.eclipse.kura.web.client.util.FailureHandler;
 import org.eclipse.kura.web.shared.model.GwtSnapshot;
@@ -25,11 +27,6 @@ import org.eclipse.kura.web.shared.service.GwtSnapshotService;
 import org.eclipse.kura.web.shared.service.GwtSnapshotServiceAsync;
 import org.gwtbootstrap3.client.ui.CheckBox;
 import org.gwtbootstrap3.client.ui.constants.ButtonType;
-
-import com.google.gwt.core.client.GWT;
-import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.user.client.Window;
-import com.google.gwt.user.client.rpc.AsyncCallback;
 
 public class SnapshotRollbackModal extends SnapshotSelectorModal {
 
@@ -48,7 +45,9 @@ public class SnapshotRollbackModal extends SnapshotSelectorModal {
 
         setupFooterButtons();
 
-        setModalTitleDescriptionAndHints(MSGS.deviceSnapshotRollbackTitle(), MSGS.deviceSnapshotRollbackConfirm(),
+        setModalTitleDescriptionAndHints(
+                MSGS.deviceSnapshotRollbackTitle(),
+                MSGS.deviceSnapshotRollbackConfirm(),
                 MSGS.deviceSnapshotRollbackHint());
 
         setAdvancedModePanelVisible(true);
@@ -58,9 +57,9 @@ public class SnapshotRollbackModal extends SnapshotSelectorModal {
 
     @Override
     protected void recoverAndShowMainModal() {
-        
+
         this.snapshotFooter.clear();
-        
+
         setupFooterButtons();
 
         super.recoverAndShowMainModal(); // o this.snapshotModal.show()
@@ -105,14 +104,13 @@ public class SnapshotRollbackModal extends SnapshotSelectorModal {
             public void onFailure(Throwable ex) {
                 EntryClassUi.hideWaitModal();
                 FailureHandler.handle(ex);
-
             }
 
             @Override
             public void onSuccess(GwtXSRFToken token) {
 
-                gwtSnapshotService.configurationRollbackDeviceSnapshot(token, snapshot, selectedPids,
-                        new AsyncCallback<Void>() {
+                gwtSnapshotService.configurationRollbackDeviceSnapshot(
+                        token, snapshot, selectedPids, new AsyncCallback<Void>() {
 
                             @Override
                             public void onFailure(Throwable ex) {
@@ -129,12 +127,14 @@ public class SnapshotRollbackModal extends SnapshotSelectorModal {
         });
 
         hideAndReset();
-
     }
 
     private void onSnapshotRollback(GwtSnapshot snapshot) {
-        hideMainAndShowAdvancedModal(MSGS.deviceSnapshotRollbackAdvancedModalTitle(),
-                MSGS.deviceSnapshotRollbackAdvancedModalMessage(), MSGS.apply(), MSGS.cancelButton(),
+        hideMainAndShowAdvancedModal(
+                MSGS.deviceSnapshotRollbackAdvancedModalTitle(),
+                MSGS.deviceSnapshotRollbackAdvancedModalMessage(),
+                MSGS.apply(),
+                MSGS.cancelButton(),
                 userConfirmed -> onSnapshotRollbackConfirmationSelection(snapshot, userConfirmed));
     }
 
@@ -147,7 +147,6 @@ public class SnapshotRollbackModal extends SnapshotSelectorModal {
                 public void onFailure(Throwable ex) {
                     EntryClassUi.hideWaitModal();
                     FailureHandler.handle(ex);
-
                 }
 
                 @Override
@@ -193,14 +192,15 @@ public class SnapshotRollbackModal extends SnapshotSelectorModal {
         if (this.advancedModeClickHandler != null) {
             this.advancedModeClickHandler.removeHandler();
         }
-
     }
 
     private void setupFooterButtons() {
-        this.cancelButton = new SnapshotSelectorActionButton(MSGS.cancelButton(), FONT_AWESOME_STYLE_NAME,
-                ButtonType.PRIMARY, e -> hideAndReset());
+        this.cancelButton = new SnapshotSelectorActionButton(
+                MSGS.cancelButton(), FONT_AWESOME_STYLE_NAME, ButtonType.PRIMARY, e -> hideAndReset());
 
-        this.rollbackOrNextButton = new SnapshotSelectorActionButton(MSGS.rollback(), FONT_AWESOME_STYLE_NAME,
+        this.rollbackOrNextButton = new SnapshotSelectorActionButton(
+                MSGS.rollback(),
+                FONT_AWESOME_STYLE_NAME,
                 ButtonType.PRIMARY,
                 e -> onRollbackOrNextClick(getSelectedSnapshot(), getSelectedPidsList(), getAdvancedModeValue()));
 

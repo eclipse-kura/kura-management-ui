@@ -13,7 +13,6 @@
 package org.eclipse.kura.web.server.util;
 
 import java.util.HashMap;
-
 import org.eclipse.kura.core.configuration.ComponentConfigurationImpl;
 import org.eclipse.kura.internal.wire.asset.WireAssetChannelDescriptor;
 import org.eclipse.kura.internal.wire.asset.WireAssetOCD;
@@ -23,12 +22,11 @@ public class GwtWireAssetConstants {
 
     public static final String WIRE_ASSET_PID = "org.eclipse.kura.wire.WireAsset";
 
-    public static final GwtConfigComponent WIRE_ASSET_OCD = GwtServerUtil
-            .toGwtConfigComponent(new ComponentConfigurationImpl(WIRE_ASSET_PID, new WireAssetOCD(), new HashMap<>()));
+    public static final GwtConfigComponent WIRE_ASSET_OCD = GwtServerUtil.toGwtConfigComponent(
+            new ComponentConfigurationImpl(WIRE_ASSET_PID, new WireAssetOCD(), new HashMap<>()));
 
-    public static final GwtConfigComponent WIRE_ASSET_CHANNEL_DESCRIPTOR = GwtServerUtil.toGwtConfigComponent(null,
-            WireAssetChannelDescriptor.get().getDescriptor());
+    public static final GwtConfigComponent WIRE_ASSET_CHANNEL_DESCRIPTOR = GwtServerUtil.toGwtConfigComponent(
+            null, WireAssetChannelDescriptor.get().getDescriptor());
 
-    private GwtWireAssetConstants() {
-    }
+    private GwtWireAssetConstants() {}
 }

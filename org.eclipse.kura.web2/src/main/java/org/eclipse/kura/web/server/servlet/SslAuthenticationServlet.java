@@ -1,29 +1,27 @@
 /*******************************************************************************
  * Copyright (c) 2020, 2025 Eurotech and/or its affiliates and others
- * 
+ *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
  * which is available at https://www.eclipse.org/legal/epl-2.0/
- * 
+ *
  * SPDX-License-Identifier: EPL-2.0
- * 
+ *
  * Contributors:
  *  Eurotech
  *******************************************************************************/
 package org.eclipse.kura.web.server.servlet;
 
-import java.io.IOException;
-import java.security.cert.X509Certificate;
-import java.util.Optional;
-
-import javax.naming.ldap.LdapName;
-import javax.naming.ldap.Rdn;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
-
+import java.io.IOException;
+import java.security.cert.X509Certificate;
+import java.util.Optional;
+import javax.naming.ldap.LdapName;
+import javax.naming.ldap.Rdn;
 import org.eclipse.kura.KuraErrorCode;
 import org.eclipse.kura.KuraException;
 import org.eclipse.kura.audit.AuditConstants;
@@ -41,7 +39,7 @@ public class SslAuthenticationServlet extends HttpServlet {
     private static final Logger logger = LoggerFactory.getLogger(SslAuthenticationServlet.class);
 
     /**
-     * 
+     *
      */
     private static final long serialVersionUID = -2371828320004624864L;
 
@@ -65,17 +63,19 @@ public class SslAuthenticationServlet extends HttpServlet {
                 throw new KuraException(KuraErrorCode.SECURITY_EXCEPTION);
             }
 
-            final X509Certificate[] clientCertificates = (X509Certificate[]) req
-                    .getAttribute("jakarta.servlet.request.X509Certificate");
+            final X509Certificate[] clientCertificates =
+                    (X509Certificate[]) req.getAttribute("jakarta.servlet.request.X509Certificate");
 
             if (clientCertificates == null || clientCertificates.length == 0) {
                 throw new IllegalArgumentException("Certificate chain is empty");
             }
 
-            final LdapName ldapName = new LdapName(clientCertificates[0].getSubjectX500Principal().getName());
+            final LdapName ldapName =
+                    new LdapName(clientCertificates[0].getSubjectX500Principal().getName());
 
             final Optional<Rdn> commonNameRdn = ldapName.getRdns().stream()
-                    .filter(r -> "cn".equalsIgnoreCase(r.getType())).findAny();
+                    .filter(r -> "cn".equalsIgnoreCase(r.getType()))
+                    .findAny();
 
             if (!commonNameRdn.isPresent()) {
                 throw new IllegalArgumentException("Certificate common name is not present");
@@ -110,7 +110,6 @@ public class SslAuthenticationServlet extends HttpServlet {
             logger.warn("certificate authentication failed", e);
             sendUnauthorized(resp);
         }
-
     }
 
     private void sendUnauthorized(final HttpServletResponse resp) {

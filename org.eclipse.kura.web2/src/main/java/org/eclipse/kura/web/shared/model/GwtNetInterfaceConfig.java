@@ -1,12 +1,12 @@
 /*******************************************************************************
  * Copyright (c) 2011, 2026 Eurotech and/or its affiliates and others
- * 
+ *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
  * which is available at https://www.eclipse.org/legal/epl-2.0/
- * 
+ *
  * SPDX-License-Identifier: EPL-2.0
- * 
+ *
  * Contributors:
  *  Eurotech
  *  Areti
@@ -127,7 +127,7 @@ public class GwtNetInterfaceConfig extends KuraBaseModel implements Serializable
     public void setReadOnlyDnsServers(String dnsServers) {
         set("dnsReadOnlyServers", dnsServers);
     }
-    
+
     public Integer getMtu() {
         return get("mtu");
     }
@@ -402,9 +402,9 @@ public class GwtNetInterfaceConfig extends KuraBaseModel implements Serializable
     }
 
     public void setIpv6Mtu(Integer mtu) {
-    	set("ipv6.mtu", mtu);
+        set("ipv6.mtu", mtu);
     }
-    
+
     public Integer getPromisc() {
         return get("promisc");
     }
@@ -436,8 +436,10 @@ public class GwtNetInterfaceConfig extends KuraBaseModel implements Serializable
                 final Object newVal = otherProps.get(entry.getKey());
                 if (oldVal != null) {
                     if (!oldVal.equals(newVal)) {
-                        logger.log(Level.FINER, () -> "Values differ - Key: " + entry.getKey() + " oldVal: " + oldVal
-                                + ", newVal: " + newVal);
+                        logger.log(
+                                Level.FINER,
+                                () -> "Values differ - Key: " + entry.getKey() + " oldVal: " + oldVal + ", newVal: "
+                                        + newVal);
                         return false;
                     }
                 } else if (newVal != null) {

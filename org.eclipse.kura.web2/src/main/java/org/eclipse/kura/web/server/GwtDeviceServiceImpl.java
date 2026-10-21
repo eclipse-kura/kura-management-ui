@@ -22,7 +22,6 @@ import java.util.Properties;
 import java.util.SortedSet;
 import java.util.TreeSet;
 import java.util.concurrent.TimeUnit;
-
 import org.eclipse.kura.KuraErrorCode;
 import org.eclipse.kura.KuraException;
 import org.eclipse.kura.KuraProcessExecutionErrorException;
@@ -84,14 +83,18 @@ public class GwtDeviceServiceImpl extends OsgiRemoteServiceServlet implements Gw
             Properties systemProperties = systemService.getProperties();
 
             pairs.add(new GwtGroupedNVPair(DEV_INFO, "devKuraVersion", systemService.getKuraVersion()));
-            pairs.add(new GwtGroupedNVPair(DEV_INFO, "devClientId",
+            pairs.add(new GwtGroupedNVPair(
+                    DEV_INFO,
+                    "devClientId",
                     systemService.getPrimaryMacAddress() != null ? systemService.getPrimaryMacAddress() : UNKNOWN));
             pairs.add(new GwtGroupedNVPair(DEV_INFO, "devDisplayName", systemService.getDeviceName()));
-            pairs.add(new GwtGroupedNVPair(DEV_INFO, "devUptime",
-                    formatUptime(Long.parseLong(systemAdminService.getUptime()))));
-            pairs.add(new GwtGroupedNVPair(DEV_INFO, "devLastWifiChannel",
-                    String.valueOf(systemService.getKuraWifiTopChannel())));
-            pairs.add(new GwtGroupedNVPair(DEV_INFO, "devInternetConnectionStatus",
+            pairs.add(new GwtGroupedNVPair(
+                    DEV_INFO, "devUptime", formatUptime(Long.parseLong(systemAdminService.getUptime()))));
+            pairs.add(new GwtGroupedNVPair(
+                    DEV_INFO, "devLastWifiChannel", String.valueOf(systemService.getKuraWifiTopChannel())));
+            pairs.add(new GwtGroupedNVPair(
+                    DEV_INFO,
+                    "devInternetConnectionStatus",
                     systemService.getInternetConnectionStatus().toString()));
 
             pairs.add(new GwtGroupedNVPair(DEV_HW, "devModelName", systemService.getModelName()));
@@ -105,25 +108,27 @@ public class GwtDeviceServiceImpl extends OsgiRemoteServiceServlet implements Gw
             pairs.add(new GwtGroupedNVPair(DEV_SW, "devOs", systemService.getOsName()));
             pairs.add(new GwtGroupedNVPair(DEV_SW, "devOsArch", systemService.getOsArch()));
 
-            pairs.add(new GwtGroupedNVPair(DEV_JAVA, "devJvmName",
-                    systemProperties.getProperty(SystemService.KEY_JAVA_VM_NAME)));
-            pairs.add(new GwtGroupedNVPair(DEV_JAVA, "devJvmVersion",
-                    systemProperties.getProperty(SystemService.KEY_JAVA_VM_VERSION)));
+            pairs.add(new GwtGroupedNVPair(
+                    DEV_JAVA, "devJvmName", systemProperties.getProperty(SystemService.KEY_JAVA_VM_NAME)));
+            pairs.add(new GwtGroupedNVPair(
+                    DEV_JAVA, "devJvmVersion", systemProperties.getProperty(SystemService.KEY_JAVA_VM_VERSION)));
 
-            pairs.add(new GwtGroupedNVPair(DEV_JAVA, "devJvmProfile",
-                    systemService.getJavaVendor() + " " + systemService.getJavaVersion()));
-            pairs.add(new GwtGroupedNVPair(DEV_JAVA, "devOsgiFramework",
-                    systemProperties.getProperty(SystemService.KEY_OSGI_FW_NAME)));
-            pairs.add(new GwtGroupedNVPair(DEV_JAVA, "devOsgiFrameworkVersion",
+            pairs.add(new GwtGroupedNVPair(
+                    DEV_JAVA, "devJvmProfile", systemService.getJavaVendor() + " " + systemService.getJavaVersion()));
+            pairs.add(new GwtGroupedNVPair(
+                    DEV_JAVA, "devOsgiFramework", systemProperties.getProperty(SystemService.KEY_OSGI_FW_NAME)));
+            pairs.add(new GwtGroupedNVPair(
+                    DEV_JAVA,
+                    "devOsgiFrameworkVersion",
                     systemProperties.getProperty(SystemService.KEY_OSGI_FW_VERSION)));
             if (systemService.getNumberOfProcessors() != -1) {
-                pairs.add(new GwtGroupedNVPair(DEV_JAVA, "devNumProc",
-                        String.valueOf(systemService.getNumberOfProcessors())));
+                pairs.add(new GwtGroupedNVPair(
+                        DEV_JAVA, "devNumProc", String.valueOf(systemService.getNumberOfProcessors())));
             }
-            pairs.add(new GwtGroupedNVPair(DEV_JAVA, "devRamTot",
-                    String.valueOf(systemService.getTotalMemory()) + " kB"));
-            pairs.add(new GwtGroupedNVPair(DEV_JAVA, "devRamFree",
-                    String.valueOf(systemService.getFreeMemory()) + " kB"));
+            pairs.add(new GwtGroupedNVPair(
+                    DEV_JAVA, "devRamTot", String.valueOf(systemService.getTotalMemory()) + " kB"));
+            pairs.add(new GwtGroupedNVPair(
+                    DEV_JAVA, "devRamFree", String.valueOf(systemService.getFreeMemory()) + " kB"));
         } catch (Exception e) {
             throw new GwtKuraException(GwtKuraErrorCode.INTERNAL_ERROR, e);
         }
@@ -149,7 +154,10 @@ public class GwtDeviceServiceImpl extends OsgiRemoteServiceServlet implements Gw
 
             if (group != null) {
                 StringBuilder sbGroup = new StringBuilder();
-                sbGroup.append("ThreadGroup ").append(group.getName()).append(" [").append("maxprio=")
+                sbGroup.append("ThreadGroup ")
+                        .append(group.getName())
+                        .append(" [")
+                        .append("maxprio=")
                         .append(group.getMaxPriority());
                 sbGroup.append(", parent=");
                 if (group.getParent() != null) {
@@ -184,8 +192,8 @@ public class GwtDeviceServiceImpl extends OsgiRemoteServiceServlet implements Gw
                         sbThreadValue.append(thread.getContextClassLoader());
                         sbThreadValue.append(']');
 
-                        pairs.add(new GwtGroupedNVPair(sbGroup.toString(), sbThreadName.toString(),
-                                sbThreadValue.toString()));
+                        pairs.add(new GwtGroupedNVPair(
+                                sbGroup.toString(), sbThreadName.toString(), sbThreadValue.toString()));
                     }
                 }
             }
@@ -193,7 +201,7 @@ public class GwtDeviceServiceImpl extends OsgiRemoteServiceServlet implements Gw
         return new ArrayList<>(pairs);
     }
 
-    @SuppressWarnings({ "unchecked", "rawtypes" })
+    @SuppressWarnings({"unchecked", "rawtypes"})
     @Override
     public ArrayList<GwtGroupedNVPair> findSystemProperties(GwtXSRFToken xsrfToken) throws GwtKuraException {
         checkXSRFToken(xsrfToken);
@@ -239,8 +247,8 @@ public class GwtDeviceServiceImpl extends OsgiRemoteServiceServlet implements Gw
     public boolean checkIfContainerOrchestratorIsActive(GwtXSRFToken xsrfToken) throws GwtKuraException {
         checkXSRFToken(xsrfToken);
 
-        ContainerOrchestrationService checkIfContainerOrchestratorIsActive = ServiceLocator.getInstance()
-                .getService(ContainerOrchestrationService.class);
+        ContainerOrchestrationService checkIfContainerOrchestratorIsActive =
+                ServiceLocator.getInstance().getService(ContainerOrchestrationService.class);
 
         return checkIfContainerOrchestratorIsActive != null;
     }
@@ -250,8 +258,8 @@ public class GwtDeviceServiceImpl extends OsgiRemoteServiceServlet implements Gw
         checkXSRFToken(xsrfToken);
         List<GwtGroupedNVPair> pairs = new ArrayList<>();
         try {
-            ContainerOrchestrationService checkIfContainerOrchestratorIsActive = ServiceLocator.getInstance()
-                    .getService(ContainerOrchestrationService.class);
+            ContainerOrchestrationService checkIfContainerOrchestratorIsActive =
+                    ServiceLocator.getInstance().getService(ContainerOrchestrationService.class);
             List<ImageInstanceDescriptor> images = checkIfContainerOrchestratorIsActive.listImageInstanceDescriptors();
             if (images != null) {
                 for (ImageInstanceDescriptor image : images) {
@@ -277,8 +285,8 @@ public class GwtDeviceServiceImpl extends OsgiRemoteServiceServlet implements Gw
     public void deleteImage(GwtXSRFToken xsrfToken, String imageId) throws GwtKuraException {
         checkXSRFToken(xsrfToken);
 
-        ContainerOrchestrationService containerOrchestrationService = ServiceLocator.getInstance()
-                .getService(ContainerOrchestrationService.class);
+        ContainerOrchestrationService containerOrchestrationService =
+                ServiceLocator.getInstance().getService(ContainerOrchestrationService.class);
 
         List<ImageInstanceDescriptor> images = containerOrchestrationService.listImageInstanceDescriptors();
 
@@ -300,7 +308,6 @@ public class GwtDeviceServiceImpl extends OsgiRemoteServiceServlet implements Gw
         // image was not found, throw error
         logger.error("Could not find image with name: {}", imageId);
         throw new GwtKuraException(GwtKuraErrorCode.INTERNAL_ERROR);
-
     }
 
     @Override
@@ -308,10 +315,10 @@ public class GwtDeviceServiceImpl extends OsgiRemoteServiceServlet implements Gw
         checkXSRFToken(xsrfToken);
         List<GwtGroupedNVPair> pairs = new ArrayList<>();
         try {
-            ContainerOrchestrationService checkIfContainerOrchestratorIsActive = ServiceLocator.getInstance()
-                    .getService(ContainerOrchestrationService.class);
-            List<ContainerInstanceDescriptor> containers = checkIfContainerOrchestratorIsActive
-                    .listContainerDescriptors();
+            ContainerOrchestrationService checkIfContainerOrchestratorIsActive =
+                    ServiceLocator.getInstance().getService(ContainerOrchestrationService.class);
+            List<ContainerInstanceDescriptor> containers =
+                    checkIfContainerOrchestratorIsActive.listContainerDescriptors();
             if (containers != null) {
                 for (ContainerInstanceDescriptor container : containers) {
                     GwtGroupedNVPair pair = new GwtGroupedNVPair();
@@ -335,8 +342,8 @@ public class GwtDeviceServiceImpl extends OsgiRemoteServiceServlet implements Gw
     public void startContainer(GwtXSRFToken xsrfToken, String containerName) throws GwtKuraException {
         checkXSRFToken(xsrfToken);
 
-        ContainerOrchestrationService containerOrchestrationService = ServiceLocator.getInstance()
-                .getService(ContainerOrchestrationService.class);
+        ContainerOrchestrationService containerOrchestrationService =
+                ServiceLocator.getInstance().getService(ContainerOrchestrationService.class);
         List<ContainerInstanceDescriptor> containers = containerOrchestrationService.listContainerDescriptors();
 
         logger.info("Starting container with name: {}", containerName);
@@ -363,8 +370,8 @@ public class GwtDeviceServiceImpl extends OsgiRemoteServiceServlet implements Gw
     public void stopContainer(GwtXSRFToken xsrfToken, String containerName) throws GwtKuraException {
         checkXSRFToken(xsrfToken);
 
-        ContainerOrchestrationService containerOrchestrationService = ServiceLocator.getInstance()
-                .getService(ContainerOrchestrationService.class);
+        ContainerOrchestrationService containerOrchestrationService =
+                ServiceLocator.getInstance().getService(ContainerOrchestrationService.class);
 
         List<ContainerInstanceDescriptor> containers = containerOrchestrationService.listContainerDescriptors();
 
@@ -386,7 +393,6 @@ public class GwtDeviceServiceImpl extends OsgiRemoteServiceServlet implements Gw
         // Bundle was not found, throw error
         logger.error("Could not find container with name: {}", containerName);
         throw new GwtKuraException(GwtKuraErrorCode.INTERNAL_ERROR);
-
     }
 
     private boolean isSigned(Bundle bundle) {
@@ -440,7 +446,6 @@ public class GwtDeviceServiceImpl extends OsgiRemoteServiceServlet implements Gw
         // Bundle was not found, throw error
         logger.error("Could not find bundle with ID: {}", bundleId);
         throw new GwtKuraException(GwtKuraErrorCode.INTERNAL_ERROR);
-
     }
 
     @Override
@@ -548,35 +553,35 @@ public class GwtDeviceServiceImpl extends OsgiRemoteServiceServlet implements Gw
 
     private String toStateString(final Bundle bundle) {
         switch (bundle.getState()) {
-        case Bundle.INSTALLED:
-            return "bndInstalled";
-        case Bundle.RESOLVED:
-            return "bndResolved";
-        case Bundle.STARTING:
-            return "bndStarting";
-        case Bundle.ACTIVE:
-            return "bndActive";
-        case Bundle.STOPPING:
-            return "bndStopping";
-        case Bundle.UNINSTALLED:
-            return "bndUninstalled";
-        default:
-            return "bndUnknown";
+            case Bundle.INSTALLED:
+                return "bndInstalled";
+            case Bundle.RESOLVED:
+                return "bndResolved";
+            case Bundle.STARTING:
+                return "bndStarting";
+            case Bundle.ACTIVE:
+                return "bndActive";
+            case Bundle.STOPPING:
+                return "bndStopping";
+            case Bundle.UNINSTALLED:
+                return "bndUninstalled";
+            default:
+                return "bndUnknown";
         }
     }
 
     private String containerStateToString(final ContainerInstanceDescriptor container) {
         switch (container.getContainerState()) {
-        case STARTING:
-            return "bndInstalled";
-        case ACTIVE:
-            return "bndActive";
-        case FAILED:
-            return "bndUninstalled";
-        case STOPPING:
-            return "bndUninstalled";
-        default:
-            return "bndUnknown";
+            case STARTING:
+                return "bndInstalled";
+            case ACTIVE:
+                return "bndActive";
+            case FAILED:
+                return "bndUninstalled";
+            case STOPPING:
+                return "bndUninstalled";
+            default:
+                return "bndUnknown";
         }
     }
 
@@ -587,7 +592,13 @@ public class GwtDeviceServiceImpl extends OsgiRemoteServiceServlet implements Gw
         long seconds = TimeUnit.MILLISECONDS.toSeconds(uptime) - TimeUnit.MILLISECONDS.toMinutes(uptime) * 60;
 
         StringBuilder sb = new StringBuilder();
-        sb.append(days).append(" days ").append(hours).append(":").append(minutes).append(":").append(seconds)
+        sb.append(days)
+                .append(" days ")
+                .append(hours)
+                .append(":")
+                .append(minutes)
+                .append(":")
+                .append(seconds)
                 .append(" hms");
 
         return sb.toString();
@@ -627,10 +638,10 @@ final class ThreadComparator implements Comparator {
         String t1 = ((Thread) thread1).getName();
         String t2 = ((Thread) thread2).getName();
         if (null == t1) {
-            t1 = ""; //$NON-NLS-1$
+            t1 = ""; // $NON-NLS-1$
         }
         if (null == t2) {
-            t2 = ""; //$NON-NLS-1$
+            t2 = ""; // $NON-NLS-1$
         }
 
         return t1.toLowerCase().compareTo(t2.toLowerCase());
@@ -659,10 +670,10 @@ final class ThreadGroupComparator implements Comparator {
         String t1 = ((ThreadGroup) thread1).getName();
         String t2 = ((ThreadGroup) thread2).getName();
         if (null == t1) {
-            t1 = ""; //$NON-NLS-1$
+            t1 = ""; // $NON-NLS-1$
         }
         if (null == t2) {
-            t2 = ""; //$NON-NLS-1$
+            t2 = ""; // $NON-NLS-1$
         }
         return t1.toLowerCase().compareTo(t2.toLowerCase());
     }

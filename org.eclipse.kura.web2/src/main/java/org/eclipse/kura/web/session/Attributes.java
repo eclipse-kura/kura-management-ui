@@ -13,7 +13,6 @@
 package org.eclipse.kura.web.session;
 
 public enum Attributes {
-
     AUTORIZED_USER("org.eclipse.kura.web.user"),
     LAST_ACTIVITY("org.eclipse.kura.web.lastActivity"),
     CREDENTIALS_HASH("org.eclipse.kura.web.credentialsHash"),

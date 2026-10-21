@@ -1,20 +1,24 @@
 /*******************************************************************************
  * Copyright (c) 2017, 2020 Eurotech and/or its affiliates and others
- * 
+ *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
  * which is available at https://www.eclipse.org/legal/epl-2.0/
- * 
+ *
  * SPDX-License-Identifier: EPL-2.0
- * 
+ *
  * Contributors:
  *  Eurotech
  *******************************************************************************/
 package org.eclipse.kura.web.client.ui.wires;
 
+import com.google.gwt.core.client.GWT;
+import com.google.gwt.uibinder.client.UiBinder;
+import com.google.gwt.uibinder.client.UiField;
+import com.google.gwt.user.client.ui.Composite;
+import com.google.gwt.user.client.ui.Widget;
 import java.util.List;
 import java.util.Optional;
-
 import org.eclipse.kura.web.client.messages.Messages;
 import org.eclipse.kura.web.client.util.PidTextBox;
 import org.eclipse.kura.web.shared.model.GwtConfigComponent;
@@ -29,16 +33,9 @@ import org.gwtbootstrap3.client.ui.Modal;
 import org.gwtbootstrap3.client.ui.ModalHeader;
 import org.gwtbootstrap3.client.ui.TextBox;
 
-import com.google.gwt.core.client.GWT;
-import com.google.gwt.uibinder.client.UiBinder;
-import com.google.gwt.uibinder.client.UiField;
-import com.google.gwt.user.client.ui.Composite;
-import com.google.gwt.user.client.ui.Widget;
-
 public class WiresDialogs extends Composite {
 
-    interface WiresDialogsUiBinder extends UiBinder<Widget, WiresDialogs> {
-    }
+    interface WiresDialogsUiBinder extends UiBinder<Widget, WiresDialogs> {}
 
     private static final WiresDialogsUiBinder uiBinder = GWT.create(WiresDialogsUiBinder.class);
 
@@ -46,54 +43,79 @@ public class WiresDialogs extends Composite {
 
     @UiField
     ListBox assetInstance;
+
     @UiField
     Button buttonSelectAssetCancel;
+
     @UiField
     Button buttonNewAsset;
+
     @UiField
     Button buttonSelectAssetOk;
+
     @UiField
     Modal selectDriverModal;
+
     @UiField
     ListBox driverInstance;
+
     @UiField
     Button buttonSelectDriverCancel;
+
     @UiField
     Button buttonNewDriver;
+
     @UiField
     Button buttonSelectDriverOk;
+
     @UiField
     Modal newAssetModal;
+
     @UiField
     PidTextBox newAssetName;
+
     @UiField
     TextBox newAssetDriverInstance;
+
     @UiField
     Button newAssetOk;
+
     @UiField
     Button newAssetCancel;
+
     @UiField
     Modal newDriverModal;
+
     @UiField
     PidTextBox newDriverName;
+
     @UiField
     ListBox newDriverFactory;
+
     @UiField
     Button newDriverCancel;
+
     @UiField
     Button newDriverOk;
+
     @UiField
     Modal selectAssetModal;
+
     @UiField
     ModalHeader newAssetModalHeader;
+
     @UiField
     FormLabel componentNameLabel;
+
     @UiField
     Modal genericCompModal;
+
     @UiField
     Button btnComponentModalYes;
+
     @UiField
     Button btnComponentModalNo;
+
     @UiField
     PidTextBox componentName;
 
@@ -149,7 +171,9 @@ public class WiresDialogs extends Composite {
 
         this.buttonSelectAssetOk.addClickHandler(event -> {
             if (WiresDialogs.this.pickCallback.isPresent()) {
-                WiresDialogs.this.pickCallback.get()
+                WiresDialogs.this
+                        .pickCallback
+                        .get()
                         .onNewComponentCreated(WiresDialogs.this.assetInstance.getSelectedValue());
                 WiresDialogs.this.pickCallback = Optional.empty();
             }
@@ -301,6 +325,5 @@ public class WiresDialogs extends Composite {
         public void onShow(ModalShowEvent evt) {
             modalCount++;
         }
-
     }
 }

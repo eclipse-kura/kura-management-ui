@@ -12,11 +12,10 @@
  *******************************************************************************/
 package org.eclipse.kura.web.shared.service;
 
-import org.eclipse.kura.web.shared.GwtKuraException;
-import org.eclipse.kura.web.shared.model.GwtLoginInfo;
-
 import com.google.gwt.user.client.rpc.RemoteService;
 import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
+import org.eclipse.kura.web.shared.GwtKuraException;
+import org.eclipse.kura.web.shared.model.GwtLoginInfo;
 
 @RemoteServiceRelativePath("loginInfo")
 public interface GwtLoginInfoService extends RemoteService {

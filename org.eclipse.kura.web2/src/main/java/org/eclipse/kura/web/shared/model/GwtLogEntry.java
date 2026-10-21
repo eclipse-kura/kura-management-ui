@@ -21,7 +21,6 @@ public class GwtLogEntry extends KuraBaseModel implements Serializable {
     private String timestamp;
 
     public enum LogEntryKeys {
-
         SOURCE_LOGPROVIDER_PID("SOURCE_LOGPROVIDER_PID"),
         PID("_PID"),
         SYSLOG_ID("SYSLOG_IDENTIFIER"),

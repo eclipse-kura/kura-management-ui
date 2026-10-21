@@ -13,7 +13,6 @@
 package org.eclipse.kura.web.server;
 
 import java.util.Set;
-
 import org.eclipse.kura.configuration.ConfigurableComponent;
 import org.eclipse.kura.web.Console;
 import org.eclipse.kura.web.ConsoleOptions;
@@ -43,14 +42,16 @@ public class GwtLoginInfoServiceImpl extends OsgiRemoteServiceServlet implements
 
         try {
 
-            final BundleContext bundleContext = FrameworkUtil.getBundle(GwtLoginInfoServiceImpl.class)
-                    .getBundleContext();
+            final BundleContext bundleContext =
+                    FrameworkUtil.getBundle(GwtLoginInfoServiceImpl.class).getBundleContext();
 
-            final ServiceReference<?> ref = bundleContext.getServiceReferences(ConfigurableComponent.class.getName(),
-                    "(service.pid=org.eclipse.kura.http.server.manager.HttpService)")[0];
+            final ServiceReference<?> ref = bundleContext
+                    .getServiceReferences(
+                            ConfigurableComponent.class.getName(),
+                            "(service.pid=org.eclipse.kura.http.server.manager.HttpService)")[0];
 
-            final Set<Integer> clientAuthPorts = GwtServerUtil
-                    .getArrayProperty(ref.getProperty("https.client.auth.ports"), Integer.class);
+            final Set<Integer> clientAuthPorts =
+                    GwtServerUtil.getArrayProperty(ref.getProperty("https.client.auth.ports"), Integer.class);
 
             for (final Integer port : clientAuthPorts) {
                 if (Console.getConsoleOptions().isPortAllowed(port)) {
@@ -66,5 +67,4 @@ public class GwtLoginInfoServiceImpl extends OsgiRemoteServiceServlet implements
 
         return new GwtLoginInfo(preLoginBannerContent, options.getEnabledAuthMethods(), clientAuthPort);
     }
-
 }

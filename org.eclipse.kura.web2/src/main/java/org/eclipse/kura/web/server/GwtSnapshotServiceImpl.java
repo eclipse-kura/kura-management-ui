@@ -1,12 +1,12 @@
 /*******************************************************************************
  * Copyright (c) 2011, 2024 Eurotech and/or its affiliates and others
- * 
+ *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
  * which is available at https://www.eclipse.org/legal/epl-2.0/
- * 
+ *
  * SPDX-License-Identifier: EPL-2.0
- * 
+ *
  * Contributors:
  *  Eurotech
  *  Jens Reimann <jreimann@redhat.com>
@@ -18,7 +18,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
-
 import org.eclipse.kura.configuration.ComponentConfiguration;
 import org.eclipse.kura.configuration.ConfigurationService;
 import org.eclipse.kura.system.SystemService;
@@ -80,8 +79,8 @@ public class GwtSnapshotServiceImpl extends OsgiRemoteServiceServlet implements 
     }
 
     @Override
-    public void configurationRollbackDeviceSnapshot(GwtXSRFToken xsrfToken, GwtSnapshot snapshot,
-            List<String> targetPids) throws GwtKuraException {
+    public void configurationRollbackDeviceSnapshot(
+            GwtXSRFToken xsrfToken, GwtSnapshot snapshot, List<String> targetPids) throws GwtKuraException {
 
         checkXSRFToken(xsrfToken);
 
@@ -91,7 +90,8 @@ public class GwtSnapshotServiceImpl extends OsgiRemoteServiceServlet implements 
             ConfigurationService cs = locator.getService(ConfigurationService.class);
 
             List<ComponentConfiguration> targetConfigurations = cs.getSnapshot(snapshot.getSnapshotId()).stream()
-                    .filter(config -> targetPids.contains(config.getPid())).collect(Collectors.toList());
+                    .filter(config -> targetPids.contains(config.getPid()))
+                    .collect(Collectors.toList());
 
             cs.updateConfigurations(targetConfigurations, true);
 
@@ -108,7 +108,6 @@ public class GwtSnapshotServiceImpl extends OsgiRemoteServiceServlet implements 
         } catch (Exception e) {
             KuraExceptionHandler.handle(e);
         }
-
     }
 
     @Override
@@ -131,6 +130,5 @@ public class GwtSnapshotServiceImpl extends OsgiRemoteServiceServlet implements 
         }
 
         return configurationList;
-
     }
 }

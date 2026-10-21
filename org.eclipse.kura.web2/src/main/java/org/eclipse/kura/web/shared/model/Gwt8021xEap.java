@@ -1,19 +1,18 @@
 /*******************************************************************************
  * Copyright (c) 2023 Eurotech and/or its affiliates and others
- * 
+ *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
  * which is available at https://www.eclipse.org/legal/epl-2.0/
- * 
+ *
  * SPDX-License-Identifier: EPL-2.0
- * 
+ *
  * Contributors:
  *  Eurotech
  *******************************************************************************/
 package org.eclipse.kura.web.shared.model;
 
 public enum Gwt8021xEap {
-
     TLS("Kura8021xEapTls"),
     TTLS("Kura8021xEapTtls"),
     PEAP("Kura8021xEapPeap");
@@ -36,5 +35,4 @@ public enum Gwt8021xEap {
         }
         return Gwt8021xEap.TTLS;
     }
-
 }

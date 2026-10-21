@@ -12,15 +12,13 @@
  *******************************************************************************/
 package org.eclipse.kura.web.session;
 
-import java.io.IOException;
-import java.util.Objects;
-
-import org.osgi.framework.FrameworkUtil;
-import org.osgi.service.servlet.context.ServletContextHelper;
-
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
+import java.io.IOException;
+import java.util.Objects;
+import org.osgi.framework.FrameworkUtil;
+import org.osgi.service.servlet.context.ServletContextHelper;
 
 public class HttpServletContextHelper extends ServletContextHelper {
 
@@ -56,5 +54,4 @@ public class HttpServletContextHelper extends ServletContextHelper {
             return false;
         }
     }
-
 }

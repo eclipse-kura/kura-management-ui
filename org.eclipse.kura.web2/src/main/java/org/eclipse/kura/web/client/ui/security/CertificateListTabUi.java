@@ -12,6 +12,22 @@
  *******************************************************************************/
 package org.eclipse.kura.web.client.ui.security;
 
+import com.google.gwt.core.client.GWT;
+import com.google.gwt.event.shared.HandlerRegistration;
+import com.google.gwt.uibinder.client.UiBinder;
+import com.google.gwt.uibinder.client.UiField;
+import com.google.gwt.user.cellview.client.CellTable;
+import com.google.gwt.user.cellview.client.ColumnSortEvent;
+import com.google.gwt.user.cellview.client.ColumnSortEvent.ListHandler;
+import com.google.gwt.user.cellview.client.SimplePager;
+import com.google.gwt.user.cellview.client.SimplePager.TextLocation;
+import com.google.gwt.user.cellview.client.TextColumn;
+import com.google.gwt.user.client.ui.Composite;
+import com.google.gwt.user.client.ui.ScrollPanel;
+import com.google.gwt.user.client.ui.Widget;
+import com.google.gwt.view.client.HasRows;
+import com.google.gwt.view.client.ListDataProvider;
+import com.google.gwt.view.client.SingleSelectionModel;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Date;
@@ -19,7 +35,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
-
 import org.eclipse.kura.web.client.messages.Messages;
 import org.eclipse.kura.web.client.ui.AlertDialog;
 import org.eclipse.kura.web.client.ui.AlertDialog.ConfirmListener;
@@ -40,29 +55,11 @@ import org.gwtbootstrap3.client.ui.ModalFooter;
 import org.gwtbootstrap3.client.ui.PanelFooter;
 import org.gwtbootstrap3.client.ui.html.Span;
 
-import com.google.gwt.core.client.GWT;
-import com.google.gwt.event.shared.HandlerRegistration;
-import com.google.gwt.uibinder.client.UiBinder;
-import com.google.gwt.uibinder.client.UiField;
-import com.google.gwt.user.cellview.client.CellTable;
-import com.google.gwt.user.cellview.client.ColumnSortEvent;
-import com.google.gwt.user.cellview.client.ColumnSortEvent.ListHandler;
-import com.google.gwt.user.cellview.client.SimplePager;
-import com.google.gwt.user.cellview.client.SimplePager.TextLocation;
-import com.google.gwt.user.cellview.client.TextColumn;
-import com.google.gwt.user.client.ui.Composite;
-import com.google.gwt.user.client.ui.ScrollPanel;
-import com.google.gwt.user.client.ui.Widget;
-import com.google.gwt.view.client.HasRows;
-import com.google.gwt.view.client.ListDataProvider;
-import com.google.gwt.view.client.SingleSelectionModel;
-
 public class CertificateListTabUi extends Composite implements Tab, CertificateModalListener {
 
     private static CertificateListTabUiUiBinder uiBinder = GWT.create(CertificateListTabUiUiBinder.class);
 
-    interface CertificateListTabUiUiBinder extends UiBinder<Widget, CertificateListTabUi> {
-    }
+    interface CertificateListTabUiUiBinder extends UiBinder<Widget, CertificateListTabUi> {}
 
     private static final Messages MSGS = GWT.create(Messages.class);
 
@@ -71,25 +68,34 @@ public class CertificateListTabUi extends Composite implements Tab, CertificateM
 
     @UiField
     Button refresh;
+
     @UiField
     Button add;
+
     @UiField
     Button uninstall;
 
     @UiField
     Modal certAddModal;
+
     @UiField
     ScrollPanel certAddModalBody;
+
     @UiField
     Button nextStepButton;
+
     @UiField
     Button applyModalButton;
+
     @UiField
     Button resetModalButton;
+
     @UiField
     Button closeModalButton;
+
     @UiField
     AlertDialog alertDialog;
+
     @UiField
     PanelFooter tablePanelFooter;
 
@@ -153,14 +159,14 @@ public class CertificateListTabUi extends Composite implements Tab, CertificateM
         RequestQueue.submit(c -> this.gwtCertificatesService.listKeystoreServicePids(c.callback(resultPids -> {
             this.pids = resultPids;
             this.gwtCertificatesService.listEntries(c.callback(result -> {
-
                 CertificateListTabUi.this.certificatesDataProvider.getList().clear();
                 for (GwtKeystoreEntry pair : result) {
                     if (pair != null) {
                         this.certificatesDataProvider.getList().add(pair);
                     }
                 }
-                this.certificatesGrid.setVisible(!this.certificatesDataProvider.getList().isEmpty());
+                this.certificatesGrid.setVisible(
+                        !this.certificatesDataProvider.getList().isEmpty());
                 this.selectionModel.clear();
                 ColumnSortEvent.fire(this.certificatesGrid, this.certificatesGrid.getColumnSortList());
             }));
@@ -295,7 +301,8 @@ public class CertificateListTabUi extends Composite implements Tab, CertificateM
     private ListHandler<GwtKeystoreEntry> getTypeSortHandler(TextColumn<GwtKeystoreEntry> col2) {
         ListHandler<GwtKeystoreEntry> typeSortHandler = new ListHandler<>(this.certificatesDataProvider.getList());
 
-        typeSortHandler.setComparator(col2, getComparator(entry -> entry.getKind().name()));
+        typeSortHandler.setComparator(
+                col2, getComparator(entry -> entry.getKind().name()));
 
         return typeSortHandler;
     }
@@ -388,8 +395,14 @@ public class CertificateListTabUi extends Composite implements Tab, CertificateM
         this.certAddModal.setTitle("Add Certificate");
         this.certAddModalBody.clear();
 
-        this.keyPairTabUi = new KeyPairTabUi(selectedCertType.getType(), this.pids, getStorageAliases(), this,
-                this.resetModalButton, this.applyModalButton, this.closeModalButton);
+        this.keyPairTabUi = new KeyPairTabUi(
+                selectedCertType.getType(),
+                this.pids,
+                getStorageAliases(),
+                this,
+                this.resetModalButton,
+                this.applyModalButton,
+                this.closeModalButton);
         this.certAddModalBody.add(keyPairTabUi);
 
         this.nextStepButton.setVisible(false);
@@ -417,11 +430,9 @@ public class CertificateListTabUi extends Composite implements Tab, CertificateM
 
         RequestQueue.submit(c -> this.gwtXSRFService.generateSecurityToken(c.callback(
                 token -> this.gwtCertificatesService.removeEntry(token, selected, c.callback(ok -> refresh())))));
-
     }
 
     private enum CertType {
-
         KEY_PAIR(MSGS.securityAddKeyPair(), KeyPairTabUi.Type.KEY_PAIR),
         CERTIFICATE(MSGS.securityAddCertificate(), KeyPairTabUi.Type.CERTIFICATE);
 
@@ -462,8 +473,8 @@ public class CertificateListTabUi extends Composite implements Tab, CertificateM
         if (isValid) {
             this.certAddModal.hide();
         } else {
-            this.alertDialog.show(MSGS.formWithErrorsOrIncomplete(), AlertDialog.Severity.ERROR,
-                    (ConfirmListener) null);
+            this.alertDialog.show(
+                    MSGS.formWithErrorsOrIncomplete(), AlertDialog.Severity.ERROR, (ConfirmListener) null);
         }
 
         this.certAddModalBody.remove(this.keyPairTabUi);

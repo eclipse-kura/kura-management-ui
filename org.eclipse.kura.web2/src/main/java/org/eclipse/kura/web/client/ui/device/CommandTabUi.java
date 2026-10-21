@@ -1,12 +1,12 @@
 /*******************************************************************************
  * Copyright (c) 2011, 2026 Eurotech and/or its affiliates and others
- * 
+ *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
  * which is available at https://www.eclipse.org/legal/epl-2.0/
- * 
+ *
  * SPDX-License-Identifier: EPL-2.0
- * 
+ *
  * Contributors:
  *  Eurotech
  *******************************************************************************/
@@ -14,8 +14,19 @@
 
 package org.eclipse.kura.web.client.ui.device;
 
+import com.google.gwt.core.client.GWT;
+import com.google.gwt.event.dom.client.KeyCodes;
+import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
+import com.google.gwt.uibinder.client.UiBinder;
+import com.google.gwt.uibinder.client.UiField;
+import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.google.gwt.user.client.ui.Composite;
+import com.google.gwt.user.client.ui.FileUpload;
+import com.google.gwt.user.client.ui.FormPanel;
+import com.google.gwt.user.client.ui.HTML;
+import com.google.gwt.user.client.ui.Hidden;
+import com.google.gwt.user.client.ui.Widget;
 import java.util.Optional;
-
 import org.eclipse.kura.web.Console;
 import org.eclipse.kura.web.client.messages.Messages;
 import org.eclipse.kura.web.client.util.request.RequestQueue;
@@ -31,19 +42,6 @@ import org.gwtbootstrap3.client.ui.Input;
 import org.gwtbootstrap3.client.ui.PanelBody;
 import org.gwtbootstrap3.client.ui.TextBox;
 
-import com.google.gwt.core.client.GWT;
-import com.google.gwt.event.dom.client.KeyCodes;
-import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
-import com.google.gwt.uibinder.client.UiBinder;
-import com.google.gwt.uibinder.client.UiField;
-import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.google.gwt.user.client.ui.Composite;
-import com.google.gwt.user.client.ui.FileUpload;
-import com.google.gwt.user.client.ui.FormPanel;
-import com.google.gwt.user.client.ui.HTML;
-import com.google.gwt.user.client.ui.Hidden;
-import com.google.gwt.user.client.ui.Widget;
-
 public class CommandTabUi extends Composite {
 
     private static CommandTabUiUiBinder uiBinder = GWT.create(CommandTabUiUiBinder.class);
@@ -54,26 +52,32 @@ public class CommandTabUi extends Composite {
     @SuppressWarnings("unused")
     private GwtSession session;
 
-    interface CommandTabUiUiBinder extends UiBinder<Widget, CommandTabUi> {
-    }
+    interface CommandTabUiUiBinder extends UiBinder<Widget, CommandTabUi> {}
 
     private final GwtSecurityTokenServiceAsync gwtXSRFService = GWT.create(GwtSecurityTokenService.class);
     private final GwtDeviceServiceAsync gwtDeviceService = GWT.create(GwtDeviceService.class);
 
     @UiField
     TextBox formExecute;
+
     @UiField
     Input formPassword;
+
     @UiField
     Button reset;
+
     @UiField
     Button execute;
+
     @UiField
     FormPanel commandForm;
+
     @UiField
     FileUpload docPath;
+
     @UiField
     PanelBody resultPanel;
+
     @UiField
     Hidden xsrfTokenField;
 
@@ -119,8 +123,8 @@ public class CommandTabUi extends Composite {
 
         this.execute.setText(MSGS.deviceCommandExecute());
 
-        this.execute.addClickHandler(
-                event -> RequestQueue.submit(c -> this.gwtXSRFService.generateSecurityToken(c.callback(token -> {
+        this.execute.addClickHandler(event ->
+                RequestQueue.submit(c -> this.gwtXSRFService.generateSecurityToken(c.callback(token -> {
                     this.xsrfTokenField.setValue(token.getToken());
 
                     requestCallback = Optional.of(c.callback(new AsyncCallback<Void>() {
@@ -132,8 +136,9 @@ public class CommandTabUi extends Composite {
 
                         @Override
                         public void onSuccess(Void result) {
-                            CommandTabUi.this.gwtXSRFService.generateSecurityToken(
-                                    c.callback(t -> CommandTabUi.this.gwtDeviceService.executeCommand(t,
+                            CommandTabUi.this.gwtXSRFService.generateSecurityToken(c.callback(t ->
+                                    CommandTabUi.this.gwtDeviceService.executeCommand(
+                                            t,
                                             CommandTabUi.this.formExecute.getText(),
                                             CommandTabUi.this.formPassword.getText(),
                                             c.callback(new AsyncCallback<String>() {
@@ -168,7 +173,6 @@ public class CommandTabUi extends Composite {
         this.commandForm.setAction(SERVLET_URL);
 
         this.commandForm.addSubmitCompleteHandler(event -> {
-
             if (!requestCallback.isPresent()) {
                 return;
             }
@@ -188,20 +192,18 @@ public class CommandTabUi extends Composite {
             }
 
             requestCallback = Optional.empty();
-
         });
 
         this.docPath.getElement().setAttribute("accept", ".sh,.zip");
-
     }
 
     public void display(String string) {
         this.resultPanel.clear();
-        this.resultPanel.add(new HTML(new SafeHtmlBuilder().appendEscapedLines(string).toSafeHtml()));
+        this.resultPanel.add(
+                new HTML(new SafeHtmlBuilder().appendEscapedLines(string).toSafeHtml()));
     }
 
     public void setSession(GwtSession currentSession) {
         this.session = currentSession;
     }
-
 }

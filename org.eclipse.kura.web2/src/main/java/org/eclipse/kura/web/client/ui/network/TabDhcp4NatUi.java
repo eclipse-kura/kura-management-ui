@@ -12,8 +12,13 @@
  *******************************************************************************/
 package org.eclipse.kura.web.client.ui.network;
 
+import com.google.gwt.core.client.GWT;
+import com.google.gwt.uibinder.client.UiBinder;
+import com.google.gwt.uibinder.client.UiField;
+import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.google.gwt.user.client.ui.ScrollPanel;
+import com.google.gwt.user.client.ui.Widget;
 import java.util.List;
-
 import org.eclipse.kura.web.client.messages.Messages;
 import org.eclipse.kura.web.client.ui.AbstractServicesUi;
 import org.eclipse.kura.web.client.ui.AlertDialog;
@@ -48,13 +53,6 @@ import org.gwtbootstrap3.client.ui.TextBox;
 import org.gwtbootstrap3.client.ui.constants.ValidationState;
 import org.gwtbootstrap3.client.ui.html.Span;
 
-import com.google.gwt.core.client.GWT;
-import com.google.gwt.uibinder.client.UiBinder;
-import com.google.gwt.uibinder.client.UiField;
-import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.google.gwt.user.client.ui.ScrollPanel;
-import com.google.gwt.user.client.ui.Widget;
-
 public class TabDhcp4NatUi extends AbstractServicesUi implements NetworkTab {
 
     private static final String ROUTER_OFF_MESSAGE = MessageUtils.get(GwtNetRouterMode.netRouterOff.name());
@@ -63,10 +61,10 @@ public class TabDhcp4NatUi extends AbstractServicesUi implements NetworkTab {
     private static final String WIFI_STATION_MODE = GwtWifiWirelessMode.netWifiWirelessModeStation.name();
     private static TabDhcpNatUiUiBinder uiBinder = GWT.create(TabDhcpNatUiUiBinder.class);
 
-    interface TabDhcpNatUiUiBinder extends UiBinder<Widget, TabDhcp4NatUi> {
-    }
+    interface TabDhcpNatUiUiBinder extends UiBinder<Widget, TabDhcp4NatUi> {}
 
-    private static final String REGEX_IPV4 = "\\b(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\b";
+    private static final String REGEX_IPV4 =
+            "\\b(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\b";
     private static final Messages MSGS = GWT.create(Messages.class);
     private final GwtSecurityTokenServiceAsync gwtXSRFService = GWT.create(GwtSecurityTokenService.class);
     private final GwtNetworkServiceAsync gwtNetworkService = GWT.create(GwtNetworkService.class);
@@ -82,18 +80,25 @@ public class TabDhcp4NatUi extends AbstractServicesUi implements NetworkTab {
 
     @UiField
     FormLabel labelRouter;
+
     @UiField
     FormLabel labelBegin;
+
     @UiField
     FormLabel labelEnd;
+
     @UiField
     FormLabel labelSubnet;
+
     @UiField
     FormLabel labelDefaultLease;
+
     @UiField
     FormLabel labelMaxLease;
+
     @UiField
     FormLabel labelPass;
+
     @UiField
     FormLabel labelDhcpLease;
 
@@ -102,12 +107,16 @@ public class TabDhcp4NatUi extends AbstractServicesUi implements NetworkTab {
 
     @UiField
     TextBox begin;
+
     @UiField
     TextBox end;
+
     @UiField
     TextBox subnet;
+
     @UiField
     TextBox defaultLease;
+
     @UiField
     TextBox maxLease;
 
@@ -116,28 +125,37 @@ public class TabDhcp4NatUi extends AbstractServicesUi implements NetworkTab {
 
     @UiField
     InlineRadio radio1;
+
     @UiField
     InlineRadio radio2;
 
     @UiField
     FormGroup groupRouter;
+
     @UiField
     FormGroup groupBegin;
+
     @UiField
     FormGroup groupEnd;
+
     @UiField
     FormGroup groupSubnet;
+
     @UiField
     FormGroup groupDefaultLease;
+
     @UiField
     FormGroup groupMaxLease;
+
     @UiField
     FormGroup groupDhcpLease;
+
     @UiField
     FormControlStatic dhcpLeaseRead;
 
     @UiField
     HelpBlock helpRouter;
+
     @UiField
     HelpBlock helpDhcpLease;
 
@@ -149,18 +167,25 @@ public class TabDhcp4NatUi extends AbstractServicesUi implements NetworkTab {
 
     @UiField
     HelpButton routerHelp;
+
     @UiField
     HelpButton beginHelp;
+
     @UiField
     HelpButton endHelp;
+
     @UiField
     HelpButton subnetHelp;
+
     @UiField
     HelpButton defaultLeaseHelp;
+
     @UiField
     HelpButton maxLeaseHelp;
+
     @UiField
     HelpButton passHelp;
+
     @UiField
     HelpButton dhcpLeaseHelp;
 
@@ -239,10 +264,12 @@ public class TabDhcp4NatUi extends AbstractServicesUi implements NetworkTab {
             updatedNetIf.setRouterDhcpBeginAddress(this.begin.getText());
             updatedNetIf.setRouterDhcpEndAddress(this.end.getText());
             updatedNetIf.setRouterDhcpSubnetMask(this.subnet.getText());
-            if (this.defaultLease.getText() != null && !"".equals(this.defaultLease.getText().trim())) {
+            if (this.defaultLease.getText() != null
+                    && !"".equals(this.defaultLease.getText().trim())) {
                 updatedNetIf.setRouterDhcpDefaultLease(Integer.parseInt(this.defaultLease.getText()));
             }
-            if (this.maxLease.getText() != null && !"".equals(this.maxLease.getText().trim())) {
+            if (this.maxLease.getText() != null
+                    && !"".equals(this.maxLease.getText().trim())) {
                 updatedNetIf.setRouterDhcpMaxLease(Integer.parseInt(this.maxLease.getText()));
             }
             updatedNetIf.setRouterDnsPass(this.radio1.getValue());
@@ -273,7 +300,6 @@ public class TabDhcp4NatUi extends AbstractServicesUi implements NetworkTab {
             this.radio2.setValue(!this.selectedNetIfConfig.getRouterDnsPass());
 
             loadDhcpLease();
-
         }
         refreshForm();
     }
@@ -287,7 +313,8 @@ public class TabDhcp4NatUi extends AbstractServicesUi implements NetworkTab {
         if (wifiConfig != null) {
             wifiMode = wifiConfig.getWirelessMode();
         }
-        if (this.selectedNetIfConfig.getHwTypeEnum() == GwtNetIfType.WIFI && wifiMode != null
+        if (this.selectedNetIfConfig.getHwTypeEnum() == GwtNetIfType.WIFI
+                && wifiMode != null
                 && (wifiMode.equals(WIFI_STATION_MODE) || wifiMode.equals(WIFI_DISABLED))) {
             this.router.setEnabled(false);
             this.begin.setEnabled(false);
@@ -608,7 +635,6 @@ public class TabDhcp4NatUi extends AbstractServicesUi implements NetworkTab {
         if (TabDhcp4NatUi.this.groupBegin.getValidationState().equals(ValidationState.NONE)) {
             checkDhcpRangeValidity();
         }
-
     }
 
     private void checkSubnetMatch() {
@@ -676,7 +702,8 @@ public class TabDhcp4NatUi extends AbstractServicesUi implements NetworkTab {
 
                 @Override
                 public void onSuccess(GwtXSRFToken token) {
-                    TabDhcp4NatUi.this.gwtNetworkService.getDhcpLeases(token,
+                    TabDhcp4NatUi.this.gwtNetworkService.getDhcpLeases(
+                            token,
                             TabDhcp4NatUi.this.selectedNetIfConfig.getInterfaceName(),
                             new AsyncCallback<List<String>>() {
 

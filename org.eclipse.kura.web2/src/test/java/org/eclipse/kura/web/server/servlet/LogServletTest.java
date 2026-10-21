@@ -35,7 +35,6 @@ import java.util.Set;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
-
 import org.junit.Assume;
 import org.junit.Rule;
 import org.junit.Test;
@@ -93,7 +92,8 @@ public class LogServletTest {
     public void shouldNameTheArchiveAfterTheDeviceAndTheMoment() {
         LocalDateTime timestamp = LocalDateTime.of(2026, 8, 18, 15, 26, 7);
 
-        assertEquals("Kura_Logs_gateway-01_20260818-152607",
+        assertEquals(
+                "Kura_Logs_gateway-01_20260818-152607",
                 this.logServlet.buildArchiveName("gateway-01", timestamp).replace(".zip", ""));
     }
 
@@ -110,18 +110,17 @@ public class LogServletTest {
     public void shouldKeepTheArchiveNameSafeForAFileSystemAndForTheHeader() {
         LocalDateTime timestamp = LocalDateTime.of(2026, 8, 18, 15, 26, 7);
 
-        assertEquals("Kura_Logs_my_device_20260818-152607.zip",
-                this.logServlet.buildArchiveName("my/device", timestamp));
-        assertEquals("Kura_Logs_dev_rm_-rf_20260818-152607.zip",
+        assertEquals(
+                "Kura_Logs_my_device_20260818-152607.zip", this.logServlet.buildArchiveName("my/device", timestamp));
+        assertEquals(
+                "Kura_Logs_dev_rm_-rf_20260818-152607.zip",
                 this.logServlet.buildArchiveName("dev\"; rm -rf /", timestamp));
-        assertEquals("Kura_Logs_ESF_GW_20260818-152607.zip",
-                this.logServlet.buildArchiveName("ESF GW", timestamp));
+        assertEquals("Kura_Logs_ESF_GW_20260818-152607.zip", this.logServlet.buildArchiveName("ESF GW", timestamp));
     }
 
     @Test
     public void shouldCapAVeryLongDeviceName() {
-        String longName = this.logServlet.sanitizeForFileName(
-                "abcdefghijabcdefghijabcdefghijabcdefghijabcdefghij");
+        String longName = this.logServlet.sanitizeForFileName("abcdefghijabcdefghijabcdefghijabcdefghijabcdefghij");
 
         assertEquals(40, longName.length());
         assertEquals("abcdefghijabcdefghijabcdefghijabcdefghij", longName);
@@ -210,7 +209,7 @@ public class LogServletTest {
         Path tempDir = this.logServlet.createPrivateTempDirectory();
         Files.write(tempDir.resolve("kura_journal.log"), "journal".getBytes(StandardCharsets.UTF_8));
         Files.createDirectory(tempDir.resolve("nested"));
-        Files.write(tempDir.resolve("nested").resolve("Kura_Logs.zip"), new byte[] { 1, 2, 3 });
+        Files.write(tempDir.resolve("nested").resolve("Kura_Logs.zip"), new byte[] {1, 2, 3});
 
         this.logServlet.deleteTempDirectory(tempDir);
 

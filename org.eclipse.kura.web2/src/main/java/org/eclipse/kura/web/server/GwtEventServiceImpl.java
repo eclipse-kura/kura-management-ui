@@ -1,17 +1,18 @@
 /*******************************************************************************
  * Copyright (c) 2016, 2025 Eurotech and/or its affiliates and others
- * 
+ *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
  * which is available at https://www.eclipse.org/legal/epl-2.0/
- * 
+ *
  * SPDX-License-Identifier: EPL-2.0
- * 
+ *
  * Contributors:
  *  Eurotech
  *******************************************************************************/
 package org.eclipse.kura.web.server;
 
+import jakarta.servlet.http.HttpSession;
 import java.util.ArrayList;
 import java.util.Deque;
 import java.util.Dictionary;
@@ -19,9 +20,6 @@ import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
-
-import jakarta.servlet.http.HttpSession;
-
 import org.eclipse.kura.core.configuration.ConfigurationChangeEvent;
 import org.eclipse.kura.web.server.util.GwtServerUtil;
 import org.eclipse.kura.web.shared.ForwardedEventTopic;
@@ -87,8 +85,7 @@ public class GwtEventServiceImpl extends OsgiRemoteServiceServlet implements Gwt
             final HttpSession session = getThreadLocalRequest().getSession(false);
 
             // ignore concurrency events raised by myself
-            if (next.getTopic().equals(ConfigurationChangeEvent.CONF_CHANGE_EVENT_TOPIC)
-                    && session != null) {
+            if (next.getTopic().equals(ConfigurationChangeEvent.CONF_CHANGE_EVENT_TOPIC) && session != null) {
 
                 String currentSession = GwtServerUtil.getSessionIdHash(session);
                 String eventSession = (String) next.get(ConfigurationChangeEvent.CONF_CHANGE_EVENT_SESSION_PROP);
@@ -172,5 +169,4 @@ public class GwtEventServiceImpl extends OsgiRemoteServiceServlet implements Gwt
 
         return result;
     }
-
 }

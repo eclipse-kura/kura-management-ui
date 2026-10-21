@@ -12,9 +12,20 @@
  *******************************************************************************/
 package org.eclipse.kura.web.client.ui.device;
 
+import com.google.gwt.core.client.GWT;
+import com.google.gwt.uibinder.client.UiBinder;
+import com.google.gwt.uibinder.client.UiField;
+import com.google.gwt.user.client.Cookies;
+import com.google.gwt.user.client.Random;
+import com.google.gwt.user.client.Timer;
+import com.google.gwt.user.client.Window;
+import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.google.gwt.user.client.ui.Composite;
+import com.google.gwt.user.client.ui.FormPanel;
+import com.google.gwt.user.client.ui.TextArea;
+import com.google.gwt.user.client.ui.Widget;
 import java.util.LinkedList;
 import java.util.List;
-
 import org.eclipse.kura.web.Console;
 import org.eclipse.kura.web.client.messages.Messages;
 import org.eclipse.kura.web.client.ui.EntryClassUi;
@@ -36,19 +47,6 @@ import org.gwtbootstrap3.client.ui.ListBox;
 import org.gwtbootstrap3.client.ui.Panel;
 import org.gwtbootstrap3.client.ui.Row;
 
-import com.google.gwt.core.client.GWT;
-import com.google.gwt.uibinder.client.UiBinder;
-import com.google.gwt.uibinder.client.UiField;
-import com.google.gwt.user.client.Cookies;
-import com.google.gwt.user.client.Random;
-import com.google.gwt.user.client.Timer;
-import com.google.gwt.user.client.Window;
-import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.google.gwt.user.client.ui.Composite;
-import com.google.gwt.user.client.ui.FormPanel;
-import com.google.gwt.user.client.ui.TextArea;
-import com.google.gwt.user.client.ui.Widget;
-
 public class LogTabUi extends Composite {
 
     private static LogTabUiUiBinder uiBinder = GWT.create(LogTabUiUiBinder.class);
@@ -59,30 +57,38 @@ public class LogTabUi extends Composite {
     @SuppressWarnings("unused")
     private GwtSession session;
 
-    interface LogTabUiUiBinder extends UiBinder<Widget, LogTabUi> {
-    }
+    interface LogTabUiUiBinder extends UiBinder<Widget, LogTabUi> {}
 
     private final GwtSecurityTokenServiceAsync gwtXSRFService = GWT.create(GwtSecurityTokenService.class);
     private final GwtLogServiceAsync gwtLogService = GWT.create(GwtLogService.class);
 
     @UiField
     Button execute;
+
     @UiField
     Form logForm;
+
     @UiField
     FormLabel logLabel;
+
     @UiField
     Panel deviceLogsPanel;
+
     @UiField
     Row controlsRow;
+
     @UiField
     TextArea logTextArea;
+
     @UiField
     ListBox logProviderListBox;
+
     @UiField
     CheckBox showStackTraceCheckbox;
+
     @UiField
     CheckBox showMoreInfoCheckbox;
+
     @UiField
     Button openNewWindow;
 
@@ -98,8 +104,8 @@ public class LogTabUi extends Composite {
     private String nonce = newNonce();
 
     private static final int DOWNLOAD_COMPLETE_WAIT_TIMEOUT = 5000;
-    private static final int DOWNLOAD_COMPLETION_RETRIES= 60; 
-    
+    private static final int DOWNLOAD_COMPLETION_RETRIES = 60;
+
     private Timer waitDownloadCompleted = new Timer() {
 
         // safety parameter, 60 retries every 5 seconds = 5 minutes
@@ -126,7 +132,6 @@ public class LogTabUi extends Composite {
             this.retryLimit = DOWNLOAD_COMPLETION_RETRIES;
             this.cancel();
         }
-
     };
 
     public LogTabUi() {
@@ -135,8 +140,8 @@ public class LogTabUi extends Composite {
         this.logLabel.setText(MSGS.logDownload());
 
         this.execute.setText(MSGS.download());
-        this.execute.addClickHandler(
-                event -> LogTabUi.this.gwtXSRFService.generateSecurityToken(new AsyncCallback<GwtXSRFToken>() {
+        this.execute.addClickHandler(event ->
+                LogTabUi.this.gwtXSRFService.generateSecurityToken(new AsyncCallback<GwtXSRFToken>() {
 
                     @Override
                     public void onFailure(Throwable ex) {
@@ -257,10 +262,8 @@ public class LogTabUi extends Composite {
                             }
                         }
                     }
-
                 });
             }
-
         });
     }
 
@@ -269,14 +272,17 @@ public class LogTabUi extends Composite {
 
         for (GwtLogEntry entry : this.logs) {
             if (this.logProviderListBox.getSelectedValue().equals(entry.getSourceLogProviderPid())) {
-                displayedText.append(entry.prettyPrint(this.showMoreInfoCheckbox.getValue().booleanValue(),
+                displayedText.append(entry.prettyPrint(
+                        this.showMoreInfoCheckbox.getValue().booleanValue(),
                         this.showStackTraceCheckbox.getValue().booleanValue()));
             }
         }
 
         this.logTextArea.setText(displayedText.toString());
         if (this.autoFollow) {
-            this.logTextArea.getElement().setScrollTop(this.logTextArea.getElement().getScrollHeight());
+            this.logTextArea
+                    .getElement()
+                    .setScrollTop(this.logTextArea.getElement().getScrollHeight());
         }
     }
 

@@ -4,17 +4,23 @@
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
  * which is available at https://www.eclipse.org/legal/epl-2.0/
- * 
+ *
  * SPDX-License-Identifier: EPL-2.0
- * 
+ *
  * Contributors:
  *  Areti
  *******************************************************************************/
 package org.eclipse.kura.web.client.ui.network;
 
+import com.google.gwt.core.client.GWT;
+import com.google.gwt.i18n.client.NumberFormat;
+import com.google.gwt.uibinder.client.UiBinder;
+import com.google.gwt.uibinder.client.UiField;
+import com.google.gwt.user.client.ui.Composite;
+import com.google.gwt.user.client.ui.ScrollPanel;
+import com.google.gwt.user.client.ui.Widget;
 import java.util.Objects;
 import java.util.Optional;
-
 import org.eclipse.kura.web.client.messages.Messages;
 import org.eclipse.kura.web.client.util.HelpButton;
 import org.eclipse.kura.web.client.util.MessageUtils;
@@ -30,14 +36,6 @@ import org.gwtbootstrap3.client.ui.PanelHeader;
 import org.gwtbootstrap3.client.ui.constants.ValidationState;
 import org.gwtbootstrap3.client.ui.html.Span;
 
-import com.google.gwt.core.client.GWT;
-import com.google.gwt.i18n.client.NumberFormat;
-import com.google.gwt.uibinder.client.UiBinder;
-import com.google.gwt.uibinder.client.UiField;
-import com.google.gwt.user.client.ui.Composite;
-import com.google.gwt.user.client.ui.ScrollPanel;
-import com.google.gwt.user.client.ui.Widget;
-
 public class TabAdvancedUi extends Composite implements NetworkTab {
 
     private static final String PROMISC_DEFAULT = "netAdvPromiscDefault";
@@ -48,44 +46,53 @@ public class TabAdvancedUi extends Composite implements NetworkTab {
     private static final int IPV6_MIN_MTU = 1280;
     private static final int MAX_MTU_SUPPORTED = 1500;
 
-    interface TabAdvancedUiUiBinder extends UiBinder<Widget, TabAdvancedUi> {
-    }
+    interface TabAdvancedUiUiBinder extends UiBinder<Widget, TabAdvancedUi> {}
 
     @UiField
     FormGroup groupMtu;
+
     @UiField
     FormGroup groupIp6Mtu;
+
     @UiField
     FormGroup groupPromisc;
 
     @UiField
     FormLabel labelMtu;
+
     @UiField
     FormLabel labelIp6Mtu;
+
     @UiField
     FormLabel labelPromisc;
 
     @UiField
     HelpBlock wrongInputMtu;
+
     @UiField
     HelpBlock wrongInputIp6Mtu;
 
     @UiField
     HelpButton helpButtonMtu;
+
     @UiField
     HelpButton helpButtonIp6Mtu;
+
     @UiField
     HelpButton helpButtonPromisc;
 
     @UiField
     IntegerBox mtu;
+
     @UiField
     IntegerBox ip6Mtu;
+
     @UiField
     ListBox promisc;
 
     @UiField
     PanelHeader helpTitle;
+
     @UiField
     ScrollPanel helpText;
 
@@ -250,20 +257,19 @@ public class TabAdvancedUi extends Composite implements NetworkTab {
 
     private void refreshFieldsBasedOnInterface(GwtNetInterfaceConfig config) {
         switch (config.getHwTypeEnum()) {
-        case ETHERNET:
-            this.promisc.setEnabled(true);
-            break;
-        case LOOPBACK:
-            this.mtu.setEnabled(false);
-            this.ip6Mtu.setEnabled(false);
-            break;
-        case MODEM:
-            break;
-        case WIFI:
-            break;
-        default:
-            break;
-
+            case ETHERNET:
+                this.promisc.setEnabled(true);
+                break;
+            case LOOPBACK:
+                this.mtu.setEnabled(false);
+                this.ip6Mtu.setEnabled(false);
+                break;
+            case MODEM:
+                break;
+            case WIFI:
+                break;
+            default:
+                break;
         }
     }
 
@@ -345,7 +351,9 @@ public class TabAdvancedUi extends Composite implements NetworkTab {
         this.mtu.setValue(this.selectedNetIfConfig.get().getMtu());
         this.ip6Mtu.setValue(this.selectedNetIfConfig.get().getIpv6Mtu());
         for (int i = 0; i < this.promisc.getItemCount(); i++) {
-            if (this.promisc.getValue(i).equals(this.selectedNetIfConfig.get().getPromisc().toString())) {
+            if (this.promisc
+                    .getValue(i)
+                    .equals(this.selectedNetIfConfig.get().getPromisc().toString())) {
                 this.promisc.setSelectedIndex(i);
                 break;
             }
@@ -359,5 +367,4 @@ public class TabAdvancedUi extends Composite implements NetworkTab {
     public void clear() {
         // Not needed
     }
-
 }

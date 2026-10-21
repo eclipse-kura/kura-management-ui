@@ -1,12 +1,12 @@
 /*******************************************************************************
  * Copyright (c) 2016, 2026 Eurotech and/or its affiliates and others
- * 
+ *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
  * which is available at https://www.eclipse.org/legal/epl-2.0/
- * 
+ *
  * SPDX-License-Identifier: EPL-2.0
- * 
+ *
  * Contributors:
  *  Eurotech
  *  Amit Kumar Mondal
@@ -15,6 +15,10 @@ package org.eclipse.kura.web.server.servlet;
 
 import static org.eclipse.kura.util.base.StringUtil.isNullOrEmpty;
 
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintStream;
@@ -27,12 +31,6 @@ import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
-
-import jakarta.servlet.ServletException;
-import jakarta.servlet.http.HttpServlet;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-
 import org.eclipse.kura.web.server.KuraRemoteServiceServlet;
 import org.eclipse.kura.web.server.KuraRemoteServiceServlet.KuraPermissionException;
 import org.eclipse.kura.web.server.RequiredPermissions.Mode;
@@ -83,8 +81,8 @@ public final class WiresBlinkServlet extends HttpServlet implements WireAdminLis
     private static final long serialVersionUID = -8962416452919656283L;
 
     /** Bundle Context */
-    private static final BundleContext BUNDLE_CONTEXT = FrameworkUtil.getBundle(WiresBlinkServlet.class)
-            .getBundleContext();
+    private static final BundleContext BUNDLE_CONTEXT =
+            FrameworkUtil.getBundle(WiresBlinkServlet.class).getBundleContext();
 
     /** Used to track the new sessions */
     private static Map<String, RequestContext> requests = new ConcurrentHashMap<>();
@@ -131,7 +129,7 @@ public final class WiresBlinkServlet extends HttpServlet implements WireAdminLis
     public void doGet(final HttpServletRequest request, final HttpServletResponse response)
             throws ServletException, IOException {
         try {
-            KuraRemoteServiceServlet.requirePermissions(request, Mode.ALL, new String[] { KuraPermission.WIRES_ADMIN });
+            KuraRemoteServiceServlet.requirePermissions(request, Mode.ALL, new String[] {KuraPermission.WIRES_ADMIN});
         } catch (final KuraPermissionException e) {
             response.sendError(403);
             return;
@@ -162,7 +160,6 @@ public final class WiresBlinkServlet extends HttpServlet implements WireAdminLis
         final RequestContext context;
 
         synchronized (this) {
-
             if (shutdown) {
                 try {
                     response.sendError(400);
@@ -201,7 +198,8 @@ public final class WiresBlinkServlet extends HttpServlet implements WireAdminLis
         removeContext(requestId);
         requests.put(requestId, context);
         if (registration == null) {
-            registration = BUNDLE_CONTEXT.registerService(WireAdminListener.class, this, WIRE_EVENT_LISTENER_PROPERTIES);
+            registration =
+                    BUNDLE_CONTEXT.registerService(WireAdminListener.class, this, WIRE_EVENT_LISTENER_PROPERTIES);
             logger.info("registered");
         }
     }
@@ -379,5 +377,4 @@ public final class WiresBlinkServlet extends HttpServlet implements WireAdminLis
             context.submit(wire);
         }
     }
-
 }

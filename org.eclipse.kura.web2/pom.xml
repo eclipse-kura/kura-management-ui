@@ -14,9 +14,7 @@
      Red Hat Inc
 
 -->
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
@@ -208,10 +206,10 @@
                 <executions>
                     <execution>
                         <id>copy-embedded-jars</id>
-                        <phase>validate</phase>
                         <goals>
                             <goal>copy-dependencies</goal>
                         </goals>
+                        <phase>validate</phase>
                         <configuration>
                             <outputDirectory>${project.basedir}/lib</outputDirectory>
                             <stripVersion>true</stripVersion>
@@ -287,10 +285,10 @@
                 <executions>
                     <execution>
                         <id>compress_js_css</id>
-                        <phase>process-resources</phase>
                         <goals>
                             <goal>compress</goal>
                         </goals>
+                        <phase>process-resources</phase>
                     </execution>
                 </executions>
             </plugin>
@@ -299,6 +297,17 @@
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>gwt-maven-plugin</artifactId>
                 <version>2.10.0</version>
+                <configuration>
+                    <style>OBF</style>
+                    <failOnError>true</failOnError>
+                    <extraJvmArgs>-Xmx2048M -Xss1024k -XX:+UseParallelGC</extraJvmArgs>
+                    <sourceLevel>auto</sourceLevel>
+                    <localWorkers>2</localWorkers>
+                    <runTarget>denali.html</runTarget>
+                    <i18nMessagesBundle>org.eclipse.kura.web.client.messages.Messages</i18nMessagesBundle>
+                    <i18nConstantsWithLookupBundle>org.eclipse.kura.web.client.messages.ValidationMessages</i18nConstantsWithLookupBundle>
+                    <outputDirectory>src/main/webapp</outputDirectory>
+                </configuration>
                 <dependencies>
                     <dependency>
                         <groupId>org.gwtproject</groupId>
@@ -314,31 +323,20 @@
                 <executions>
                     <execution>
                         <id>gwt-generate</id>
-                        <phase>generate-sources</phase>
                         <goals>
                             <goal>i18n</goal>
                             <goal>generateAsync</goal>
                         </goals>
+                        <phase>generate-sources</phase>
                     </execution>
                     <execution>
                         <id>gwt-compile</id>
-                        <phase>compile</phase>
                         <goals>
                             <goal>compile</goal>
                         </goals>
+                        <phase>compile</phase>
                     </execution>
                 </executions>
-                <configuration>
-                    <style>OBF</style>
-                    <failOnError>true</failOnError>
-                    <extraJvmArgs>-Xmx2048M -Xss1024k -XX:+UseParallelGC</extraJvmArgs>
-                    <sourceLevel>auto</sourceLevel>
-                    <localWorkers>2</localWorkers>
-                    <runTarget>denali.html</runTarget>
-                    <i18nMessagesBundle>org.eclipse.kura.web.client.messages.Messages</i18nMessagesBundle>
-                    <i18nConstantsWithLookupBundle>org.eclipse.kura.web.client.messages.ValidationMessages</i18nConstantsWithLookupBundle>
-                    <outputDirectory>src/main/webapp</outputDirectory>
-                </configuration>
             </plugin>
 
             <!-- the web application is packaged under www/, without the GWT deploy artifacts -->
@@ -348,10 +346,10 @@
                 <executions>
                     <execution>
                         <id>stage-webapp</id>
-                        <phase>compile</phase>
                         <goals>
                             <goal>copy-resources</goal>
                         </goals>
+                        <phase>compile</phase>
                         <configuration>
                             <outputDirectory>${www.staging.dir}</outputDirectory>
                             <resources>
@@ -372,18 +370,18 @@
             <plugin>
                 <groupId>biz.aQute.bnd</groupId>
                 <artifactId>bnd-maven-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>default-bnd-process</id>
-                        <phase>prepare-package</phase>
-                        <goals>
-                            <goal>bnd-process</goal>
-                        </goals>
-                    </execution>
-                </executions>
                 <configuration>
                     <includeClassesDir>true</includeClassesDir>
                 </configuration>
+                <executions>
+                    <execution>
+                        <id>default-bnd-process</id>
+                        <goals>
+                            <goal>bnd-process</goal>
+                        </goals>
+                        <phase>prepare-package</phase>
+                    </execution>
+                </executions>
             </plugin>
 
             <plugin>

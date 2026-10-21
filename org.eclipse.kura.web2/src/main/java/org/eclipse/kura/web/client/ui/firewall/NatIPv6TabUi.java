@@ -12,9 +12,20 @@
  *******************************************************************************/
 package org.eclipse.kura.web.client.ui.firewall;
 
+import com.google.gwt.core.client.GWT;
+import com.google.gwt.editor.client.Editor;
+import com.google.gwt.editor.client.EditorError;
+import com.google.gwt.uibinder.client.UiBinder;
+import com.google.gwt.uibinder.client.UiField;
+import com.google.gwt.user.cellview.client.TextColumn;
+import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.google.gwt.user.client.ui.Composite;
+import com.google.gwt.user.client.ui.Widget;
+import com.google.gwt.view.client.ListDataProvider;
+import com.google.gwt.view.client.SingleSelectionModel;
+import com.google.web.bindery.event.shared.HandlerRegistration;
 import java.util.ArrayList;
 import java.util.List;
-
 import org.eclipse.kura.web.client.messages.Messages;
 import org.eclipse.kura.web.client.ui.AlertDialog;
 import org.eclipse.kura.web.client.ui.EntryClassUi;
@@ -43,27 +54,13 @@ import org.gwtbootstrap3.client.ui.form.error.BasicEditorError;
 import org.gwtbootstrap3.client.ui.form.validator.Validator;
 import org.gwtbootstrap3.client.ui.gwt.CellTable;
 
-import com.google.gwt.core.client.GWT;
-import com.google.gwt.editor.client.Editor;
-import com.google.gwt.editor.client.EditorError;
-import com.google.gwt.uibinder.client.UiBinder;
-import com.google.gwt.uibinder.client.UiField;
-import com.google.gwt.user.cellview.client.TextColumn;
-import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.google.gwt.user.client.ui.Composite;
-import com.google.gwt.user.client.ui.Widget;
-import com.google.gwt.view.client.ListDataProvider;
-import com.google.gwt.view.client.SingleSelectionModel;
-import com.google.web.bindery.event.shared.HandlerRegistration;
-
 public class NatIPv6TabUi extends Composite implements Tab, ButtonBar.Listener {
 
     private static final String ZERO_ADDRESS_CIDR = "::/0";
 
     private static NatTabUiUiBinder uiBinder = GWT.create(NatTabUiUiBinder.class);
 
-    interface NatTabUiUiBinder extends UiBinder<Widget, NatIPv6TabUi> {
-    }
+    interface NatTabUiUiBinder extends UiBinder<Widget, NatIPv6TabUi> {}
 
     private static final Messages MSGS = GWT.create(Messages.class);
 
@@ -80,8 +77,10 @@ public class NatIPv6TabUi extends Composite implements Tab, ButtonBar.Listener {
 
     @UiField
     ButtonBar buttonBar;
+
     @UiField
     Alert notification;
+
     @UiField
     CellTable<GwtFirewallNatEntry> natGrid = new CellTable<>();
 
@@ -90,64 +89,85 @@ public class NatIPv6TabUi extends Composite implements Tab, ButtonBar.Listener {
 
     @UiField
     FormGroup groupInput;
+
     @UiField
     FormGroup groupOutput;
+
     @UiField
     FormGroup groupProtocol;
+
     @UiField
     FormGroup groupSource;
+
     @UiField
     FormGroup groupDestination;
+
     @UiField
     FormGroup groupEnable;
 
     @UiField
     FormLabel labelInput;
+
     @UiField
     FormLabel labelOutput;
+
     @UiField
     FormLabel labelProtocol;
+
     @UiField
     FormLabel labelSource;
+
     @UiField
     FormLabel labelDestination;
+
     @UiField
     FormLabel labelEnable;
 
     @UiField
     Tooltip tooltipInput;
+
     @UiField
     Tooltip tooltipOutput;
+
     @UiField
     Tooltip tooltipProtocol;
+
     @UiField
     Tooltip tooltipSource;
+
     @UiField
     Tooltip tooltipDestination;
+
     @UiField
     Tooltip tooltipEnable;
 
     @UiField
     TextBox input;
+
     @UiField
     TextBox output;
+
     @UiField
     TextBox source;
+
     @UiField
     TextBox destination;
 
     @UiField
     ListBox protocol;
+
     @UiField
     ListBox enable;
 
     @UiField
     Button submit;
+
     @UiField
     Button cancel;
 
     @UiField
     Modal existingRule;
+
     @UiField
     Button close;
 
@@ -158,8 +178,8 @@ public class NatIPv6TabUi extends Composite implements Tab, ButtonBar.Listener {
 
     public NatIPv6TabUi() {
         initWidget(uiBinder.createAndBindUi(this));
-        this.selectionModel.addSelectionChangeHandler(event -> NatIPv6TabUi.this.buttonBar
-                .setEditDeleteButtonsDirty(NatIPv6TabUi.this.selectionModel.getSelectedObject() != null));
+        this.selectionModel.addSelectionChangeHandler(event -> NatIPv6TabUi.this.buttonBar.setEditDeleteButtonsDirty(
+                NatIPv6TabUi.this.selectionModel.getSelectedObject() != null));
         this.natGrid.setSelectionModel(this.selectionModel);
 
         initTable();
@@ -195,14 +215,18 @@ public class NatIPv6TabUi extends Composite implements Tab, ButtonBar.Listener {
             @Override
             public void onSuccess(GwtXSRFToken token) {
                 NatIPv6TabUi.this.setDirty(false);
-                NatIPv6TabUi.this.gwtNetworkService.findDeviceFirewallNATsIPv6(token,
-                        new AsyncCallback<List<GwtFirewallNatEntry>>() {
+                NatIPv6TabUi.this.gwtNetworkService.findDeviceFirewallNATsIPv6(
+                        token, new AsyncCallback<List<GwtFirewallNatEntry>>() {
 
                             @Override
                             public void onFailure(Throwable caught) {
                                 EntryClassUi.hideWaitModal();
-                                FailureHandler.handle(caught,
-                                        NatIPv6TabUi.this.gwtNetworkService.getClass().getSimpleName());
+                                FailureHandler.handle(
+                                        caught,
+                                        NatIPv6TabUi.this
+                                                .gwtNetworkService
+                                                .getClass()
+                                                .getSimpleName());
                             }
 
                             @Override
@@ -363,8 +387,8 @@ public class NatIPv6TabUi extends Composite implements Tab, ButtonBar.Listener {
 
             @Override
             public void onSuccess(GwtXSRFToken token) {
-                NatIPv6TabUi.this.gwtNetworkService.updateDeviceFirewallNATsIPv6(token, updatedNatConf,
-                        new AsyncCallback<Void>() {
+                NatIPv6TabUi.this.gwtNetworkService.updateDeviceFirewallNATsIPv6(
+                        token, updatedNatConf, new AsyncCallback<Void>() {
 
                             @Override
                             public void onFailure(Throwable caught) {
@@ -381,7 +405,6 @@ public class NatIPv6TabUi extends Composite implements Tab, ButtonBar.Listener {
                         });
             }
         });
-
     }
 
     @Override
@@ -408,7 +431,6 @@ public class NatIPv6TabUi extends Composite implements Tab, ButtonBar.Listener {
             resetFields();
         });
         showModal(null);
-
     }
 
     @Override
@@ -442,7 +464,6 @@ public class NatIPv6TabUi extends Composite implements Tab, ButtonBar.Listener {
             resetFields();
         });
         showModal(selection);
-
     }
 
     @Override
@@ -469,7 +490,6 @@ public class NatIPv6TabUi extends Composite implements Tab, ButtonBar.Listener {
         });
 
         this.submit.addClickHandler(event -> {
-
             if (!checkEntries()) {
                 return;
             }
@@ -479,7 +499,8 @@ public class NatIPv6TabUi extends Composite implements Tab, ButtonBar.Listener {
             natEntry.setOutInterface(NatIPv6TabUi.this.output.getText());
             natEntry.setProtocol(NatIPv6TabUi.this.protocol.getSelectedItemText());
 
-            if (NatIPv6TabUi.this.source.getText() != null && !"".equals(NatIPv6TabUi.this.source.getText().trim())) {
+            if (NatIPv6TabUi.this.source.getText() != null
+                    && !"".equals(NatIPv6TabUi.this.source.getText().trim())) {
                 natEntry.setSourceNetwork(NatIPv6TabUi.this.source.getText());
             } else {
                 natEntry.setSourceNetwork(ZERO_ADDRESS_CIDR);
@@ -564,13 +585,14 @@ public class NatIPv6TabUi extends Composite implements Tab, ButtonBar.Listener {
             @Override
             public List<EditorError> validate(Editor<String> editor, String value) {
                 List<EditorError> result = new ArrayList<>();
-                if (NatIPv6TabUi.this.input.getText() == null || "".equals(NatIPv6TabUi.this.input.getText().trim())
+                if (NatIPv6TabUi.this.input.getText() == null
+                        || "".equals(NatIPv6TabUi.this.input.getText().trim())
                         || NatIPv6TabUi.this.input.getText().trim().isEmpty()
                         || !NatIPv6TabUi.this.input.getText().trim().matches(FieldType.ALPHANUMERIC.getRegex())
-                        || NatIPv6TabUi.this.input.getText().trim()
-                                .length() > FirewallPanelUtils.INTERFACE_NAME_MAX_LENGTH) {
-                    result.add(new BasicEditorError(NatIPv6TabUi.this.input, value,
-                            MSGS.firewallNatFormInputInterfaceErrorMessage()));
+                        || NatIPv6TabUi.this.input.getText().trim().length()
+                                > FirewallPanelUtils.INTERFACE_NAME_MAX_LENGTH) {
+                    result.add(new BasicEditorError(
+                            NatIPv6TabUi.this.input, value, MSGS.firewallNatFormInputInterfaceErrorMessage()));
                 }
                 return result;
             }
@@ -588,13 +610,14 @@ public class NatIPv6TabUi extends Composite implements Tab, ButtonBar.Listener {
             @Override
             public List<EditorError> validate(Editor<String> editor, String value) {
                 List<EditorError> result = new ArrayList<>();
-                if (NatIPv6TabUi.this.output.getText() == null || "".equals(NatIPv6TabUi.this.output.getText().trim())
+                if (NatIPv6TabUi.this.output.getText() == null
+                        || "".equals(NatIPv6TabUi.this.output.getText().trim())
                         || NatIPv6TabUi.this.output.getText().trim().isEmpty()
                         || !NatIPv6TabUi.this.output.getText().trim().matches(FieldType.ALPHANUMERIC.getRegex())
-                        || NatIPv6TabUi.this.output.getText().trim()
-                                .length() > FirewallPanelUtils.INTERFACE_NAME_MAX_LENGTH) {
-                    result.add(new BasicEditorError(NatIPv6TabUi.this.output, value,
-                            MSGS.firewallNatFormOutputInterfaceErrorMessage()));
+                        || NatIPv6TabUi.this.output.getText().trim().length()
+                                > FirewallPanelUtils.INTERFACE_NAME_MAX_LENGTH) {
+                    result.add(new BasicEditorError(
+                            NatIPv6TabUi.this.output, value, MSGS.firewallNatFormOutputInterfaceErrorMessage()));
                 }
                 return result;
             }
@@ -613,9 +636,13 @@ public class NatIPv6TabUi extends Composite implements Tab, ButtonBar.Listener {
             public List<EditorError> validate(Editor<String> editor, String value) {
                 List<EditorError> result = new ArrayList<>();
                 if (!NatIPv6TabUi.this.source.getText().trim().isEmpty()
-                        && !NatIPv6TabUi.this.source.getText().trim().matches(FieldType.IPV6_CIDR_NOTATION.getRegex())) {
-                    result.add(new BasicEditorError(NatIPv6TabUi.this.source, value,
-                            MSGS.firewallNatFormSourceNetworkIPv6ErrorMessage()));
+                        && !NatIPv6TabUi.this
+                                .source
+                                .getText()
+                                .trim()
+                                .matches(FieldType.IPV6_CIDR_NOTATION.getRegex())) {
+                    result.add(new BasicEditorError(
+                            NatIPv6TabUi.this.source, value, MSGS.firewallNatFormSourceNetworkIPv6ErrorMessage()));
                 }
                 return result;
             }
@@ -634,8 +661,14 @@ public class NatIPv6TabUi extends Composite implements Tab, ButtonBar.Listener {
             public List<EditorError> validate(Editor<String> editor, String value) {
                 List<EditorError> result = new ArrayList<>();
                 if (!NatIPv6TabUi.this.destination.getText().trim().isEmpty()
-                        && !NatIPv6TabUi.this.destination.getText().trim().matches(FieldType.IPV6_CIDR_NOTATION.getRegex())) {
-                    result.add(new BasicEditorError(NatIPv6TabUi.this.destination, value,
+                        && !NatIPv6TabUi.this
+                                .destination
+                                .getText()
+                                .trim()
+                                .matches(FieldType.IPV6_CIDR_NOTATION.getRegex())) {
+                    result.add(new BasicEditorError(
+                            NatIPv6TabUi.this.destination,
+                            value,
                             MSGS.firewallNatFormDestinationNetworkIPv6ErrorMessage()));
                 }
                 return result;
@@ -723,8 +756,8 @@ public class NatIPv6TabUi extends Composite implements Tab, ButtonBar.Listener {
         if (entries != null && firewallNatEntry != null) {
             for (GwtFirewallNatEntry entry : entries) {
                 String sourceNetwork = entry.getSourceNetwork() != null ? entry.getSourceNetwork() : ZERO_ADDRESS_CIDR;
-                String destinationNetwork = entry.getDestinationNetwork() != null ? entry.getDestinationNetwork()
-                        : ZERO_ADDRESS_CIDR;
+                String destinationNetwork =
+                        entry.getDestinationNetwork() != null ? entry.getDestinationNetwork() : ZERO_ADDRESS_CIDR;
                 String newSourceNetwork = firewallNatEntry.getSourceNetwork() != null
                         ? firewallNatEntry.getSourceNetwork()
                         : ZERO_ADDRESS_CIDR;
@@ -735,7 +768,8 @@ public class NatIPv6TabUi extends Composite implements Tab, ButtonBar.Listener {
                 if (entry.getInInterface().equals(firewallNatEntry.getInInterface())
                         && entry.getOutInterface().equals(firewallNatEntry.getOutInterface())
                         && entry.getProtocol().equals(firewallNatEntry.getProtocol())
-                        && sourceNetwork.equals(newSourceNetwork) && destinationNetwork.equals(newDestinationNetwork)) {
+                        && sourceNetwork.equals(newSourceNetwork)
+                        && destinationNetwork.equals(newDestinationNetwork)) {
                     isDuplicateEntry = true;
                     break;
                 }
@@ -767,13 +801,15 @@ public class NatIPv6TabUi extends Composite implements Tab, ButtonBar.Listener {
         boolean valid = true;
 
         if (NatIPv6TabUi.this.groupInput.getValidationState() == ValidationState.ERROR
-                || NatIPv6TabUi.this.input.getText() == null || "".equals(NatIPv6TabUi.this.input.getText().trim())) {
+                || NatIPv6TabUi.this.input.getText() == null
+                || "".equals(NatIPv6TabUi.this.input.getText().trim())) {
             NatIPv6TabUi.this.groupInput.setValidationState(ValidationState.ERROR);
             valid = false;
         }
 
         if (NatIPv6TabUi.this.groupOutput.getValidationState() == ValidationState.ERROR
-                || NatIPv6TabUi.this.output.getText() == null || "".equals(NatIPv6TabUi.this.output.getText().trim())) {
+                || NatIPv6TabUi.this.output.getText() == null
+                || "".equals(NatIPv6TabUi.this.output.getText().trim())) {
             NatIPv6TabUi.this.groupOutput.setValidationState(ValidationState.ERROR);
             valid = false;
         }

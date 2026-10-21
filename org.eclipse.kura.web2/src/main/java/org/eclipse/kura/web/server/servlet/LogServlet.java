@@ -14,6 +14,11 @@ package org.eclipse.kura.web.server.servlet;
 
 import static java.util.Objects.isNull;
 
+import jakarta.servlet.ServletException;
+import jakarta.servlet.ServletOutputStream;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.File;
@@ -37,13 +42,6 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
-
-import jakarta.servlet.ServletException;
-import jakarta.servlet.ServletOutputStream;
-import jakarta.servlet.http.Cookie;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-
 import org.eclipse.kura.executor.Command;
 import org.eclipse.kura.executor.CommandStatus;
 import org.eclipse.kura.executor.PrivilegedExecutorService;
@@ -82,8 +80,7 @@ public class LogServlet extends AuditServlet {
     @Override
     protected void doGet(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse)
             throws ServletException {
-        KuraRemoteServiceServlet.requirePermissions(httpServletRequest, Mode.ALL,
-                new String[] { KuraPermission.DEVICE });
+        KuraRemoteServiceServlet.requirePermissions(httpServletRequest, Mode.ALL, new String[] {KuraPermission.DEVICE});
 
         // BEGIN XSRF - Servlet dependent code
         try {
@@ -145,8 +142,10 @@ public class LogServlet extends AuditServlet {
 
         List<File> fileList = new ArrayList<>();
         paths.stream().forEach(path -> {
-            try (Stream<Path> kuraLogDirStream = Files.list(Paths.get(path));) {
-                fileList.addAll(kuraLogDirStream.filter(filePath -> filePath.toFile().isFile()).map(Path::toFile)
+            try (Stream<Path> kuraLogDirStream = Files.list(Paths.get(path)); ) {
+                fileList.addAll(kuraLogDirStream
+                        .filter(filePath -> filePath.toFile().isFile())
+                        .map(Path::toFile)
                         .collect(Collectors.toList()));
             } catch (IOException e) {
                 logger.warn("Unable to fetch log files for {}", path);
@@ -157,8 +156,8 @@ public class LogServlet extends AuditServlet {
     }
 
     private List<File> collectJournalLogs(SystemService ss, PrivilegedExecutorService pes, Path tempDir) {
-        String outputFields = ss.getProperties().getProperty("kura.log.download.journal.fields",
-                "SYSLOG_IDENTIFIER,PRIORITY,MESSAGE,STACKTRACE");
+        String outputFields = ss.getProperties()
+                .getProperty("kura.log.download.journal.fields", "SYSLOG_IDENTIFIER,PRIORITY,MESSAGE,STACKTRACE");
 
         List<File> journalFiles = new ArrayList<>();
 
@@ -181,14 +180,18 @@ public class LogServlet extends AuditServlet {
         return journalFiles;
     }
 
-    private void createReply(HttpServletResponse httpServletResponse, List<File> fileList, Path tempDir, String nonce,
-            String archiveName) throws IOException {
+    private void createReply(
+            HttpServletResponse httpServletResponse,
+            List<File> fileList,
+            Path tempDir,
+            String nonce,
+            String archiveName)
+            throws IOException {
 
         // the archive is assembled on disk instead of in memory: /var/log can be arbitrarily large,
         // and the completion cookie must be sent only once the archive is actually ready
         Path zipPath = tempDir.resolve(TEMP_ZIP_FILE_NAME);
-        try (ZipOutputStream zos = new ZipOutputStream(
-                new BufferedOutputStream(Files.newOutputStream(zipPath)))) {
+        try (ZipOutputStream zos = new ZipOutputStream(new BufferedOutputStream(Files.newOutputStream(zipPath)))) {
             zipFiles(zos, fileList);
         }
 
@@ -237,8 +240,7 @@ public class LogServlet extends AuditServlet {
         }
         sanitized = sanitized.substring(start, end);
 
-        return sanitized.length() > MAX_DEVICE_NAME_LENGTH ? sanitized.substring(0, MAX_DEVICE_NAME_LENGTH)
-                : sanitized;
+        return sanitized.length() > MAX_DEVICE_NAME_LENGTH ? sanitized.substring(0, MAX_DEVICE_NAME_LENGTH) : sanitized;
     }
 
     private static boolean isTrimmableFileNameChar(char c) {
@@ -320,8 +322,8 @@ public class LogServlet extends AuditServlet {
         return writeJournalLog(pes, outputFields, outputFile, null);
     }
 
-    private boolean writeJournalLog(PrivilegedExecutorService pes, String outputFields, String outputFile,
-            String unit) {
+    private boolean writeJournalLog(
+            PrivilegedExecutorService pes, String outputFields, String outputFile, String unit) {
 
         List<String> commandSequence = new ArrayList<>();
 
@@ -350,8 +352,8 @@ public class LogServlet extends AuditServlet {
     }
 
     Path createPrivateTempDirectory() throws IOException {
-        return Files.createTempDirectory(TEMP_DIR_PREFIX,
-                PosixFilePermissions.asFileAttribute(PosixFilePermissions.fromString("rwx------")));
+        return Files.createTempDirectory(
+                TEMP_DIR_PREFIX, PosixFilePermissions.asFileAttribute(PosixFilePermissions.fromString("rwx------")));
     }
 
     void deleteTempDirectory(Path tempDir) {

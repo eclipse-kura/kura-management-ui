@@ -1,6 +1,6 @@
 /*******************************************************************************
  * Copyright (c) 2017, 2021 Eurotech and/or its affiliates and others
- * 
+ *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
  * which is available at https://www.eclipse.org/legal/epl-2.0/
@@ -10,11 +10,14 @@
  * Contributors:
  *  Eurotech
  *******************************************************************************/
-
 package org.eclipse.kura.web.client.ui;
 
+import com.google.gwt.core.client.GWT;
+import com.google.gwt.uibinder.client.UiBinder;
+import com.google.gwt.uibinder.client.UiField;
+import com.google.gwt.user.client.ui.Composite;
+import com.google.gwt.user.client.ui.Widget;
 import java.util.Optional;
-
 import org.eclipse.kura.web.client.messages.Messages;
 import org.gwtbootstrap3.client.ui.Alert;
 import org.gwtbootstrap3.client.ui.Button;
@@ -26,18 +29,11 @@ import org.gwtbootstrap3.client.ui.html.Paragraph;
 import org.gwtbootstrap3.client.ui.html.Strong;
 import org.gwtbootstrap3.client.ui.html.UnorderedList;
 
-import com.google.gwt.core.client.GWT;
-import com.google.gwt.uibinder.client.UiBinder;
-import com.google.gwt.uibinder.client.UiField;
-import com.google.gwt.user.client.ui.Composite;
-import com.google.gwt.user.client.ui.Widget;
-
 public class AlertDialog extends Composite implements HasId {
 
     private static AlertDialogUiBinder uiBinder = GWT.create(AlertDialogUiBinder.class);
 
-    interface AlertDialogUiBinder extends UiBinder<Widget, AlertDialog> {
-    }
+    interface AlertDialogUiBinder extends UiBinder<Widget, AlertDialog> {}
 
     private static final Messages MSGS = GWT.create(Messages.class);
 
@@ -45,16 +41,22 @@ public class AlertDialog extends Composite implements HasId {
 
     @UiField
     Button yes;
+
     @UiField
     Button no;
+
     @UiField
     ModalFooter alertFooter;
+
     @UiField
     Paragraph messageText;
+
     @UiField
     Alert alertBody;
+
     @UiField
     Strong alertText;
+
     @UiField
     UnorderedList extraItems;
 
@@ -113,8 +115,14 @@ public class AlertDialog extends Composite implements HasId {
         this.modal.show();
     }
 
-    public void show(String title, String message, String yesButtonAlternativeText, String noButtonAlternativeText,
-            Severity severity, DismissListener listener, String... extraItems) {
+    public void show(
+            String title,
+            String message,
+            String yesButtonAlternativeText,
+            String noButtonAlternativeText,
+            Severity severity,
+            DismissListener listener,
+            String... extraItems) {
         setAlertText(message, severity);
         setTitle(title);
         setListener(listener);
@@ -161,7 +169,11 @@ public class AlertDialog extends Composite implements HasId {
         show(title, message, Severity.INFO, listener);
     }
 
-    public void show(String title, String message, DismissListener listener, String confirmButtonText,
+    public void show(
+            String title,
+            String message,
+            DismissListener listener,
+            String confirmButtonText,
             String dismissButtonText) {
         // TODO:
     }
@@ -200,13 +212,11 @@ public class AlertDialog extends Composite implements HasId {
     public interface ConfirmListener {
 
         public void onConfirm();
-
     }
 
     public interface DismissListener {
 
         public void onDismissed(boolean confirmed);
-
     }
 
     private static DismissListener toDismissListener(final ConfirmListener listener) {

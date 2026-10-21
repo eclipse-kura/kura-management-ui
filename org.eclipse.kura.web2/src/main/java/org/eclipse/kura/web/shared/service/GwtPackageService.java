@@ -12,8 +12,9 @@
  *******************************************************************************/
 package org.eclipse.kura.web.shared.service;
 
+import com.google.gwt.user.client.rpc.RemoteService;
+import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
 import java.util.List;
-
 import org.eclipse.kura.web.server.Audit;
 import org.eclipse.kura.web.server.RequiredPermissions;
 import org.eclipse.kura.web.shared.GwtKuraException;
@@ -21,9 +22,6 @@ import org.eclipse.kura.web.shared.KuraPermission;
 import org.eclipse.kura.web.shared.model.GwtDeploymentPackage;
 import org.eclipse.kura.web.shared.model.GwtMarketplacePackageDescriptor;
 import org.eclipse.kura.web.shared.model.GwtXSRFToken;
-
-import com.google.gwt.user.client.rpc.RemoteService;
-import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
 
 @RemoteServiceRelativePath("package")
 @RequiredPermissions(KuraPermission.PACKAGES_ADMIN)
@@ -40,5 +38,4 @@ public interface GwtPackageService extends RemoteService {
     @Audit(componentName = "UI Packages", description = "Install deployment package from Eclipse Marketplace")
     public void installPackageFromMarketplace(GwtXSRFToken xsrfToken, GwtMarketplacePackageDescriptor descriptor)
             throws GwtKuraException;
-
 }

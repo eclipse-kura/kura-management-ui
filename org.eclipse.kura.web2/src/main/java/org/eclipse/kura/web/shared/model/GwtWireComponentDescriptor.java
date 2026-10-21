@@ -1,16 +1,15 @@
 /*******************************************************************************
  * Copyright (c) 2017, 2020 Eurotech and/or its affiliates and others
- * 
+ *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
  * which is available at https://www.eclipse.org/legal/epl-2.0/
- * 
+ *
  * SPDX-License-Identifier: EPL-2.0
- * 
+ *
  * Contributors:
  *  Eurotech
  *******************************************************************************/
-
 package org.eclipse.kura.web.shared.model;
 
 import java.io.Serializable;
@@ -32,12 +31,19 @@ public final class GwtWireComponentDescriptor extends GwtBaseModel implements Se
     private Map<Integer, String> inputPortNames;
     private Map<Integer, String> outputPortNames;
 
-    public GwtWireComponentDescriptor() {
-    }
+    public GwtWireComponentDescriptor() {}
 
-    public GwtWireComponentDescriptor(String name, String factoryPid, int minInputPorts, int maxInputPorts,
-            int defaultInputPorts, int minOutputPorts, int maxOutputPorts, int defaultOutputPorts,
-            Map<Integer, String> inputPortNames, Map<Integer, String> outputPortNames) {
+    public GwtWireComponentDescriptor(
+            String name,
+            String factoryPid,
+            int minInputPorts,
+            int maxInputPorts,
+            int defaultInputPorts,
+            int minOutputPorts,
+            int maxOutputPorts,
+            int defaultOutputPorts,
+            Map<Integer, String> inputPortNames,
+            Map<Integer, String> outputPortNames) {
         this.name = name;
         this.factoryPid = factoryPid;
         this.minInputPorts = minInputPorts;

@@ -30,7 +30,5 @@ public final class KuraPermission {
     public static final Set<String> DEFAULT_PERMISSIONS = Collections.unmodifiableSet(new HashSet<>(
             Arrays.asList(ADMIN, PACKAGES_ADMIN, DEVICE, CLOUD_CONNECTION_ADMIN, WIRES_ADMIN, MAINTENANCE)));
 
-    private KuraPermission() {
-    }
-
+    private KuraPermission() {}
 }

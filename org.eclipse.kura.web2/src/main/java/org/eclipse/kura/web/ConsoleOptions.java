@@ -21,7 +21,6 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
-
 import org.eclipse.kura.configuration.ComponentConfiguration;
 import org.eclipse.kura.core.configuration.ComponentConfigurationImpl;
 import org.eclipse.kura.core.configuration.metatype.Tocd;
@@ -38,14 +37,18 @@ public class ConsoleOptions {
                     .build(), //
             String.class);
 
-    private final SelfConfiguringComponentProperty<Integer> sessionMaxInactivityInterval = new SelfConfiguringComponentProperty<>(
-            new AdBuilder("session.max.inactivity.interval", "Session max inactivity interval", Tscalar.INTEGER) //
-                    .setDefault("15") //
-                    .setMin("1") //
-                    .setDescription(
-                            "The session max inactivity interval in minutes. If no interaction with the Web UI is performed for the value of this parameter in minutes, a new login will be requested.") //
-                    .build(), //
-            Integer.class);
+    private final SelfConfiguringComponentProperty<Integer> sessionMaxInactivityInterval =
+            new SelfConfiguringComponentProperty<>(
+                    new AdBuilder(
+                                    "session.max.inactivity.interval",
+                                    "Session max inactivity interval",
+                                    Tscalar.INTEGER) //
+                            .setDefault("15") //
+                            .setMin("1") //
+                            .setDescription(
+                                    "The session max inactivity interval in minutes. If no interaction with the Web UI is performed for the value of this parameter in minutes, a new login will be requested.") //
+                            .build(), //
+                    Integer.class);
 
     private final SelfConfiguringComponentProperty<Integer[]> allowedPorts = new SelfConfiguringComponentProperty<>(
             new AdBuilder("allowed.ports", "Allowed ports", Tscalar.INTEGER) //
@@ -57,17 +60,19 @@ public class ConsoleOptions {
                     .build(), //
             Integer[].class);
 
-    private final SelfConfiguringComponentProperty<String> sslManagerServiceTarget = new SelfConfiguringComponentProperty<>(
-            new AdBuilder("SslManagerService.target", "SslManagerService Target Filter", Tscalar.STRING) //
-                    .setRequired(true) //
-                    .setDefault("(kura.service.pid=org.eclipse.kura.ssl.SslManagerService)") //
-                    .setDescription(
-                            "Specifies, as an OSGi target filter, the pid of the SslManagerService used to create HTTPS connections. This is needed for example for fetching package descriptions from Eclipse Marketplace.") //
-                    .build(),
-            String.class);
+    private final SelfConfiguringComponentProperty<String> sslManagerServiceTarget =
+            new SelfConfiguringComponentProperty<>(
+                    new AdBuilder("SslManagerService.target", "SslManagerService Target Filter", Tscalar.STRING) //
+                            .setRequired(true) //
+                            .setDefault("(kura.service.pid=org.eclipse.kura.ssl.SslManagerService)") //
+                            .setDescription(
+                                    "Specifies, as an OSGi target filter, the pid of the SslManagerService used to create HTTPS connections. This is needed for example for fetching package descriptions from Eclipse Marketplace.") //
+                            .build(),
+                    String.class);
 
     private final List<SelfConfiguringComponentProperty<?>> configurationProperties = new ArrayList<>();
-    private final Map<String, SelfConfiguringComponentProperty<Boolean>> authenticationMethodProperties = new HashMap<>();
+    private final Map<String, SelfConfiguringComponentProperty<Boolean>> authenticationMethodProperties =
+            new HashMap<>();
     private final ComponentConfiguration config;
 
     private ConsoleOptions() {
@@ -103,8 +108,10 @@ public class ConsoleOptions {
     }
 
     public Set<String> getEnabledAuthMethods() {
-        return this.authenticationMethodProperties.entrySet().stream().filter(e -> e.getValue().get())
-                .map(Map.Entry::getKey).collect(Collectors.toSet());
+        return this.authenticationMethodProperties.entrySet().stream()
+                .filter(e -> e.getValue().get())
+                .map(Map.Entry::getKey)
+                .collect(Collectors.toSet());
     }
 
     public Set<Integer> getAllowedPorts() {
@@ -174,17 +181,18 @@ public class ConsoleOptions {
 
     private void addAuthenticationMethodProperty(final String name, final boolean enabledByDefault) {
         final SelfConfiguringComponentProperty<Boolean> result = new SelfConfiguringComponentProperty<>(
-                new AdBuilder(getAuthenticationMethodPropertyId(name), "Authentication Method \"" + name + "\" Enabled",
-                        Tscalar.BOOLEAN) //
-                                .setDefault(Boolean.toString(enabledByDefault)) //
-                                .setDescription(
-                                        "Defines whether the \"" + name + "\" authentication method is enabled or not") //
-                                .build(), //
+                new AdBuilder(
+                                getAuthenticationMethodPropertyId(name),
+                                "Authentication Method \"" + name + "\" Enabled",
+                                Tscalar.BOOLEAN) //
+                        .setDefault(Boolean.toString(enabledByDefault)) //
+                        .setDescription(
+                                "Defines whether the \"" + name + "\" authentication method is enabled or not") //
+                        .build(), //
                 Boolean.class);
 
         this.authenticationMethodProperties.put(name, result);
         this.configurationProperties.add(result);
-
     }
 
     private static String getAuthenticationMethodPropertyId(final String name) {
@@ -201,8 +209,12 @@ public class ConsoleOptions {
 
     @Override
     public int hashCode() {
-        return Objects.hash(this.allowedPorts, this.appRoot, this.authenticationMethodProperties,
-                this.sessionMaxInactivityInterval, this.sslManagerServiceTarget);
+        return Objects.hash(
+                this.allowedPorts,
+                this.appRoot,
+                this.authenticationMethodProperties,
+                this.sessionMaxInactivityInterval,
+                this.sslManagerServiceTarget);
     }
 
     @Override
@@ -223,7 +235,5 @@ public class ConsoleOptions {
                         other.allowedPorts.getOptional().isPresent() ? other.allowedPorts.get() : new Integer[] {})
                 && Objects.equals(this.sslManagerServiceTarget.get(), other.sslManagerServiceTarget.get())
                 && Objects.equals(getEnabledAuthMethods(), other.getEnabledAuthMethods());
-
     }
-
 }

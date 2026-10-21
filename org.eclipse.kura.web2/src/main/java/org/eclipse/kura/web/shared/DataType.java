@@ -1,12 +1,12 @@
 /*******************************************************************************
  * Copyright (c) 2016, 2024 Eurotech and/or its affiliates and others
- * 
+ *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
  * which is available at https://www.eclipse.org/legal/epl-2.0/
- * 
+ *
  * SPDX-License-Identifier: EPL-2.0
- * 
+ *
  * Contributors:
  *  Eurotech
  *  Amit Kumar Mondal
@@ -15,7 +15,6 @@
 /**
  * This is a copy of {@code org.eclipse.kura.type.DataType}
  */
-
 package org.eclipse.kura.web.shared;
 
 import org.eclipse.kura.type.TypedValue;
@@ -27,7 +26,6 @@ import org.eclipse.kura.type.TypedValue;
  * @since 1.2
  */
 public enum DataType {
-
     BOOLEAN,
 
     BYTE_ARRAY,

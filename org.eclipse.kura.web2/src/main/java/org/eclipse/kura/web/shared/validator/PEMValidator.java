@@ -19,5 +19,4 @@ public class PEMValidator extends RegexValidator {
     public PEMValidator(String message) {
         super(PEM_REGEX, message);
     }
-
 }

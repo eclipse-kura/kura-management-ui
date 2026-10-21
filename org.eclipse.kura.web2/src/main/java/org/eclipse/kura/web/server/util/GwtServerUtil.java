@@ -15,6 +15,11 @@ package org.eclipse.kura.web.server.util;
 
 import static org.eclipse.kura.configuration.ConfigurationService.KURA_SERVICE_PID;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -29,7 +34,6 @@ import java.util.Set;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-
 import org.eclipse.kura.configuration.ComponentConfiguration;
 import org.eclipse.kura.configuration.ConfigurationService;
 import org.eclipse.kura.configuration.Password;
@@ -76,13 +80,6 @@ import org.osgi.service.component.runtime.ServiceComponentRuntime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-
-import jakarta.servlet.ServletException;
-import jakarta.servlet.http.HttpServletResponse;
-import jakarta.servlet.http.HttpSession;
-
 /**
  * The Class GwtServerUtil is an utility class required for Kura Server
  * Components in GWT.
@@ -100,21 +97,23 @@ public final class GwtServerUtil {
     /**
      * The Constant to check if the provided interface is a configurable component.
      */
-    public static final String PATTERN_SERVICE_PROVIDE_CONFIGURABLE_COMP = "provide interface=\""
-            + "org.eclipse.kura.configuration.ConfigurableComponent\"";
+    public static final String PATTERN_SERVICE_PROVIDE_CONFIGURABLE_COMP =
+            "provide interface=\"" + "org.eclipse.kura.configuration.ConfigurableComponent\"";
 
     /** The Constant to check if provided interface is Wire Emitter. */
-    public static final String PATTERN_SERVICE_PROVIDE_EMITTER = "provide interface=\"org.eclipse.kura.wire.WireEmitter\"";
+    public static final String PATTERN_SERVICE_PROVIDE_EMITTER =
+            "provide interface=\"org.eclipse.kura.wire.WireEmitter\"";
 
     /** The Constant to check if provided interface is Wire Receiver. */
-    public static final String PATTERN_SERVICE_PROVIDE_RECEIVER = "provide interface=\"org.eclipse.kura.wire.WireReceiver\"";
+    public static final String PATTERN_SERVICE_PROVIDE_RECEIVER =
+            "provide interface=\"org.eclipse.kura.wire.WireReceiver\"";
 
     /**
      * The Constant to check if the provided interface is a self configuring
      * component.
      */
-    public static final String PATTERN_SERVICE_PROVIDE_SELF_CONFIGURING_COMP = "provide interface=\""
-            + "org.eclipse.kura.configuration.SelfConfiguringComponent\"";
+    public static final String PATTERN_SERVICE_PROVIDE_SELF_CONFIGURING_COMP =
+            "provide interface=\"" + "org.eclipse.kura.configuration.SelfConfiguringComponent\"";
 
     private static final String DRIVER_PID = "driver.pid";
 
@@ -302,8 +301,10 @@ public final class GwtServerUtil {
             Optional<String[]> current = Optional.empty();
 
             if (currentObjValue instanceof Password[] passwords) {
-                current = Optional.of(Arrays.stream(passwords).map(p -> new String(p.getPassword()))
-                        .collect(Collectors.toList()).toArray(new String[] {}));
+                current = Optional.of(Arrays.stream(passwords)
+                        .map(p -> new String(p.getPassword()))
+                        .collect(Collectors.toList())
+                        .toArray(new String[] {}));
             }
 
             mergeCurrentPasswords(strValues, current);
@@ -363,8 +364,8 @@ public final class GwtServerUtil {
         // No need to instantiate
     }
 
-    public static Map<String, Object> fillPropertiesFromConfiguration(final GwtConfigComponent config,
-            final ComponentConfiguration currentCC) {
+    public static Map<String, Object> fillPropertiesFromConfiguration(
+            final GwtConfigComponent config, final ComponentConfiguration currentCC) {
         // Build the new properties
         final Map<String, Object> properties = new HashMap<>(config.getProperties());
         final ComponentConfiguration backupCC = currentCC;
@@ -379,8 +380,8 @@ public final class GwtServerUtil {
             final Map<String, Object> backupConfigProp = backupCC.getConfigurationProperties();
             for (final GwtConfigParameter gwtConfigParam : config.getParameters()) {
                 final Map<String, Object> currentConfigProp = currentCC.getConfigurationProperties();
-                final Object objValue = getUserDefinedObject(gwtConfigParam,
-                        currentConfigProp.get(gwtConfigParam.getName()));
+                final Object objValue =
+                        getUserDefinedObject(gwtConfigParam, currentConfigProp.get(gwtConfigParam.getName()));
                 if (!isUnsetPasswordValue(gwtConfigParam.getType(), objValue)) {
                     properties.put(gwtConfigParam.getId(), objValue);
                 }
@@ -544,8 +545,8 @@ public final class GwtServerUtil {
         return GwtServerUtil.toGwtConfigComponent(new ComponentConfigurationImpl(pid, ocd, null));
     }
 
-    public static ComponentConfiguration fromGwtConfigComponent(GwtConfigComponent gwtCompConfig,
-            ComponentConfiguration currentCC) {
+    public static ComponentConfiguration fromGwtConfigComponent(
+            GwtConfigComponent gwtCompConfig, ComponentConfiguration currentCC) {
         if (currentCC == null) {
             final ComponentConfigurationImpl result = new ComponentConfigurationImpl();
             result.setPid(gwtCompConfig.getComponentId());
@@ -560,8 +561,8 @@ public final class GwtServerUtil {
             Object objValue;
             Object currentValue = currentConfigProp.get(gwtConfigParam.getId());
 
-            boolean isReadOnly = gwtConfigParam.getMin() != null
-                    && gwtConfigParam.getMin().equals(gwtConfigParam.getMax());
+            boolean isReadOnly =
+                    gwtConfigParam.getMin() != null && gwtConfigParam.getMin().equals(gwtConfigParam.getMax());
             if (isReadOnly) {
                 objValue = currentValue;
             } else {
@@ -616,7 +617,8 @@ public final class GwtServerUtil {
     public static boolean isFactoryOf(final String factoryPid, final Predicate<Set<String>> filter) {
 
         try {
-            return ServiceLocator.applyToServiceOptionally(ServiceComponentRuntime.class,
+            return ServiceLocator.applyToServiceOptionally(
+                    ServiceComponentRuntime.class,
                     scr -> scr.getComponentDescriptionDTOs().stream().anyMatch(c -> {
                         if (!Objects.equals(factoryPid, c.name)) {
                             return false;
@@ -627,7 +629,6 @@ public final class GwtServerUtil {
         } catch (final Exception e) {
             return false;
         }
-
     }
 
     public static boolean isFactoryOfAnyService(final String factoryPid, final Class<?>... interfaces) {
@@ -646,11 +647,12 @@ public final class GwtServerUtil {
             throws GwtKuraException {
 
         try {
-            return ServiceLocator
-                    .applyToServiceOptionally(ServiceComponentRuntime.class,
+            return ServiceLocator.applyToServiceOptionally(
+                            ServiceComponentRuntime.class,
                             scr -> scr.getComponentDescriptionDTOs().stream()
                                     .filter(c -> providedInterfacesMatch(c.serviceInterfaces, filter)))
-                    .map(c -> c.name).collect(Collectors.toSet());
+                    .map(c -> c.name)
+                    .collect(Collectors.toSet());
         } catch (final Exception e) {
             throw new GwtKuraException(GwtKuraErrorCode.INTERNAL_ERROR, e);
         }
@@ -660,8 +662,8 @@ public final class GwtServerUtil {
             throws GwtKuraException {
         final Set<String> names = getServiceProviderComponentNames(filter);
 
-        final Set<String> factoryPids = ServiceLocator.applyToServiceOptionally(ConfigurationService.class,
-                ConfigurationService::getFactoryComponentPids);
+        final Set<String> factoryPids = ServiceLocator.applyToServiceOptionally(
+                ConfigurationService.class, ConfigurationService::getFactoryComponentPids);
 
         names.removeIf(n -> !factoryPids.contains(n));
 
@@ -671,10 +673,12 @@ public final class GwtServerUtil {
     public static List<GwtComponentInstanceInfo> getComponentInstances(final Predicate<Set<String>> filter)
             throws GwtKuraException {
         try {
-            return ServiceLocator.applyToServiceOptionally(ServiceComponentRuntime.class,
+            return ServiceLocator.applyToServiceOptionally(
+                    ServiceComponentRuntime.class,
                     scr -> scr.getComponentDescriptionDTOs().stream()
                             .filter(c -> providedInterfacesMatch(c.serviceInterfaces, filter))
-                            .flatMap(c -> scr.getComponentConfigurationDTOs(c).stream()).map(c -> {
+                            .flatMap(c -> scr.getComponentConfigurationDTOs(c).stream())
+                            .map(c -> {
                                 final Map<String, Object> properties = c.properties;
 
                                 final Object kuraServicePid = properties.get(KURA_SERVICE_PID);
@@ -693,15 +697,16 @@ public final class GwtServerUtil {
                                 }
 
                                 return new GwtComponentInstanceInfo((String) kuraServicePid, factoryPid);
-
-                            }).filter(Objects::nonNull).collect(Collectors.toList()));
+                            })
+                            .filter(Objects::nonNull)
+                            .collect(Collectors.toList()));
         } catch (final Exception e) {
             throw new GwtKuraException(GwtKuraErrorCode.INTERNAL_ERROR, e);
         }
     }
 
-    private static boolean providedInterfacesMatch(final String[] providedInterfaces,
-            final Predicate<Set<String>> filter) {
+    private static boolean providedInterfacesMatch(
+            final String[] providedInterfaces, final Predicate<Set<String>> filter) {
         if (providedInterfaces == null) {
             return filter.test(Collections.emptySet());
         }
@@ -714,7 +719,8 @@ public final class GwtServerUtil {
     }
 
     public static boolean providesService(final String kuraServicePid, final Predicate<Set<String>> filter) {
-        final BundleContext context = FrameworkUtil.getBundle(GwtServerUtil.class).getBundleContext();
+        final BundleContext context =
+                FrameworkUtil.getBundle(GwtServerUtil.class).getBundleContext();
 
         final String pidFilter = "(kura.service.pid=" + kuraServicePid + ")";
 
@@ -733,8 +739,7 @@ public final class GwtServerUtil {
                 if (rawProvidedInterfaces instanceof String providedInterface) {
                     providedInterfaces = Collections.singleton(providedInterface);
                 } else if (rawProvidedInterfaces instanceof String[] strings) {
-                    providedInterfaces = Arrays.asList(strings).stream()
-                            .collect(Collectors.toSet());
+                    providedInterfaces = Arrays.asList(strings).stream().collect(Collectors.toSet());
                 } else {
                     providedInterfaces = Collections.emptySet();
                 }
@@ -751,16 +756,17 @@ public final class GwtServerUtil {
     }
 
     private static ServiceReference<Marshaller>[] getXmlMarshallers() {
-        String filterString = String.format("(&(kura.service.pid=%s))",
-                "org.eclipse.kura.xml.marshaller.unmarshaller.provider");
+        String filterString =
+                String.format("(&(kura.service.pid=%s))", "org.eclipse.kura.xml.marshaller.unmarshaller.provider");
         return ServiceUtil.getServiceReferences(
-                FrameworkUtil.getBundle(DeviceSnapshotsServlet.class).getBundleContext(), Marshaller.class,
+                FrameworkUtil.getBundle(DeviceSnapshotsServlet.class).getBundleContext(),
+                Marshaller.class,
                 filterString);
     }
 
     private static void ungetServiceReferences(final ServiceReference<?>[] refs) {
-        ServiceUtil.ungetServiceReferences(FrameworkUtil.getBundle(DeviceSnapshotsServlet.class).getBundleContext(),
-                refs);
+        ServiceUtil.ungetServiceReferences(
+                FrameworkUtil.getBundle(DeviceSnapshotsServlet.class).getBundleContext(), refs);
     }
 
     private static String marshal(Object object) {
@@ -768,7 +774,8 @@ public final class GwtServerUtil {
         ServiceReference<Marshaller>[] marshallerSRs = getXmlMarshallers();
         try {
             for (final ServiceReference<Marshaller> marshallerSR : marshallerSRs) {
-                Marshaller marshaller = FrameworkUtil.getBundle(DeviceSnapshotsServlet.class).getBundleContext()
+                Marshaller marshaller = FrameworkUtil.getBundle(DeviceSnapshotsServlet.class)
+                        .getBundleContext()
                         .getService(marshallerSR);
                 result = marshaller.marshal(object);
                 if (result != null) {
@@ -783,7 +790,10 @@ public final class GwtServerUtil {
         return result;
     }
 
-    public static void writeXmlSnapshot(HttpServletResponse response, PrintWriter writer, final String filename,
+    public static void writeXmlSnapshot(
+            HttpServletResponse response,
+            PrintWriter writer,
+            final String filename,
             List<ComponentConfiguration> configs) {
         // build a list of configuration which can be marshalled in XML
         List<ComponentConfiguration> configImpls = new ArrayList<>();
@@ -805,7 +815,10 @@ public final class GwtServerUtil {
         writer.write(result);
     }
 
-    public static void writeJsonSnapshot(HttpServletResponse response, PrintWriter writer, final String filename,
+    public static void writeJsonSnapshot(
+            HttpServletResponse response,
+            PrintWriter writer,
+            final String filename,
             List<ComponentConfiguration> configs) {
 
         final ComponentConfigurationList dto = DTOUtil.toComponentConfigurationList(configs, null, false);
@@ -820,8 +833,12 @@ public final class GwtServerUtil {
         gson.toJson(dto, writer);
     }
 
-    public static void writeSnapshot(final HttpServletResponse response, final List<ComponentConfiguration> configs,
-            final String filename, final String format) throws ServletException {
+    public static void writeSnapshot(
+            final HttpServletResponse response,
+            final List<ComponentConfiguration> configs,
+            final String filename,
+            final String format)
+            throws ServletException {
 
         String downloadFormat = format;
 
@@ -848,18 +865,21 @@ public final class GwtServerUtil {
         for (GwtNetInterfaceConfig netConfig : gwtNetworkConfigList) {
             if (netConfig instanceof GwtWifiNetInterfaceConfig wifiConfig) {
                 GwtWifiConfig gwtAPWifiConfig = wifiConfig.getAccessPointWifiConfig();
-                if (gwtAPWifiConfig != null && gwtAPWifiConfig.getPassword() != null
+                if (gwtAPWifiConfig != null
+                        && gwtAPWifiConfig.getPassword() != null
                         && !gwtAPWifiConfig.getPassword().isEmpty()) {
                     gwtAPWifiConfig.setPassword(PASSWORD_PLACEHOLDER);
                 }
 
                 GwtWifiConfig gwtStationWifiConfig = wifiConfig.getStationWifiConfig();
-                if (gwtStationWifiConfig != null && gwtStationWifiConfig.getPassword() != null
+                if (gwtStationWifiConfig != null
+                        && gwtStationWifiConfig.getPassword() != null
                         && !gwtStationWifiConfig.getPassword().isEmpty()) {
                     gwtStationWifiConfig.setPassword(PASSWORD_PLACEHOLDER);
                 }
                 Gwt8021xConfig gwt8021xConfig = wifiConfig.get8021xConfig();
-                if (gwt8021xConfig != null && gwt8021xConfig.getPassword() != null
+                if (gwt8021xConfig != null
+                        && gwt8021xConfig.getPassword() != null
                         && !gwt8021xConfig.getPassword().isEmpty()) {
                     gwt8021xConfig.setPassword(PASSWORD_PLACEHOLDER);
                 }
@@ -874,7 +894,6 @@ public final class GwtServerUtil {
 
     public static GwtPasswordStrenghtRequirements getPasswordStrenghtRequirements() throws GwtKuraException {
         return ServiceLocator.applyToServiceOptionally(PasswordStrengthVerificationService.class, s -> {
-
             final PasswordStrengthRequirements r = s.getPasswordStrengthRequirements();
 
             final GwtPasswordStrenghtRequirements result = new GwtPasswordStrenghtRequirements();
@@ -893,15 +912,15 @@ public final class GwtServerUtil {
     }
 
     public static Optional<String> getPostLoginMessage() throws GwtKuraException {
-        return ServiceLocator.applyToServiceOptionally(LoginBannerService.class,
-                LoginBannerService::getPostLoginBanner);
+        return ServiceLocator.applyToServiceOptionally(
+                LoginBannerService.class, LoginBannerService::getPostLoginBanner);
     }
 
     public static void validateUserPassword(final Optional<String> username, final String password)
             throws GwtKuraException {
 
-        final List<Validator<String>> validators = PasswordStrengthValidators.fromConfig(username,
-                getPasswordStrenghtRequirements());
+        final List<Validator<String>> validators =
+                PasswordStrengthValidators.fromConfig(username, getPasswordStrenghtRequirements());
 
         final List<String> errors = new ArrayList<>();
 
@@ -921,7 +940,6 @@ public final class GwtServerUtil {
 
     public static void fillDriverDefinitions(List<GwtConfigComponent> resultDefinitions) throws GwtKuraException {
         ServiceLocator.applyToServiceOptionally(OCDService.class, ocdService -> {
-
             for (ComponentConfiguration config : ocdService.getServiceProviderOCDs("org.eclipse.kura.driver.Driver")) {
                 final GwtConfigComponent descriptor = GwtServerUtil.toGwtConfigComponent(config);
                 if (descriptor != null) {
@@ -936,18 +954,19 @@ public final class GwtServerUtil {
     public static void fillDriverDescriptors(List<GwtConfigComponent> resultDescriptors) throws GwtKuraException {
 
         ServiceLocator.applyToServiceOptionally(DriverDescriptorService.class, driverDescriptorService -> {
-
             if (driverDescriptorService != null) {
-                driverDescriptorService.listDriverDescriptors().stream().map(GwtServerUtil::toGwtConfigComponent)
-                        .filter(Objects::nonNull).forEach(resultDescriptors::add);
+                driverDescriptorService.listDriverDescriptors().stream()
+                        .map(GwtServerUtil::toGwtConfigComponent)
+                        .filter(Objects::nonNull)
+                        .forEach(resultDescriptors::add);
             }
             return (Void) null;
         });
     }
 
     public static GwtConfigComponent getChannelDescriptor(final String driverPid) throws GwtKuraException {
-        final DriverDescriptorService driverDescriptorService = ServiceLocator.getInstance()
-                .getService(DriverDescriptorService.class);
+        final DriverDescriptorService driverDescriptorService =
+                ServiceLocator.getInstance().getService(DriverDescriptorService.class);
 
         Optional<DriverDescriptor> driverDescriptorOptional = driverDescriptorService.getDriverDescriptor(driverPid);
 

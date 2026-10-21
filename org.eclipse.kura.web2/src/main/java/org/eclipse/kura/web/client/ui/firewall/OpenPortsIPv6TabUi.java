@@ -12,11 +12,22 @@
  *******************************************************************************/
 package org.eclipse.kura.web.client.ui.firewall;
 
+import com.google.gwt.core.client.GWT;
+import com.google.gwt.editor.client.Editor;
+import com.google.gwt.editor.client.EditorError;
+import com.google.gwt.uibinder.client.UiBinder;
+import com.google.gwt.uibinder.client.UiField;
+import com.google.gwt.user.cellview.client.TextColumn;
+import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.google.gwt.user.client.ui.Composite;
+import com.google.gwt.user.client.ui.Widget;
+import com.google.gwt.view.client.ListDataProvider;
+import com.google.gwt.view.client.SingleSelectionModel;
+import com.google.web.bindery.event.shared.HandlerRegistration;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-
 import org.eclipse.kura.web.client.messages.Messages;
 import org.eclipse.kura.web.client.ui.AlertDialog;
 import org.eclipse.kura.web.client.ui.EntryClassUi;
@@ -44,19 +55,6 @@ import org.gwtbootstrap3.client.ui.form.error.BasicEditorError;
 import org.gwtbootstrap3.client.ui.form.validator.Validator;
 import org.gwtbootstrap3.client.ui.gwt.CellTable;
 
-import com.google.gwt.core.client.GWT;
-import com.google.gwt.editor.client.Editor;
-import com.google.gwt.editor.client.EditorError;
-import com.google.gwt.uibinder.client.UiBinder;
-import com.google.gwt.uibinder.client.UiField;
-import com.google.gwt.user.cellview.client.TextColumn;
-import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.google.gwt.user.client.ui.Composite;
-import com.google.gwt.user.client.ui.Widget;
-import com.google.gwt.view.client.ListDataProvider;
-import com.google.gwt.view.client.SingleSelectionModel;
-import com.google.web.bindery.event.shared.HandlerRegistration;
-
 public class OpenPortsIPv6TabUi extends Composite implements Tab, ButtonBar.Listener {
 
     private static final String STATUS_TABLE_ROW = "status-table-row";
@@ -68,8 +66,7 @@ public class OpenPortsIPv6TabUi extends Composite implements Tab, ButtonBar.List
 
     private static final Messages MSGS = GWT.create(Messages.class);
 
-    interface OpenPortsTabUiUiBinder extends UiBinder<Widget, OpenPortsIPv6TabUi> {
-    }
+    interface OpenPortsTabUiUiBinder extends UiBinder<Widget, OpenPortsIPv6TabUi> {}
 
     private final ListDataProvider<GwtFirewallOpenPortEntry> openPortsDataProvider = new ListDataProvider<>();
     private final SingleSelectionModel<GwtFirewallOpenPortEntry> selectionModel = new SingleSelectionModel<>();
@@ -82,6 +79,7 @@ public class OpenPortsIPv6TabUi extends Composite implements Tab, ButtonBar.List
 
     @UiField
     ButtonBar buttonBar;
+
     @UiField
     Alert notification;
 
@@ -93,67 +91,91 @@ public class OpenPortsIPv6TabUi extends Composite implements Tab, ButtonBar.List
 
     @UiField
     FormGroup groupPort;
+
     @UiField
     FormGroup groupPermittedNw;
+
     @UiField
     FormGroup groupPermittedI;
+
     @UiField
     FormGroup groupUnpermittedI;
+
     @UiField
     FormGroup groupPermittedMac;
+
     @UiField
     FormGroup groupSource;
 
     @UiField
     FormLabel labelPort;
+
     @UiField
     FormLabel labelProtocol;
+
     @UiField
     FormLabel labelPermitttedNw;
+
     @UiField
     FormLabel labelPermitttedI;
+
     @UiField
     FormLabel labelUnPermitttedI;
+
     @UiField
     FormLabel labelPermitttedMac;
+
     @UiField
     FormLabel labelSource;
 
     @UiField
     TextBox port;
+
     @UiField
     TextBox permittedNw;
+
     @UiField
     TextBox permittedI;
+
     @UiField
     TextBox unpermittedI;
+
     @UiField
     TextBox permittedMac;
+
     @UiField
     TextBox source;
 
     @UiField
     Tooltip tooltipPort;
+
     @UiField
     Tooltip tooltipProtocol;
+
     @UiField
     Tooltip tooltipPermittedNw;
+
     @UiField
     Tooltip tooltipPermittedI;
+
     @UiField
     Tooltip tooltipUnpermittedI;
+
     @UiField
     Tooltip tooltipPermittedMac;
+
     @UiField
     Tooltip tooltipSource;
 
     @UiField
     Button submit;
+
     @UiField
     Button cancel;
 
     @UiField
     Modal existingRule;
+
     @UiField
     Button close;
 
@@ -167,8 +189,9 @@ public class OpenPortsIPv6TabUi extends Composite implements Tab, ButtonBar.List
 
     public OpenPortsIPv6TabUi() {
         initWidget(uiBinder.createAndBindUi(this));
-        this.selectionModel.addSelectionChangeHandler(event -> OpenPortsIPv6TabUi.this.buttonBar
-                .setEditDeleteButtonsDirty(OpenPortsIPv6TabUi.this.selectionModel.getSelectedObject() != null));
+        this.selectionModel.addSelectionChangeHandler(
+                event -> OpenPortsIPv6TabUi.this.buttonBar.setEditDeleteButtonsDirty(
+                        OpenPortsIPv6TabUi.this.selectionModel.getSelectedObject() != null));
         this.openPortsGrid.setSelectionModel(this.selectionModel);
 
         initTable();
@@ -205,20 +228,27 @@ public class OpenPortsIPv6TabUi extends Composite implements Tab, ButtonBar.List
             @Override
             public void onSuccess(GwtXSRFToken token) {
                 OpenPortsIPv6TabUi.this.setDirty(false);
-                OpenPortsIPv6TabUi.this.gwtNetworkService.findDeviceFirewallOpenPortsIPv6(token,
-                        new AsyncCallback<List<GwtFirewallOpenPortEntry>>() {
+                OpenPortsIPv6TabUi.this.gwtNetworkService.findDeviceFirewallOpenPortsIPv6(
+                        token, new AsyncCallback<List<GwtFirewallOpenPortEntry>>() {
 
                             @Override
                             public void onFailure(Throwable caught) {
                                 EntryClassUi.hideWaitModal();
-                                FailureHandler.handle(caught,
-                                        OpenPortsIPv6TabUi.this.gwtNetworkService.getClass().getSimpleName());
+                                FailureHandler.handle(
+                                        caught,
+                                        OpenPortsIPv6TabUi.this
+                                                .gwtNetworkService
+                                                .getClass()
+                                                .getSimpleName());
                             }
 
                             @Override
                             public void onSuccess(List<GwtFirewallOpenPortEntry> result) {
                                 for (GwtFirewallOpenPortEntry pair : result) {
-                                    OpenPortsIPv6TabUi.this.openPortsDataProvider.getList().add(pair);
+                                    OpenPortsIPv6TabUi.this
+                                            .openPortsDataProvider
+                                            .getList()
+                                            .add(pair);
                                 }
                                 refreshTable();
                                 setVisibility();
@@ -226,9 +256,7 @@ public class OpenPortsIPv6TabUi extends Composite implements Tab, ButtonBar.List
                             }
                         });
             }
-
         });
-
     }
 
     @Override
@@ -384,19 +412,24 @@ public class OpenPortsIPv6TabUi extends Composite implements Tab, ButtonBar.List
             @Override
             public void onFailure(Throwable ex) {
                 EntryClassUi.hideWaitModal();
-                FailureHandler.handle(ex, OpenPortsIPv6TabUi.this.gwtXSRFService.getClass().getName());
+                FailureHandler.handle(
+                        ex, OpenPortsIPv6TabUi.this.gwtXSRFService.getClass().getName());
             }
 
             @Override
             public void onSuccess(GwtXSRFToken token) {
-                OpenPortsIPv6TabUi.this.gwtNetworkService.updateDeviceFirewallOpenPortsIPv6(token, updatedOpenPortConf,
-                        new AsyncCallback<Void>() {
+                OpenPortsIPv6TabUi.this.gwtNetworkService.updateDeviceFirewallOpenPortsIPv6(
+                        token, updatedOpenPortConf, new AsyncCallback<Void>() {
 
                             @Override
                             public void onFailure(Throwable caught) {
                                 EntryClassUi.hideWaitModal();
-                                FailureHandler.handle(caught,
-                                        OpenPortsIPv6TabUi.this.gwtNetworkService.getClass().getSimpleName());
+                                FailureHandler.handle(
+                                        caught,
+                                        OpenPortsIPv6TabUi.this
+                                                .gwtNetworkService
+                                                .getClass()
+                                                .getSimpleName());
                             }
 
                             @Override
@@ -408,7 +441,6 @@ public class OpenPortsIPv6TabUi extends Composite implements Tab, ButtonBar.List
                         });
             }
         });
-
     }
 
     @Override
@@ -421,10 +453,14 @@ public class OpenPortsIPv6TabUi extends Composite implements Tab, ButtonBar.List
         replaceModalHideHandler(evt -> {
             if (OpenPortsIPv6TabUi.this.newOpenPortEntry != null) {
                 // Avoid duplicates
-                OpenPortsIPv6TabUi.this.openPortsDataProvider.getList()
+                OpenPortsIPv6TabUi.this
+                        .openPortsDataProvider
+                        .getList()
                         .remove(OpenPortsIPv6TabUi.this.newOpenPortEntry);
                 if (!duplicateEntry(OpenPortsIPv6TabUi.this.newOpenPortEntry)) {
-                    OpenPortsIPv6TabUi.this.openPortsDataProvider.getList()
+                    OpenPortsIPv6TabUi.this
+                            .openPortsDataProvider
+                            .getList()
                             .add(OpenPortsIPv6TabUi.this.newOpenPortEntry);
                     setVisibility();
                     refreshTable();
@@ -452,7 +488,9 @@ public class OpenPortsIPv6TabUi extends Composite implements Tab, ButtonBar.List
                 OpenPortsIPv6TabUi.this.openPortsDataProvider.getList().remove(oldEntry);
                 refreshTable();
                 if (!duplicateEntry(OpenPortsIPv6TabUi.this.editOpenPortEntry)) {
-                    OpenPortsIPv6TabUi.this.openPortsDataProvider.getList()
+                    OpenPortsIPv6TabUi.this
+                            .openPortsDataProvider
+                            .getList()
                             .add(OpenPortsIPv6TabUi.this.editOpenPortEntry);
                     OpenPortsIPv6TabUi.this.openPortsDataProvider.flush();
                     OpenPortsIPv6TabUi.this.buttonBar.setApplyResetButtonsDirty(true);
@@ -469,8 +507,8 @@ public class OpenPortsIPv6TabUi extends Composite implements Tab, ButtonBar.List
             }
             resetFields();
         });
-        final AlertDialog.ConfirmListener listener = () -> showModal(
-                OpenPortsIPv6TabUi.this.selectionModel.getSelectedObject());
+        final AlertDialog.ConfirmListener listener =
+                () -> showModal(OpenPortsIPv6TabUi.this.selectionModel.getSelectedObject());
         if (selection.getPortRange().equals("22")) {
             // show warning
             OpenPortsIPv6TabUi.this.alertDialog.show(MSGS.firewallOpenPorts22(), listener);
@@ -480,15 +518,14 @@ public class OpenPortsIPv6TabUi extends Composite implements Tab, ButtonBar.List
         } else {
             showModal(selection);
         }
-
     }
 
     @Override
     public void onDelete() {
         GwtFirewallOpenPortEntry selection = OpenPortsIPv6TabUi.this.selectionModel.getSelectedObject();
         if (selection != null) {
-            OpenPortsIPv6TabUi.this.alertDialog
-                    .show(MSGS.firewallOpenPortDeleteConfirmation(String.valueOf(selection.getPortRange())), () -> {
+            OpenPortsIPv6TabUi.this.alertDialog.show(
+                    MSGS.firewallOpenPortDeleteConfirmation(String.valueOf(selection.getPortRange())), () -> {
                         OpenPortsIPv6TabUi.this.openPortsDataProvider.getList().remove(selection);
                         OpenPortsIPv6TabUi.this.buttonBar.setApplyResetButtonsDirty(true);
                         OpenPortsIPv6TabUi.this.buttonBar.setEditDeleteButtonsDirty(false);
@@ -510,7 +547,6 @@ public class OpenPortsIPv6TabUi extends Composite implements Tab, ButtonBar.List
 
         this.submit.setText(MSGS.submitButton());
         this.submit.addClickHandler(event -> {
-
             if (!checkEntries()) {
                 return;
             }
@@ -524,7 +560,8 @@ public class OpenPortsIPv6TabUi extends Composite implements Tab, ButtonBar.List
             this.openPortEntry.setPermittedInterfaceName(validOrDefault(this.permittedI.getText(), null));
             this.openPortEntry.setUnpermittedInterfaceName(validOrDefault(this.unpermittedI.getText(), null));
             this.openPortEntry.setPermittedMAC(validOrDefault(this.permittedMac.getText(), null));
-            this.openPortEntry.setSourcePortRange(validOrDefault(this.source.getText().trim(), null));
+            this.openPortEntry.setSourcePortRange(
+                    validOrDefault(this.source.getText().trim(), null));
 
             if (OpenPortsIPv6TabUi.this.submit.getId().equals("new")) {
                 OpenPortsIPv6TabUi.this.newOpenPortEntry = OpenPortsIPv6TabUi.this.openPortEntry;
@@ -631,11 +668,20 @@ public class OpenPortsIPv6TabUi extends Composite implements Tab, ButtonBar.List
             @Override
             public List<EditorError> validate(Editor<String> editor, String value) {
                 List<EditorError> result = new ArrayList<>();
-                if (OpenPortsIPv6TabUi.this.source.getText().trim().length() > 0 && (!(FirewallPanelUtils
-                        .checkPortRegex(OpenPortsIPv6TabUi.this.source.getText().trim())
-                        || FirewallPanelUtils.checkPortRangeRegex(OpenPortsIPv6TabUi.this.source.getText().trim()))
-                        || !FirewallPanelUtils.isPortInRange(OpenPortsIPv6TabUi.this.source.getText().trim()))) {
-                    result.add(new BasicEditorError(OpenPortsIPv6TabUi.this.source, value,
+                if (OpenPortsIPv6TabUi.this.source.getText().trim().length() > 0
+                        && (!(FirewallPanelUtils.checkPortRegex(OpenPortsIPv6TabUi.this
+                                                .source
+                                                .getText()
+                                                .trim())
+                                        || FirewallPanelUtils.checkPortRangeRegex(OpenPortsIPv6TabUi.this
+                                                .source
+                                                .getText()
+                                                .trim()))
+                                || !FirewallPanelUtils.isPortInRange(
+                                        OpenPortsIPv6TabUi.this.source.getText().trim()))) {
+                    result.add(new BasicEditorError(
+                            OpenPortsIPv6TabUi.this.source,
+                            value,
                             MSGS.firewallOpenPortFormSourcePortRangeErrorMessage()));
                 }
                 return result;
@@ -656,7 +702,9 @@ public class OpenPortsIPv6TabUi extends Composite implements Tab, ButtonBar.List
                 List<EditorError> result = new ArrayList<>();
                 if (!OpenPortsIPv6TabUi.this.permittedMac.getText().trim().matches(FieldType.MAC_ADDRESS.getRegex())
                         && OpenPortsIPv6TabUi.this.permittedMac.getText().trim().length() > 0) {
-                    result.add(new BasicEditorError(OpenPortsIPv6TabUi.this.permittedMac, value,
+                    result.add(new BasicEditorError(
+                            OpenPortsIPv6TabUi.this.permittedMac,
+                            value,
                             MSGS.firewallOpenPortFormPermittedMacAddressErrorMessage()));
                 }
                 return result;
@@ -676,10 +724,17 @@ public class OpenPortsIPv6TabUi extends Composite implements Tab, ButtonBar.List
             public List<EditorError> validate(Editor<String> editor, String value) {
                 List<EditorError> result = new ArrayList<>();
                 if (!OpenPortsIPv6TabUi.this.unpermittedI.getText().trim().matches(FieldType.ALPHANUMERIC.getRegex())
-                        && OpenPortsIPv6TabUi.this.unpermittedI.getText().trim().length() > 0
-                        || OpenPortsIPv6TabUi.this.unpermittedI.getText().trim()
-                                .length() > FirewallPanelUtils.INTERFACE_NAME_MAX_LENGTH) {
-                    result.add(new BasicEditorError(OpenPortsIPv6TabUi.this.unpermittedI, value,
+                                && OpenPortsIPv6TabUi.this
+                                                .unpermittedI
+                                                .getText()
+                                                .trim()
+                                                .length()
+                                        > 0
+                        || OpenPortsIPv6TabUi.this.unpermittedI.getText().trim().length()
+                                > FirewallPanelUtils.INTERFACE_NAME_MAX_LENGTH) {
+                    result.add(new BasicEditorError(
+                            OpenPortsIPv6TabUi.this.unpermittedI,
+                            value,
                             MSGS.firewallOpenPortFormUnpermittedInterfaceErrorMessage()));
                 }
                 return result;
@@ -699,10 +754,17 @@ public class OpenPortsIPv6TabUi extends Composite implements Tab, ButtonBar.List
             public List<EditorError> validate(Editor<String> editor, String value) {
                 List<EditorError> result = new ArrayList<>();
                 if (!OpenPortsIPv6TabUi.this.permittedI.getText().trim().matches(FieldType.ALPHANUMERIC.getRegex())
-                        && OpenPortsIPv6TabUi.this.permittedI.getText().trim().length() > 0
-                        || OpenPortsIPv6TabUi.this.permittedI.getText().trim()
-                                .length() > FirewallPanelUtils.INTERFACE_NAME_MAX_LENGTH) {
-                    result.add(new BasicEditorError(OpenPortsIPv6TabUi.this.permittedI, value,
+                                && OpenPortsIPv6TabUi.this
+                                                .permittedI
+                                                .getText()
+                                                .trim()
+                                                .length()
+                                        > 0
+                        || OpenPortsIPv6TabUi.this.permittedI.getText().trim().length()
+                                > FirewallPanelUtils.INTERFACE_NAME_MAX_LENGTH) {
+                    result.add(new BasicEditorError(
+                            OpenPortsIPv6TabUi.this.permittedI,
+                            value,
                             MSGS.firewallOpenPortFormPermittedInterfaceErrorMessage()));
                 }
                 return result;
@@ -721,9 +783,15 @@ public class OpenPortsIPv6TabUi extends Composite implements Tab, ButtonBar.List
             @Override
             public List<EditorError> validate(Editor<String> editor, String value) {
                 List<EditorError> result = new ArrayList<>();
-                if (!OpenPortsIPv6TabUi.this.permittedNw.getText().trim().matches(FieldType.IPV6_CIDR_NOTATION.getRegex())
+                if (!OpenPortsIPv6TabUi.this
+                                .permittedNw
+                                .getText()
+                                .trim()
+                                .matches(FieldType.IPV6_CIDR_NOTATION.getRegex())
                         && OpenPortsIPv6TabUi.this.permittedNw.getText().trim().length() > 0) {
-                    result.add(new BasicEditorError(OpenPortsIPv6TabUi.this.permittedNw, value,
+                    result.add(new BasicEditorError(
+                            OpenPortsIPv6TabUi.this.permittedNw,
+                            value,
                             MSGS.firewallOpenPortFormPermittedNetworkIPv6ErrorMessage()));
                 }
                 return result;
@@ -745,12 +813,14 @@ public class OpenPortsIPv6TabUi extends Composite implements Tab, ButtonBar.List
                 if (OpenPortsIPv6TabUi.this.port.getText() == null
                         || "".equals(OpenPortsIPv6TabUi.this.port.getText().trim())
                         || OpenPortsIPv6TabUi.this.port.getText().trim().length() == 0
-                        || !(FirewallPanelUtils.checkPortRegex(OpenPortsIPv6TabUi.this.port.getText().trim())
-                                || FirewallPanelUtils
-                                        .checkPortRangeRegex(OpenPortsIPv6TabUi.this.port.getText().trim()))
-                        || !FirewallPanelUtils.isPortInRange(OpenPortsIPv6TabUi.this.port.getText().trim())) {
-                    result.add(new BasicEditorError(OpenPortsIPv6TabUi.this.port, value,
-                            MSGS.firewallOpenPortFormPortErrorMessage()));
+                        || !(FirewallPanelUtils.checkPortRegex(
+                                        OpenPortsIPv6TabUi.this.port.getText().trim())
+                                || FirewallPanelUtils.checkPortRangeRegex(
+                                        OpenPortsIPv6TabUi.this.port.getText().trim()))
+                        || !FirewallPanelUtils.isPortInRange(
+                                OpenPortsIPv6TabUi.this.port.getText().trim())) {
+                    result.add(new BasicEditorError(
+                            OpenPortsIPv6TabUi.this.port, value, MSGS.firewallOpenPortFormPortErrorMessage()));
                 }
                 return result;
             }
@@ -879,7 +949,8 @@ public class OpenPortsIPv6TabUi extends Composite implements Tab, ButtonBar.List
     private boolean checkEntries() {
         boolean valid = true;
 
-        if (this.groupPort.getValidationState() == ValidationState.ERROR || this.port.getText() == null
+        if (this.groupPort.getValidationState() == ValidationState.ERROR
+                || this.port.getText() == null
                 || "".equals(this.port.getText().trim())) {
             this.groupPort.setValidationState(ValidationState.ERROR);
             valid = false;
@@ -895,5 +966,4 @@ public class OpenPortsIPv6TabUi extends Composite implements Tab, ButtonBar.List
 
         return valid;
     }
-
 }

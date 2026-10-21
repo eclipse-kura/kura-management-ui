@@ -12,20 +12,18 @@
  *******************************************************************************/
 package org.eclipse.kura.web.client.ui;
 
+import com.google.gwt.editor.client.Editor;
+import com.google.gwt.editor.client.EditorError;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
-
 import org.eclipse.kura.web.client.ui.validator.GwtValidators;
 import org.eclipse.kura.web.shared.model.GwtPasswordStrenghtRequirements;
 import org.gwtbootstrap3.client.ui.Input;
 import org.gwtbootstrap3.client.ui.constants.InputType;
 import org.gwtbootstrap3.client.ui.form.validator.Validator;
-
-import com.google.gwt.editor.client.Editor;
-import com.google.gwt.editor.client.EditorError;
 
 public class NewPasswordInput extends Input {
 
@@ -62,7 +60,8 @@ public class NewPasswordInput extends Input {
         });
     }
 
-    public void setValidatorsFrom(final Optional<String> identityName, final GwtPasswordStrenghtRequirements userOptions) {
+    public void setValidatorsFrom(
+            final Optional<String> identityName, final GwtPasswordStrenghtRequirements userOptions) {
         this.validators.clear();
 
         for (final Validator<String> validator : GwtValidators.newPassword(identityName, userOptions)) {
@@ -84,7 +83,8 @@ public class NewPasswordInput extends Input {
 
     @Override
     public InputType getType() {
-        if (getElement().getAttribute(TYPE) == null || getElement().getAttribute(TYPE).isEmpty()) {
+        if (getElement().getAttribute(TYPE) == null
+                || getElement().getAttribute(TYPE).isEmpty()) {
             return null;
         }
         return InputType.valueOf(getElement().getAttribute(TYPE).toUpperCase());

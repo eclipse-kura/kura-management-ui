@@ -1,30 +1,26 @@
 /*******************************************************************************
  * Copyright (c) 2018, 2020 Eurotech and/or its affiliates and others
- * 
+ *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
  * which is available at https://www.eclipse.org/legal/epl-2.0/
- * 
+ *
  * SPDX-License-Identifier: EPL-2.0
- * 
+ *
  * Contributors:
  *  Eurotech
  *******************************************************************************/
-
 package org.eclipse.kura.web.client.ui.wires.composer;
-
-import java.util.List;
 
 import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.dom.client.Element;
+import java.util.List;
 
 public final class WireComposer extends JavaScriptObject {
 
-    protected WireComposer() {
-    }
+    protected WireComposer() {}
 
-    public static native WireComposer create(Element target)
-    /*-{
+    public static native WireComposer create(Element target) /*-{
         var self = new parent.window.WireComposer(target)
         self.dispatchWireCreated = function (wire) {
             this.isDirty = true
@@ -89,33 +85,27 @@ public final class WireComposer extends JavaScriptObject {
         return self
     }-*/;
 
-    public native void addWireComponent(WireComponent component)
-    /*-{
+    public native void addWireComponent(WireComponent component) /*-{
         this.addWireComponent(component)
     }-*/;
 
-    public native WireComponent getSelectedWireComponent()
-    /*-{
+    public native WireComponent getSelectedWireComponent() /*-{
         return this.getSelectedWireComponent()
     }-*/;
 
-    public native void deselectWireCompoent()
-    /*-{
+    public native void deselectWireCompoent() /*-{
         return this.deselectWireComponent()
     }-*/;
 
-    public native void deleteWireComponent(WireComponent component)
-    /*-{
+    public native void deleteWireComponent(WireComponent component) /*-{
         this.deleteWireComponent(component)
     }-*/;
 
-    public native void addWire(Wire wire)
-    /*-{
+    public native void addWire(Wire wire) /*-{
         this.addWire(wire)
     }-*/;
 
-    public native WireComponent getWireComponent(String pid)
-    /*-{
+    public native WireComponent getWireComponent(String pid) /*-{
         var result = null
         this.forEachWireComponent(function (component) {
             if (pid === component.pid) {
@@ -125,8 +115,7 @@ public final class WireComposer extends JavaScriptObject {
         return result
     }-*/;
 
-    public native List<WireComponent> getWireComponents()
-    /*-{
+    public native List<WireComponent> getWireComponents() /*-{
         var result = @java.util.ArrayList::new()()
         this.forEachWireComponent(function (component) {
             result.@java.util.ArrayList::add(Ljava/lang/Object;)(component)
@@ -134,8 +123,7 @@ public final class WireComposer extends JavaScriptObject {
         return result
     }-*/;
 
-    public native List<Wire> getWires()
-    /*-{
+    public native List<Wire> getWires() /*-{
         var result = @java.util.ArrayList::new()()
         this.forEachWire(function (wire) {
             result.@java.util.ArrayList::add(Ljava/lang/Object;)(wire)
@@ -143,48 +131,39 @@ public final class WireComposer extends JavaScriptObject {
         return result
     }-*/;
 
-    public native int getWireComponentCount()
-    /*-{
+    public native int getWireComponentCount() /*-{
         return this.getWireComponentCount()
     }-*/;
 
-    public native int getWireCount()
-    /*-{
+    public native int getWireCount() /*-{
         return this.getWireCount()
     }-*/;
 
-    public native void zoomIn()
-    /*-{
+    public native void zoomIn() /*-{
         this.zoomIn()
     }-*/;
 
-    public native void zoomOut()
-    /*-{
+    public native void zoomOut() /*-{
         this.zoomOut()
     }-*/;
 
-    public native void clear()
-    /*-{
+    public native void clear() /*-{
         this.clear()
     }-*/;
 
-    public native boolean isDirty()
-    /*-{
+    public native boolean isDirty() /*-{
         return this.isDirty
     }-*/;
 
-    public native void clearDirtyState()
-    /*-{
+    public native void clearDirtyState() /*-{
         this.isDirty = false;
     }-*/;
 
-    public native void fitContent(boolean transition)
-    /*-{
+    public native void fitContent(boolean transition) /*-{
         this.fitContent(transition)
     }-*/;
 
-    public native void setListener(Listener listener)
-    /*-{
+    public native void setListener(Listener listener) /*-{
         this.listener = listener
     }-*/;
 

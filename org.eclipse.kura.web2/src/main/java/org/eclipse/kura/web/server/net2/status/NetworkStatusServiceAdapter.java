@@ -21,7 +21,6 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
-
 import org.eclipse.kura.KuraException;
 import org.eclipse.kura.core.net.util.NetworkUtil;
 import org.eclipse.kura.core.util.NetUtil;
@@ -84,7 +83,6 @@ public class NetworkStatusServiceAdapter {
             setWifiStateProperties(gwtConfigToUpdate, networkInterfaceInfo.get());
             setModemStateProperties(gwtConfigToUpdate, networkInterfaceInfo.get());
         }
-
     }
 
     public Optional<NetworkInterfaceType> getNetInterfaceType(String ifName) throws KuraException {
@@ -107,8 +105,8 @@ public class NetworkStatusServiceAdapter {
         List<GwtWifiChannelFrequency> gwtChannels = new ArrayList<>();
 
         for (WifiChannel channel : channels) {
-            GwtWifiChannelFrequency gwtChannel = new GwtWifiChannelFrequency(channel.getChannel(),
-                    channel.getFrequency());
+            GwtWifiChannelFrequency gwtChannel =
+                    new GwtWifiChannelFrequency(channel.getChannel(), channel.getFrequency());
 
             Optional<Boolean> isDisabled = channel.getDisabled();
             Optional<Boolean> isNoInitiatingRadiation = channel.getNoInitiatingRadiation();
@@ -136,8 +134,8 @@ public class NetworkStatusServiceAdapter {
         List<String> interfaceNames = this.networkStatusService.getInterfaceIds();
         for (String interfaceName : interfaceNames) {
             try {
-                Optional<NetworkInterfaceStatus> ifaceStatus = this.networkStatusService
-                        .getNetworkStatus(interfaceName);
+                Optional<NetworkInterfaceStatus> ifaceStatus =
+                        this.networkStatusService.getNetworkStatus(interfaceName);
                 if (ifaceStatus.isPresent() && ifaceStatus.get() instanceof WifiInterfaceStatus wifiStatus) {
                     return wifiStatus.getCountryCode();
                 }
@@ -152,8 +150,8 @@ public class NetworkStatusServiceAdapter {
     public List<GwtWifiHotspotEntry> findWifiHotspots(String interfaceName, boolean recompute) throws KuraException {
         List<GwtWifiHotspotEntry> result = new ArrayList<>();
 
-        Optional<NetworkInterfaceStatus> ifStatus = this.networkStatusService.getNetworkStatus(interfaceName,
-                recompute);
+        Optional<NetworkInterfaceStatus> ifStatus =
+                this.networkStatusService.getNetworkStatus(interfaceName, recompute);
 
         if (ifStatus.isPresent() && ifStatus.get() instanceof WifiInterfaceStatus wifiStatus) {
 
@@ -182,8 +180,8 @@ public class NetworkStatusServiceAdapter {
     }
 
     @SuppressWarnings("restriction")
-    private void setCommonStateProperties(GwtNetInterfaceConfig gwtConfig,
-            NetworkInterfaceStatus networkInterfaceStatus) {
+    private void setCommonStateProperties(
+            GwtNetInterfaceConfig gwtConfig, NetworkInterfaceStatus networkInterfaceStatus) {
 
         gwtConfig.setName(networkInterfaceStatus.getInterfaceId());
         gwtConfig.setInterfaceName(networkInterfaceStatus.getInterfaceName());
@@ -197,8 +195,8 @@ public class NetworkStatusServiceAdapter {
         gwtConfig.setHwMTU(networkInterfaceStatus.getMtu());
     }
 
-    private void setIpv4DhcpClientProperties(GwtNetInterfaceConfig gwtConfig,
-            NetworkInterfaceStatus networkInterfaceInfo) {
+    private void setIpv4DhcpClientProperties(
+            GwtNetInterfaceConfig gwtConfig, NetworkInterfaceStatus networkInterfaceInfo) {
 
         String ipConfigMode = gwtConfig.getConfigMode();
         if (isDhcpClient(ipConfigMode)) {
@@ -208,12 +206,14 @@ public class NetworkStatusServiceAdapter {
              */
             networkInterfaceInfo.getInterfaceIp4Addresses().ifPresent(address -> {
                 if (!address.getAddresses().isEmpty()) {
-                    NetworkInterfaceIpAddress<IP4Address> firstAddress = address.getAddresses().get(0);
+                    NetworkInterfaceIpAddress<IP4Address> firstAddress =
+                            address.getAddresses().get(0);
                     gwtConfig.setIpAddress(firstAddress.getAddress().getHostAddress());
                     gwtConfig.setSubnetMask(NetworkUtil.getNetmaskStringForm(firstAddress.getPrefix()));
                 }
 
-                String gatewayAddress = address.getGateway().isPresent() ? address.getGateway().get().getHostAddress()
+                String gatewayAddress = address.getGateway().isPresent()
+                        ? address.getGateway().get().getHostAddress()
                         : EMPTY_STRING;
                 gwtConfig.setGateway(gatewayAddress);
 
@@ -236,12 +236,14 @@ public class NetworkStatusServiceAdapter {
              */
             networkInterfaceInfo.getInterfaceIp6Addresses().ifPresent(address -> {
                 if (!address.getAddresses().isEmpty()) {
-                    NetworkInterfaceIpAddress<IP6Address> firstAddress = address.getAddresses().get(0);
+                    NetworkInterfaceIpAddress<IP6Address> firstAddress =
+                            address.getAddresses().get(0);
                     gwtConfig.setIpv6Address(firstAddress.getAddress().getHostAddress());
                     gwtConfig.setIpv6SubnetMask((int) firstAddress.getPrefix());
                 }
 
-                String gatewayAddress = address.getGateway().isPresent() ? address.getGateway().get().getHostAddress()
+                String gatewayAddress = address.getGateway().isPresent()
+                        ? address.getGateway().get().getHostAddress()
                         : EMPTY_STRING;
                 gwtConfig.setIpv6Gateway(gatewayAddress);
 
@@ -266,7 +268,8 @@ public class NetworkStatusServiceAdapter {
     }
 
     private void setModemStateProperties(GwtNetInterfaceConfig gwtConfig, NetworkInterfaceStatus networkInterfaceInfo) {
-        if (gwtConfig instanceof GwtModemInterfaceConfig gwtModemConfig && networkInterfaceInfo instanceof ModemInterfaceStatus modemInterfaceInfo) {
+        if (gwtConfig instanceof GwtModemInterfaceConfig gwtModemConfig
+                && networkInterfaceInfo instanceof ModemInterfaceStatus modemInterfaceInfo) {
             Sim activeSim = null;
 
             List<Sim> availableSims = modemInterfaceInfo.getAvailableSims();
@@ -281,7 +284,8 @@ public class NetworkStatusServiceAdapter {
             gwtModemConfig.setHwRssi(String.valueOf(modemInterfaceInfo.getSignalStrength()));
             gwtModemConfig.setHwICCID(activeSim != null ? activeSim.getIccid() : "NA");
             gwtModemConfig.setHwIMSI(activeSim != null ? activeSim.getImsi() : "NA");
-            gwtModemConfig.setHwRegistration(modemInterfaceInfo.getRegistrationStatus().toString());
+            gwtModemConfig.setHwRegistration(
+                    modemInterfaceInfo.getRegistrationStatus().toString());
             gwtModemConfig.setHwNetwork(modemInterfaceInfo.getOperatorName());
             gwtModemConfig.setHwRadio(getModemAccessTechnologies(modemInterfaceInfo));
             gwtModemConfig.setHwBand(getModemBands(modemInterfaceInfo));
@@ -289,12 +293,15 @@ public class NetworkStatusServiceAdapter {
             gwtModemConfig.setManufacturer(ellipsis(modemInterfaceInfo.getManufacturer(), 20));
             gwtModemConfig.setModemId(modemInterfaceInfo.getModel());
             gwtModemConfig.setGpsSupported(modemInterfaceInfo.isGpsSupported());
-            gwtModemConfig.setSupportedGpsModes(
-                    modemInterfaceInfo.getSupporteGpsModes().stream().map(Enum::name).collect(Collectors.toList()));
+            gwtModemConfig.setSupportedGpsModes(modemInterfaceInfo.getSupporteGpsModes().stream()
+                    .map(Enum::name)
+                    .collect(Collectors.toList()));
             gwtModemConfig.setHwFirmware(modemInterfaceInfo.getFirmwareVersion());
-            gwtModemConfig.setConnectionType(modemInterfaceInfo.getConnectionType().toString());
-            gwtModemConfig.setNetworkTechnology(
-                    modemInterfaceInfo.getAccessTechnologies().stream().map(Enum::name).collect(Collectors.toList()));
+            gwtModemConfig.setConnectionType(
+                    modemInterfaceInfo.getConnectionType().toString());
+            gwtModemConfig.setNetworkTechnology(modemInterfaceInfo.getAccessTechnologies().stream()
+                    .map(Enum::name)
+                    .collect(Collectors.toList()));
             gwtModemConfig.setHwRssi(String.valueOf(modemInterfaceInfo.getSignalStrength()));
 
             // this is a duplication because the GwtModemInterfaceConfig is poorly designed
@@ -306,7 +313,9 @@ public class NetworkStatusServiceAdapter {
 
     private String getModemAccessTechnologies(ModemInterfaceStatus modemInterfaceInfo) {
         StringBuilder sb = new StringBuilder();
-        modemInterfaceInfo.getAccessTechnologies().forEach(accessTechnology -> sb.append(accessTechnology).append(","));
+        modemInterfaceInfo
+                .getAccessTechnologies()
+                .forEach(accessTechnology -> sb.append(accessTechnology).append(","));
         return sb.toString().substring(0, sb.toString().length() - 1);
     }
 
@@ -324,8 +333,8 @@ public class NetworkStatusServiceAdapter {
         }
     }
 
-    private void setWifiStateProperties(GwtNetInterfaceConfig gwtNetInterfaceConfig,
-            NetworkInterfaceStatus networkInterfaceInfo) {
+    private void setWifiStateProperties(
+            GwtNetInterfaceConfig gwtNetInterfaceConfig, NetworkInterfaceStatus networkInterfaceInfo) {
         if (gwtNetInterfaceConfig instanceof GwtWifiNetInterfaceConfig gwtWifiNetInterfaceConfig
                 && networkInterfaceInfo instanceof WifiInterfaceStatus wifiInterfaceInfo) {
             gwtWifiNetInterfaceConfig.setHwState(wifiInterfaceInfo.getState().toString());
@@ -334,14 +343,17 @@ public class NetworkStatusServiceAdapter {
         }
     }
 
-    private void setWifiSpecificStateProperties(WifiMode wifiMode, GwtWifiNetInterfaceConfig gwtWifiNetInterfaceConfig,
+    private void setWifiSpecificStateProperties(
+            WifiMode wifiMode,
+            GwtWifiNetInterfaceConfig gwtWifiNetInterfaceConfig,
             WifiInterfaceStatus wifiInterfaceInfo) {
 
         GwtWifiConfig gwtConfig;
 
         if (wifiMode.equals(WifiMode.INFRA)) {
             AtomicReference<String> rssi = new AtomicReference<>("N/A");
-            wifiInterfaceInfo.getActiveWifiAccessPoint()
+            wifiInterfaceInfo
+                    .getActiveWifiAccessPoint()
                     .ifPresent(accessPoint -> rssi.set(String.valueOf(accessPoint.getSignalStrength())));
             gwtWifiNetInterfaceConfig.setHwRssi(rssi.get());
 
@@ -409,12 +421,14 @@ public class NetworkStatusServiceAdapter {
     }
 
     private boolean isSecurityNone(Set<WifiSecurity> rsnSecurity, Set<WifiSecurity> wpaSecurity, Set<WifiFlag> flags) {
-        return !flags.contains(WifiFlag.PRIVACY) && rsnSecurity.contains(WifiSecurity.NONE)
+        return !flags.contains(WifiFlag.PRIVACY)
+                && rsnSecurity.contains(WifiSecurity.NONE)
                 && wpaSecurity.contains(WifiSecurity.NONE);
     }
 
     private boolean isSecurityWEP(Set<WifiSecurity> rsnSecurity, Set<WifiSecurity> wpaSecurity, Set<WifiFlag> flags) {
-        return flags.contains(WifiFlag.PRIVACY) && rsnSecurity.contains(WifiSecurity.NONE)
+        return flags.contains(WifiFlag.PRIVACY)
+                && rsnSecurity.contains(WifiSecurity.NONE)
                 && wpaSecurity.contains(WifiSecurity.NONE);
     }
 
@@ -426,8 +440,8 @@ public class NetworkStatusServiceAdapter {
         return flags.contains(WifiFlag.PRIVACY) && rsnSecurity.contains(WifiSecurity.KEY_MGMT_PSK);
     }
 
-    private boolean isSecurityWPA2WPA3Enterprise(Set<WifiSecurity> rsnSecurity, Set<WifiSecurity> wpaSecurity,
-            Set<WifiFlag> flags) {
+    private boolean isSecurityWPA2WPA3Enterprise(
+            Set<WifiSecurity> rsnSecurity, Set<WifiSecurity> wpaSecurity, Set<WifiFlag> flags) {
         return flags.contains(WifiFlag.PRIVACY) && (rsnSecurity.contains(WifiSecurity.KEY_MGMT_802_1X));
     }
 
@@ -487,5 +501,4 @@ public class NetworkStatusServiceAdapter {
             return intChannels;
         }
     }
-
 }

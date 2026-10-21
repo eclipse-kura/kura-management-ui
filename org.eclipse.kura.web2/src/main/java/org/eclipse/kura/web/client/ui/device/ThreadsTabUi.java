@@ -1,19 +1,27 @@
 /*******************************************************************************
  * Copyright (c) 2011, 2021 Eurotech and/or its affiliates and others
- * 
+ *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
  * which is available at https://www.eclipse.org/legal/epl-2.0/
- * 
+ *
  * SPDX-License-Identifier: EPL-2.0
- * 
+ *
  * Contributors:
  *  Eurotech
  *******************************************************************************/
 package org.eclipse.kura.web.client.ui.device;
 
+import com.google.gwt.core.client.GWT;
+import com.google.gwt.uibinder.client.UiBinder;
+import com.google.gwt.uibinder.client.UiField;
+import com.google.gwt.user.cellview.client.TextColumn;
+import com.google.gwt.user.cellview.client.TextHeader;
+import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.google.gwt.user.client.ui.Composite;
+import com.google.gwt.user.client.ui.Widget;
+import com.google.gwt.view.client.ListDataProvider;
 import java.util.List;
-
 import org.eclipse.kura.web.client.messages.Messages;
 import org.eclipse.kura.web.client.ui.EntryClassUi;
 import org.eclipse.kura.web.client.ui.Tab;
@@ -26,22 +34,11 @@ import org.eclipse.kura.web.shared.service.GwtSecurityTokenService;
 import org.eclipse.kura.web.shared.service.GwtSecurityTokenServiceAsync;
 import org.gwtbootstrap3.client.ui.gwt.CellTable;
 
-import com.google.gwt.core.client.GWT;
-import com.google.gwt.uibinder.client.UiBinder;
-import com.google.gwt.uibinder.client.UiField;
-import com.google.gwt.user.cellview.client.TextColumn;
-import com.google.gwt.user.cellview.client.TextHeader;
-import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.google.gwt.user.client.ui.Composite;
-import com.google.gwt.user.client.ui.Widget;
-import com.google.gwt.view.client.ListDataProvider;
-
 public class ThreadsTabUi extends Composite implements Tab {
 
     private static ThreadsTabUiUiBinder uiBinder = GWT.create(ThreadsTabUiUiBinder.class);
 
-    interface ThreadsTabUiUiBinder extends UiBinder<Widget, ThreadsTabUi> {
-    }
+    interface ThreadsTabUiUiBinder extends UiBinder<Widget, ThreadsTabUi> {}
 
     private static final Messages MSGS = GWT.create(Messages.class);
 
@@ -50,6 +47,7 @@ public class ThreadsTabUi extends Composite implements Tab {
 
     @UiField
     CellTable<GwtGroupedNVPair> threadsGrid = new CellTable<>();
+
     private final ListDataProvider<GwtGroupedNVPair> threadsDataProvider = new ListDataProvider<>();
 
     public ThreadsTabUi() {
@@ -58,9 +56,8 @@ public class ThreadsTabUi extends Composite implements Tab {
         loadProfileTable(this.threadsGrid, this.threadsDataProvider);
     }
 
-    private void loadProfileTable(CellTable<GwtGroupedNVPair> threadsGrid2,
-
-            ListDataProvider<GwtGroupedNVPair> dataProvider) {
+    private void loadProfileTable(
+            CellTable<GwtGroupedNVPair> threadsGrid2, ListDataProvider<GwtGroupedNVPair> dataProvider) {
 
         TextColumn<GwtGroupedNVPair> col1 = new TextColumn<GwtGroupedNVPair>() {
 
@@ -90,8 +87,7 @@ public class ThreadsTabUi extends Composite implements Tab {
     }
 
     @Override
-    public void setDirty(boolean flag) {
-    }
+    public void setDirty(boolean flag) {}
 
     @Override
     public boolean isDirty() {
@@ -126,7 +122,6 @@ public class ThreadsTabUi extends Composite implements Tab {
                         ThreadsTabUi.this.threadsDataProvider.getList().clear();
                         FailureHandler.handle(caught);
                         ThreadsTabUi.this.threadsDataProvider.flush();
-
                     }
 
                     @Override
@@ -134,7 +129,8 @@ public class ThreadsTabUi extends Composite implements Tab {
                         for (GwtGroupedNVPair resultPair : result) {
                             ThreadsTabUi.this.threadsDataProvider.getList().add(resultPair);
                         }
-                        int size = ThreadsTabUi.this.threadsDataProvider.getList().size();
+                        int size =
+                                ThreadsTabUi.this.threadsDataProvider.getList().size();
                         ThreadsTabUi.this.threadsGrid.setVisibleRange(0, size);
                         ThreadsTabUi.this.threadsDataProvider.flush();
                         EntryClassUi.hideWaitModal();

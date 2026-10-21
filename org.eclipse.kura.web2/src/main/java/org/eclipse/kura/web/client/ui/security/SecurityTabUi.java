@@ -1,17 +1,26 @@
 /*******************************************************************************
  * Copyright (c) 2011, 2020 Eurotech and/or its affiliates and others
- * 
+ *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
  * which is available at https://www.eclipse.org/legal/epl-2.0/
- * 
+ *
  * SPDX-License-Identifier: EPL-2.0
- * 
+ *
  * Contributors:
  *  Eurotech
  *******************************************************************************/
 package org.eclipse.kura.web.client.ui.security;
 
+import com.google.gwt.core.client.GWT;
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.uibinder.client.UiBinder;
+import com.google.gwt.uibinder.client.UiField;
+import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.google.gwt.user.client.ui.Composite;
+import com.google.gwt.user.client.ui.HTMLPanel;
+import com.google.gwt.user.client.ui.Widget;
 import org.eclipse.kura.web.client.messages.Messages;
 import org.eclipse.kura.web.client.ui.EntryClassUi;
 import org.eclipse.kura.web.client.ui.Tab;
@@ -27,22 +36,11 @@ import org.gwtbootstrap3.client.ui.FormLabel;
 import org.gwtbootstrap3.client.ui.PanelCollapse;
 import org.gwtbootstrap3.client.ui.html.Span;
 
-import com.google.gwt.core.client.GWT;
-import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.uibinder.client.UiBinder;
-import com.google.gwt.uibinder.client.UiField;
-import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.google.gwt.user.client.ui.Composite;
-import com.google.gwt.user.client.ui.HTMLPanel;
-import com.google.gwt.user.client.ui.Widget;
-
 public class SecurityTabUi extends Composite implements Tab {
 
     private static SecurityTabUiUiBinder uiBinder = GWT.create(SecurityTabUiUiBinder.class);
 
-    interface SecurityTabUiUiBinder extends UiBinder<Widget, SecurityTabUi> {
-    }
+    interface SecurityTabUiUiBinder extends UiBinder<Widget, SecurityTabUi> {}
 
     private static final Messages MSGS = GWT.create(Messages.class);
 
@@ -51,20 +49,28 @@ public class SecurityTabUi extends Composite implements Tab {
 
     @UiField
     HTMLPanel description;
+
     @UiField
     Anchor collapseOneAnchor;
+
     @UiField
     Anchor collapseTwoAnchor;
+
     @UiField
     PanelCollapse collapseOne;
+
     @UiField
     PanelCollapse collapseTwo;
+
     @UiField
     FormLabel securityPolicyLabel;
+
     @UiField
     FormLabel commandLineLabel;
+
     @UiField
     AnchorButton reloadPolicyFingerprint;
+
     @UiField
     AnchorButton reloadCommandLineFingerprint;
 
@@ -74,8 +80,7 @@ public class SecurityTabUi extends Composite implements Tab {
     }
 
     @Override
-    public void setDirty(boolean flag) {
-    }
+    public void setDirty(boolean flag) {}
 
     @Override
     public boolean isDirty() {
@@ -151,7 +156,6 @@ public class SecurityTabUi extends Composite implements Tab {
                                 SecurityTabUi.this.gwtSecurityService.reloadSecurityPolicyFingerprint(token, callback);
                             }
                         });
-
                     }
                 });
             }
@@ -200,15 +204,13 @@ public class SecurityTabUi extends Composite implements Tab {
                                 SecurityTabUi.this.gwtSecurityService.reloadCommandLineFingerprint(token, callback);
                             }
                         });
-
                     }
                 });
             }
         });
     }
 
-    private void reset() {
-    }
+    private void reset() {}
 
     @Override
     public void clear() {

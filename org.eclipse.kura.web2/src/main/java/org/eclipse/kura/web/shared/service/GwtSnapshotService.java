@@ -12,17 +12,15 @@
  *******************************************************************************/
 package org.eclipse.kura.web.shared.service;
 
+import com.google.gwt.user.client.rpc.RemoteService;
+import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
 import java.util.List;
-
 import org.eclipse.kura.web.server.Audit;
 import org.eclipse.kura.web.server.RequiredPermissions;
 import org.eclipse.kura.web.shared.GwtKuraException;
 import org.eclipse.kura.web.shared.KuraPermission;
 import org.eclipse.kura.web.shared.model.GwtSnapshot;
 import org.eclipse.kura.web.shared.model.GwtXSRFToken;
-
-import com.google.gwt.user.client.rpc.RemoteService;
-import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
 
 @RemoteServiceRelativePath("snapshot")
 @RequiredPermissions(KuraPermission.ADMIN)
@@ -36,6 +34,6 @@ public interface GwtSnapshotService extends RemoteService {
     public void rollbackDeviceSnapshot(GwtXSRFToken xsrfToken, GwtSnapshot snapshot) throws GwtKuraException;
 
     @Audit(componentName = "UI Snapshots", description = "Configuration Rollback device snapshot")
-    public void configurationRollbackDeviceSnapshot(GwtXSRFToken xsrfToken, GwtSnapshot snapshot,
-            List<String> targetPids) throws GwtKuraException;
+    public void configurationRollbackDeviceSnapshot(
+            GwtXSRFToken xsrfToken, GwtSnapshot snapshot, List<String> targetPids) throws GwtKuraException;
 }

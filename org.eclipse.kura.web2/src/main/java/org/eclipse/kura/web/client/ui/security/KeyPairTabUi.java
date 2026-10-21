@@ -12,9 +12,15 @@
  *******************************************************************************/
 package org.eclipse.kura.web.client.ui.security;
 
+import com.google.gwt.core.client.GWT;
+import com.google.gwt.event.shared.HandlerRegistration;
+import com.google.gwt.uibinder.client.UiBinder;
+import com.google.gwt.uibinder.client.UiField;
+import com.google.gwt.user.client.ui.Composite;
+import com.google.gwt.user.client.ui.HTMLPanel;
+import com.google.gwt.user.client.ui.Widget;
 import java.util.List;
 import java.util.Map;
-
 import org.eclipse.kura.web.client.messages.Messages;
 import org.eclipse.kura.web.client.ui.Tab;
 import org.eclipse.kura.web.client.ui.validator.GwtValidators;
@@ -31,14 +37,6 @@ import org.gwtbootstrap3.client.ui.TextArea;
 import org.gwtbootstrap3.client.ui.form.validator.Validator;
 import org.gwtbootstrap3.client.ui.html.Span;
 
-import com.google.gwt.core.client.GWT;
-import com.google.gwt.event.shared.HandlerRegistration;
-import com.google.gwt.uibinder.client.UiBinder;
-import com.google.gwt.uibinder.client.UiField;
-import com.google.gwt.user.client.ui.Composite;
-import com.google.gwt.user.client.ui.HTMLPanel;
-import com.google.gwt.user.client.ui.Widget;
-
 public class KeyPairTabUi extends Composite implements Tab {
 
     private static final int ALIAS_MAX_LENGTH = 128;
@@ -50,8 +48,7 @@ public class KeyPairTabUi extends Composite implements Tab {
 
     private static KeyPairTabUiUiBinder uiBinder = GWT.create(KeyPairTabUiUiBinder.class);
 
-    interface KeyPairTabUiUiBinder extends UiBinder<Widget, KeyPairTabUi> {
-    }
+    interface KeyPairTabUiUiBinder extends UiBinder<Widget, KeyPairTabUi> {}
 
     private static final Messages MSGS = GWT.create(Messages.class);
 
@@ -69,14 +66,19 @@ public class KeyPairTabUi extends Composite implements Tab {
 
     @UiField
     HTMLPanel description;
+
     @UiField
     FormGroup privateKeyInputForm;
+
     @UiField
     ListBox pidListBox;
+
     @UiField
     Input storageAliasInput;
+
     @UiField
     TextArea privateKeyInput;
+
     @UiField
     TextArea certificateInput;
 
@@ -88,8 +90,14 @@ public class KeyPairTabUi extends Composite implements Tab {
     private Validator<String> storageAliasValidator;
     private Map<String, List<String>> usedAliases;
 
-    public KeyPairTabUi(final Type type, final List<String> keyStorePids, final Map<String, List<String>> usedAliases,
-            final CertificateModalListener listener, Button resetButton, Button applyButton, Button closeButton) {
+    public KeyPairTabUi(
+            final Type type,
+            final List<String> keyStorePids,
+            final Map<String, List<String>> usedAliases,
+            final CertificateModalListener listener,
+            Button resetButton,
+            Button applyButton,
+            Button closeButton) {
         this.listener = listener;
         this.type = type;
 
@@ -153,12 +161,12 @@ public class KeyPairTabUi extends Composite implements Tab {
         Validator<String> notEmptyValidator = GwtValidators.nonEmpty(MSGS.formRequiredParameter());
 
         this.storageAliasInput.addValidator(notEmptyValidator);
-        this.storageAliasInput.addValidator(GwtValidators.stringLength(ALIAS_MAX_LENGTH,
-                MSGS.certificateAliasMaxLength(String.valueOf(ALIAS_MAX_LENGTH))));
+        this.storageAliasInput.addValidator(GwtValidators.stringLength(
+                ALIAS_MAX_LENGTH, MSGS.certificateAliasMaxLength(String.valueOf(ALIAS_MAX_LENGTH))));
         this.storageAliasInput.setMaxLength(ALIAS_MAX_LENGTH);
 
-        storageAliasValidator = GwtValidators.stringNotInList(this.usedAliases.get(this.pidListBox.getSelectedValue()),
-                MSGS.certificateAliasUsed());
+        storageAliasValidator = GwtValidators.stringNotInList(
+                this.usedAliases.get(this.pidListBox.getSelectedValue()), MSGS.certificateAliasUsed());
         this.storageAliasInput.addValidator(storageAliasValidator);
 
         this.pidListBox.addChangeHandler(e -> {
@@ -182,7 +190,7 @@ public class KeyPairTabUi extends Composite implements Tab {
             this.storageAliasInput.validate();
             setDirty(true);
         });
-        
+
         this.certificateInput.addValidator(notEmptyValidator);
 
         if (this.type == Type.KEY_PAIR) {
@@ -232,7 +240,6 @@ public class KeyPairTabUi extends Composite implements Tab {
         }
 
         this.applyHandler = this.applyButton.addClickHandler(event -> {
-
             final boolean isValid = isValid();
 
             if (isValid) {
@@ -254,10 +261,14 @@ public class KeyPairTabUi extends Composite implements Tab {
     }
 
     private void storeKeyPair() {
-        RequestQueue.submit(c -> this.gwtXSRFService
-                .generateSecurityToken(c.callback(token -> this.gwtCertificatesService.storeKeyPair(token,
-                        this.pidListBox.getSelectedValue(), this.privateKeyInput.getValue(),
-                        this.certificateInput.getValue(), this.storageAliasInput.getValue(), c.callback(ok -> {
+        RequestQueue.submit(c ->
+                this.gwtXSRFService.generateSecurityToken(c.callback(token -> this.gwtCertificatesService.storeKeyPair(
+                        token,
+                        this.pidListBox.getSelectedValue(),
+                        this.privateKeyInput.getValue(),
+                        this.certificateInput.getValue(),
+                        this.storageAliasInput.getValue(),
+                        c.callback(ok -> {
                             reset();
                             setDirty(false);
                             KeyPairTabUi.this.listener.onKeystoreChanged();
@@ -265,9 +276,13 @@ public class KeyPairTabUi extends Composite implements Tab {
     }
 
     private void storeCertificate() {
-        RequestQueue.submit(c -> this.gwtXSRFService.generateSecurityToken(c.callback(
-                token -> this.gwtCertificatesService.storeCertificate(token, this.pidListBox.getSelectedValue(),
-                        this.certificateInput.getValue(), this.storageAliasInput.getValue(), c.callback(ok -> {
+        RequestQueue.submit(c -> this.gwtXSRFService.generateSecurityToken(c.callback(token ->
+                this.gwtCertificatesService.storeCertificate(
+                        token,
+                        this.pidListBox.getSelectedValue(),
+                        this.certificateInput.getValue(),
+                        this.storageAliasInput.getValue(),
+                        c.callback(ok -> {
                             reset();
                             setDirty(false);
                             KeyPairTabUi.this.listener.onKeystoreChanged();
@@ -284,5 +299,4 @@ public class KeyPairTabUi extends Composite implements Tab {
     public void clear() {
         // nothing to clear
     }
-
 }

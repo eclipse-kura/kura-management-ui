@@ -1,21 +1,31 @@
 /*******************************************************************************
  * Copyright (c) 2021 Eurotech and/or its affiliates and others
- * 
+ *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
  * which is available at https://www.eclipse.org/legal/epl-2.0/
- * 
+ *
  * SPDX-License-Identifier: EPL-2.0
- * 
+ *
  * Contributors:
  *  Eurotech
  *******************************************************************************/
 package org.eclipse.kura.web.client.ui;
 
+import com.google.gwt.core.client.GWT;
+import com.google.gwt.uibinder.client.UiBinder;
+import com.google.gwt.uibinder.client.UiField;
+import com.google.gwt.user.cellview.client.CellTable;
+import com.google.gwt.user.cellview.client.TextColumn;
+import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.google.gwt.user.client.ui.Composite;
+import com.google.gwt.user.client.ui.Label;
+import com.google.gwt.user.client.ui.Widget;
+import com.google.gwt.view.client.ListDataProvider;
+import com.google.gwt.view.client.SingleSelectionModel;
 import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
-
 import org.eclipse.kura.web.client.messages.Messages;
 import org.eclipse.kura.web.client.ui.AlertDialog.ConfirmListener;
 import org.eclipse.kura.web.client.util.PidTextBox;
@@ -36,25 +46,12 @@ import org.gwtbootstrap3.client.ui.Panel;
 import org.gwtbootstrap3.client.ui.PanelHeader;
 import org.gwtbootstrap3.client.ui.html.Paragraph;
 
-import com.google.gwt.core.client.GWT;
-import com.google.gwt.uibinder.client.UiBinder;
-import com.google.gwt.uibinder.client.UiField;
-import com.google.gwt.user.cellview.client.CellTable;
-import com.google.gwt.user.cellview.client.TextColumn;
-import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.google.gwt.user.client.ui.Composite;
-import com.google.gwt.user.client.ui.Label;
-import com.google.gwt.user.client.ui.Widget;
-import com.google.gwt.view.client.ListDataProvider;
-import com.google.gwt.view.client.SingleSelectionModel;
-
 public class RestrictedComponentServiceUi extends Composite implements Tab {
 
-    private static RestrictedComponentServiceUiUiBinder uiBinder = GWT
-            .create(RestrictedComponentServiceUiUiBinder.class);
+    private static RestrictedComponentServiceUiUiBinder uiBinder =
+            GWT.create(RestrictedComponentServiceUiUiBinder.class);
 
-    interface RestrictedComponentServiceUiUiBinder extends UiBinder<Widget, RestrictedComponentServiceUi> {
-    }
+    interface RestrictedComponentServiceUiUiBinder extends UiBinder<Widget, RestrictedComponentServiceUi> {}
 
     private final GwtSecurityTokenServiceAsync gwtSecurityTokenService = GWT.create(GwtSecurityTokenService.class);
     private final GwtComponentServiceAsync gwtComponentService = GWT.create(GwtComponentService.class);
@@ -64,24 +61,31 @@ public class RestrictedComponentServiceUi extends Composite implements Tab {
 
     @UiField
     Button newServiceButton;
+
     @UiField
     Button deleteButton;
 
     @UiField
     Modal newServiceModal;
+
     @UiField
     ListBox factoriesList;
+
     @UiField
     PidTextBox serviceName;
+
     @UiField
     Button buttonNewServiceCancel;
+
     @UiField
     Button buttonNewServiceApply;
 
     @UiField
     Panel configurationArea;
+
     @UiField
     PanelHeader contentPanelHeader;
+
     @UiField
     Panel mgmtPanel;
 
@@ -90,16 +94,19 @@ public class RestrictedComponentServiceUi extends Composite implements Tab {
 
     @UiField
     Label emptyListLabel;
+
     @UiField
     CellTable<GwtComponentInstanceInfo> table;
 
     @UiField
     Paragraph introParagraph;
+
     @UiField
     Paragraph newServiceModalIntro;
 
     @UiField
     FormLabel factoriesListLabel;
+
     @UiField
     FormLabel serviceNameLabel;
 
@@ -153,16 +160,14 @@ public class RestrictedComponentServiceUi extends Composite implements Tab {
         clear();
 
         RequestQueue.submit(c -> this.backend.listServiceInstances(c.callback(result -> {
-
             this.dataProvider.getList().addAll(result);
             this.emptyListLabel.setVisible(result.isEmpty());
             this.table.setVisible(!result.isEmpty());
-
         })));
 
-        RequestQueue.submit(
-                c -> this.gwtSecurityTokenService.generateSecurityToken(c.callback(token -> this.gwtComponentService
-                        .findTrackedPids(token, c.callback(pids -> this.allTrackedPids = new HashSet<>(pids))))));
+        RequestQueue.submit(c -> this.gwtSecurityTokenService.generateSecurityToken(c.callback(
+                token -> this.gwtComponentService.findTrackedPids(
+                        token, c.callback(pids -> this.allTrackedPids = new HashSet<>(pids))))));
 
         RequestQueue.submit(c -> this.backend.listFactoryPids(c.callback(result -> {
             this.factoriesList.clear();
@@ -193,7 +198,6 @@ public class RestrictedComponentServiceUi extends Composite implements Tab {
         this.table.addColumn(col2, MSGS.factoryPidLabel());
 
         this.selectionModel.addSelectionChangeHandler(e -> {
-
             final Optional<ServicesUi> configurationUi = getConfigurationUi();
 
             if (configurationUi.isPresent()) {
@@ -226,33 +230,33 @@ public class RestrictedComponentServiceUi extends Composite implements Tab {
     private void updateSelection() {
         final GwtComponentInstanceInfo selected = this.selectionModel.getSelectedObject();
 
-        this.deleteButton.setEnabled(selected != null && selected.getFactoryPid().isPresent());
+        this.deleteButton.setEnabled(
+                selected != null && selected.getFactoryPid().isPresent());
 
         this.mgmtPanel.clear();
         this.configurationArea.setVisible(selected != null);
 
         if (selected != null) {
-            RequestQueue.submit(c -> this.gwtSecurityTokenService.generateSecurityToken(
-                    c.callback(token -> this.backend.getConfiguration(token, selected.getPid(), c.callback(result -> {
-                        this.contentPanelHeader
-                                .setText(selected.getPid() + selected.getFactoryPid().map(p -> " - " + p).orElse(""));
+            RequestQueue.submit(c -> this.gwtSecurityTokenService.generateSecurityToken(c.callback(token ->
+                    this.backend.getConfiguration(token, selected.getPid(), c.callback(result -> {
+                        this.contentPanelHeader.setText(selected.getPid()
+                                + selected.getFactoryPid().map(p -> " - " + p).orElse(""));
 
                         final ServicesUi servicesUi = new ServicesUi(result);
                         servicesUi.setBackend(new ServicesUi.Backend() {
 
                             @Override
-                            public void updateComponentConfiguration(GwtXSRFToken token, GwtConfigComponent component,
-                                    AsyncCallback<Void> callback) {
-                                RestrictedComponentServiceUi.this.backend.updateConfiguration(token, component,
-                                        callback);
-
+                            public void updateComponentConfiguration(
+                                    GwtXSRFToken token, GwtConfigComponent component, AsyncCallback<Void> callback) {
+                                RestrictedComponentServiceUi.this.backend.updateConfiguration(
+                                        token, component, callback);
                             }
 
                             @Override
-                            public void deleteFactoryConfiguration(GwtXSRFToken token, String pid,
-                                    AsyncCallback<Void> callback) {
-                                RestrictedComponentServiceUi.this.backend.deleteFactoryConfiguration(token, pid,
-                                        callback);
+                            public void deleteFactoryConfiguration(
+                                    GwtXSRFToken token, String pid, AsyncCallback<Void> callback) {
+                                RestrictedComponentServiceUi.this.backend.deleteFactoryConfiguration(
+                                        token, pid, callback);
                             }
                         });
 
@@ -311,7 +315,6 @@ public class RestrictedComponentServiceUi extends Composite implements Tab {
     private void initNewServiceModal() {
 
         this.buttonNewServiceApply.addClickHandler(event -> {
-
             final String pid = this.serviceName.getPid();
 
             if (pid == null) {
@@ -325,15 +328,16 @@ public class RestrictedComponentServiceUi extends Composite implements Tab {
             }
 
             if (this.allTrackedPids.contains(pid)) {
-                this.confirmDialog.show(MSGS.wiresComponentNameAlreadyUsed(pid), AlertDialog.Severity.ALERT,
-                        (ConfirmListener) null);
+                this.confirmDialog.show(
+                        MSGS.wiresComponentNameAlreadyUsed(pid), AlertDialog.Severity.ALERT, (ConfirmListener) null);
                 return;
             }
 
             this.newServiceModal.hide();
 
-            RequestQueue.submit(c -> this.gwtSecurityTokenService.generateSecurityToken(c.callback(token -> this.backend
-                    .createFactoryConfiguration(token, pid, factoryPid, c.callback(ok -> this.refresh())))));
+            RequestQueue.submit(c -> this.gwtSecurityTokenService.generateSecurityToken(
+                    c.callback(token -> this.backend.createFactoryConfiguration(
+                            token, pid, factoryPid, c.callback(ok -> this.refresh())))));
         });
     }
 
@@ -360,5 +364,4 @@ public class RestrictedComponentServiceUi extends Composite implements Tab {
         this.contentPanelHeader.setText("");
         this.deleteButton.setEnabled(false);
     }
-
 }

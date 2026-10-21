@@ -14,7 +14,6 @@ package org.eclipse.kura.web.server.util;
 
 import java.util.Set;
 import java.util.stream.Collectors;
-
 import org.eclipse.kura.command.PasswordCommandService;
 import org.eclipse.kura.driver.DriverService;
 import org.eclipse.kura.driver.descriptor.DriverDescriptorService;
@@ -28,11 +27,11 @@ import org.osgi.framework.wiring.BundleWiring;
 
 public class GwtFeatureUtil {
 
-    private GwtFeatureUtil() {
-    }
+    private GwtFeatureUtil() {}
 
     public static GwtSupportedFeatures getSupportedFeatures() {
-        final BundleContext bundleContext = FrameworkUtil.getBundle(GwtFeatureUtil.class).getBundleContext();
+        final BundleContext bundleContext =
+                FrameworkUtil.getBundle(GwtFeatureUtil.class).getBundleContext();
 
         final GwtSupportedFeatures result = new GwtSupportedFeatures();
 
@@ -55,17 +54,19 @@ public class GwtFeatureUtil {
     }
 
     private static final Set<String> getWiredPackages() {
-        final BundleWiring bundleWiring = FrameworkUtil.getBundle(GwtFeatureUtil.class).adapt(BundleWiring.class);
+        final BundleWiring bundleWiring =
+                FrameworkUtil.getBundle(GwtFeatureUtil.class).adapt(BundleWiring.class);
 
         return bundleWiring.getRequiredWires(PackageNamespace.PACKAGE_NAMESPACE).stream()
                 .map(w -> w.getCapability().getAttributes().get(PackageNamespace.PACKAGE_NAMESPACE))
-                .filter(String.class::isInstance).map(String.class::cast).collect(Collectors.toSet());
+                .filter(String.class::isInstance)
+                .map(String.class::cast)
+                .collect(Collectors.toSet());
     }
 
-    private static boolean isProviderServiceAvailable(final Class<?> serviceInterface,
-            final BundleContext bundleContext) {
+    private static boolean isProviderServiceAvailable(
+            final Class<?> serviceInterface, final BundleContext bundleContext) {
 
         return bundleContext.getServiceReference(serviceInterface) != null;
     }
-
 }

@@ -1,32 +1,28 @@
 /*******************************************************************************
  * Copyright (c) 2017, 2020 Eurotech and/or its affiliates and others
- * 
+ *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
  * which is available at https://www.eclipse.org/legal/epl-2.0/
- * 
+ *
  * SPDX-License-Identifier: EPL-2.0
- * 
+ *
  * Contributors:
  *  Eurotech
  *******************************************************************************/
-
 package org.eclipse.kura.web.client.util;
-
-import java.util.List;
 
 import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.dom.client.DataTransfer;
 import com.google.gwt.dom.client.Element;
 import com.google.gwt.user.client.ui.Widget;
+import java.util.List;
 
 public final class DropSupport extends JavaScriptObject {
 
-    protected DropSupport() {
-    }
+    protected DropSupport() {}
 
-    public static native DropSupport addIfSupported(Element e)
-    /*-{
+    public static native DropSupport addIfSupported(Element e) /*-{
         var self = parent.window.DropSupport.addIfSupported(e)
         if (!self) {
         return null
@@ -65,48 +61,39 @@ public final class DropSupport extends JavaScriptObject {
         public boolean onDrop(DropEvent event);
     }
 
-    public native void setListener(Listener listener)
-    /*-{
+    public native void setListener(Listener listener) /*-{
         this.listener = listener;
     }-*/;
 
     public static final class DropEvent extends JavaScriptObject {
 
-        protected DropEvent() {
-        }
+        protected DropEvent() {}
 
-        public native DataTransfer getDataTransfer()
-        /*-{
+        public native DataTransfer getDataTransfer() /*-{
             return this.dataTransfer;
         }-*/;
 
-        public native void preventDefault()
-        /*-{
+        public native void preventDefault() /*-{
             this.preventDefault();
         }-*/;
 
-        public native void stopPropagation()
-        /*-{
+        public native void stopPropagation() /*-{
             return this.stopPropagation();
         }-*/;
 
-        public native String getAsText()
-        /*-{
+        public native String getAsText() /*-{
             return this.dataTransfer.getData('Text')
         }-*/;
 
-        public native double getClientX()
-        /*-{
+        public native double getClientX() /*-{
             return this.clientX
         }-*/;
 
-        public native double getClientY()
-        /*-{
+        public native double getClientY() /*-{
             return this.clientY
         }-*/;
 
-        public native List<File> getFiles()
-        /*-{
+        public native List<File> getFiles() /*-{
             var result = @java.util.ArrayList::new()()
             if (!this.dataTransfer) {
                 return result
@@ -119,6 +106,5 @@ public final class DropSupport extends JavaScriptObject {
             }
             return result
         }-*/;
-
     }
 }

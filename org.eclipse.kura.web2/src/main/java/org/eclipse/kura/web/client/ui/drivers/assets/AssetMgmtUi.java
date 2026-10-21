@@ -1,17 +1,22 @@
 /*******************************************************************************
  * Copyright (c) 2017, 2020 Eurotech and/or its affiliates and others
- * 
+ *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
  * which is available at https://www.eclipse.org/legal/epl-2.0/
- * 
+ *
  * SPDX-License-Identifier: EPL-2.0
- * 
+ *
  * Contributors:
  *  Eurotech
  *******************************************************************************/
 package org.eclipse.kura.web.client.ui.drivers.assets;
 
+import com.google.gwt.core.client.GWT;
+import com.google.gwt.uibinder.client.UiBinder;
+import com.google.gwt.uibinder.client.UiField;
+import com.google.gwt.user.client.ui.Composite;
+import com.google.gwt.user.client.ui.Widget;
 import org.eclipse.kura.web.client.configuration.Configurations;
 import org.eclipse.kura.web.client.configuration.HasConfiguration;
 import org.eclipse.kura.web.client.messages.Messages;
@@ -23,18 +28,11 @@ import org.gwtbootstrap3.client.ui.Panel;
 import org.gwtbootstrap3.client.ui.TabListItem;
 import org.gwtbootstrap3.client.ui.TabPane;
 
-import com.google.gwt.core.client.GWT;
-import com.google.gwt.uibinder.client.UiBinder;
-import com.google.gwt.uibinder.client.UiField;
-import com.google.gwt.user.client.ui.Composite;
-import com.google.gwt.user.client.ui.Widget;
-
 public class AssetMgmtUi extends Composite {
 
     private static AssetMgmtUiUiBinder uiBinder = GWT.create(AssetMgmtUiUiBinder.class);
 
-    interface AssetMgmtUiUiBinder extends UiBinder<Widget, AssetMgmtUi> {
-    }
+    interface AssetMgmtUiUiBinder extends UiBinder<Widget, AssetMgmtUi> {}
 
     private static final Messages MSGS = GWT.create(Messages.class);
 
@@ -43,12 +41,16 @@ public class AssetMgmtUi extends Composite {
 
     @UiField
     TabListItem tab1NavTab;
+
     @UiField
     TabListItem tab2NavTab;
+
     @UiField
     TabPane tab1Pane;
+
     @UiField
     TabPane tab2Pane;
+
     @UiField
     AlertDialog alertDialog;
 
@@ -63,7 +65,9 @@ public class AssetMgmtUi extends Composite {
             return;
         }
 
-        final AssetModel model = new AssetModelImpl(new GwtConfigComponent(assetConfiguration), channelDescriptor,
+        final AssetModel model = new AssetModelImpl(
+                new GwtConfigComponent(assetConfiguration),
+                channelDescriptor,
                 configurations.getBaseChannelDescriptor());
         this.assetDataUi = new AssetDataUi(model);
         this.assetConfigUi = new AssetConfigurationUi(model, this.assetDataUi);
@@ -77,8 +81,8 @@ public class AssetMgmtUi extends Composite {
 
         this.tab2NavTab.addClickHandler(event -> {
             if (AssetMgmtUi.this.assetConfigUi.isDirty()) {
-                AssetMgmtUi.this.alertDialog.show(MSGS.driversAssetsAssetConfigDirty(), AlertDialog.Severity.ALERT,
-                        (ConfirmListener) null);
+                AssetMgmtUi.this.alertDialog.show(
+                        MSGS.driversAssetsAssetConfigDirty(), AlertDialog.Severity.ALERT, (ConfirmListener) null);
                 event.stopPropagation();
                 event.preventDefault();
                 return;
@@ -106,8 +110,8 @@ public class AssetMgmtUi extends Composite {
         return this.assetConfigUi.isDirty() || this.assetDataUi.isDirty();
     }
 
-    public ConfigurationUiButtons createAssetUiButtonBar(final AssetConfigurationUi assetUi,
-            final Configurations configurations) {
+    public ConfigurationUiButtons createAssetUiButtonBar(
+            final AssetConfigurationUi assetUi, final Configurations configurations) {
         final GwtConfigComponent gwtConfig = assetUi.getConfiguration();
         final ConfigurationUiButtons result = new ConfigurationUiButtons(assetUi);
         result.setListener(new ConfigurationUiButtons.Listener() {
@@ -116,9 +120,11 @@ public class AssetMgmtUi extends Composite {
             public void onReset() {
                 final String driverPid = gwtConfig.getParameterValue(AssetConstants.ASSET_DRIVER_PROP.value());
                 final AssetModel model = new AssetModelImpl(
-                        new GwtConfigComponent(
-                                configurations.getConfiguration(gwtConfig.getComponentId()).getConfiguration()),
-                        configurations.getChannelDescriptor(driverPid), configurations.getBaseChannelDescriptor());
+                        new GwtConfigComponent(configurations
+                                .getConfiguration(gwtConfig.getComponentId())
+                                .getConfiguration()),
+                        configurations.getChannelDescriptor(driverPid),
+                        configurations.getBaseChannelDescriptor());
                 AssetMgmtUi.this.assetDataUi.setModel(model);
                 assetUi.setModel(model);
             }
@@ -126,9 +132,10 @@ public class AssetMgmtUi extends Composite {
             @Override
             public void onApply() {
                 final GwtConfigComponent newConfig = assetUi.getConfiguration();
-                DriversAndAssetsRPC.deleteFactoryConfiguration(newConfig.getComponentId(),
-                        result2 -> DriversAndAssetsRPC.createFactoryConfiguration(newConfig.getComponentId(),
-                                newConfig.getFactoryId(), newConfig, result1 -> {
+                DriversAndAssetsRPC.deleteFactoryConfiguration(
+                        newConfig.getComponentId(),
+                        result2 -> DriversAndAssetsRPC.createFactoryConfiguration(
+                                newConfig.getComponentId(), newConfig.getFactoryId(), newConfig, result1 -> {
                                     configurations.setConfiguration(new GwtConfigComponent(newConfig));
                                     assetUi.setDirty(false);
                                 }));
@@ -136,5 +143,4 @@ public class AssetMgmtUi extends Composite {
         });
         return result;
     }
-
 }

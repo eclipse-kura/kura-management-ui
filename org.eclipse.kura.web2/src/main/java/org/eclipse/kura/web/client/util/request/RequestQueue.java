@@ -1,24 +1,22 @@
 /*******************************************************************************
  * Copyright (c) 2018, 2020 Eurotech and/or its affiliates and others
- * 
+ *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
  * which is available at https://www.eclipse.org/legal/epl-2.0/
- * 
+ *
  * SPDX-License-Identifier: EPL-2.0
- * 
+ *
  * Contributors:
  *  Eurotech
  *******************************************************************************/
 package org.eclipse.kura.web.client.util.request;
 
-import java.util.LinkedList;
-
-import org.eclipse.kura.web.client.ui.EntryClassUi;
-import org.eclipse.kura.web.client.util.FailureHandler;
-
 import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.rpc.AsyncCallback;
+import java.util.LinkedList;
+import org.eclipse.kura.web.client.ui.EntryClassUi;
+import org.eclipse.kura.web.client.util.FailureHandler;
 
 /*
  * Allows to serialize asynchronous requests. Can be used to prevent issues related to XSRF tokens and concurrent requests.
@@ -137,8 +135,7 @@ public class RequestQueue {
 
         @Override
         public <T> AsyncCallback<T> callback() {
-            return callback(result -> {
-            });
+            return callback(result -> {});
         }
 
         @Override

@@ -23,6 +23,28 @@ package org.eclipse.kura.web.client.ui.drivers.assets;
 
 import static org.eclipse.kura.web.shared.AssetConstants.CHANNEL_PROPERTY_SEPARATOR;
 
+import com.google.gwt.cell.client.AbstractCell;
+import com.google.gwt.cell.client.Cell;
+import com.google.gwt.cell.client.Cell.Context;
+import com.google.gwt.cell.client.SelectionCell;
+import com.google.gwt.cell.client.TextCell;
+import com.google.gwt.cell.client.TextInputCell;
+import com.google.gwt.core.client.GWT;
+import com.google.gwt.storage.client.Storage;
+import com.google.gwt.uibinder.client.UiBinder;
+import com.google.gwt.uibinder.client.UiField;
+import com.google.gwt.user.cellview.client.Column;
+import com.google.gwt.user.cellview.client.Header;
+import com.google.gwt.user.cellview.client.SimplePager;
+import com.google.gwt.user.cellview.client.SimplePager.TextLocation;
+import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.google.gwt.user.client.ui.FileUpload;
+import com.google.gwt.user.client.ui.HasHorizontalAlignment;
+import com.google.gwt.user.client.ui.Hidden;
+import com.google.gwt.user.client.ui.Widget;
+import com.google.gwt.view.client.HasRows;
+import com.google.gwt.view.client.ListDataProvider;
+import com.google.gwt.view.client.SingleSelectionModel;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -34,7 +56,6 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.stream.Collectors;
-
 import org.eclipse.kura.web.Console;
 import org.eclipse.kura.web.client.configuration.HasConfiguration;
 import org.eclipse.kura.web.client.ui.AbstractServicesUi;
@@ -71,35 +92,12 @@ import org.gwtbootstrap3.client.ui.gwt.CellTable;
 import org.gwtbootstrap3.client.ui.html.Paragraph;
 import org.gwtbootstrap3.client.ui.html.Strong;
 
-import com.google.gwt.cell.client.AbstractCell;
-import com.google.gwt.cell.client.Cell;
-import com.google.gwt.cell.client.Cell.Context;
-import com.google.gwt.cell.client.SelectionCell;
-import com.google.gwt.cell.client.TextCell;
-import com.google.gwt.cell.client.TextInputCell;
-import com.google.gwt.core.client.GWT;
-import com.google.gwt.storage.client.Storage;
-import com.google.gwt.uibinder.client.UiBinder;
-import com.google.gwt.uibinder.client.UiField;
-import com.google.gwt.user.cellview.client.Column;
-import com.google.gwt.user.cellview.client.Header;
-import com.google.gwt.user.cellview.client.SimplePager;
-import com.google.gwt.user.cellview.client.SimplePager.TextLocation;
-import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.google.gwt.user.client.ui.FileUpload;
-import com.google.gwt.user.client.ui.HasHorizontalAlignment;
-import com.google.gwt.user.client.ui.Hidden;
-import com.google.gwt.user.client.ui.Widget;
-import com.google.gwt.view.client.HasRows;
-import com.google.gwt.view.client.ListDataProvider;
-import com.google.gwt.view.client.SingleSelectionModel;
-
 public class AssetConfigurationUi extends AbstractServicesUi implements HasConfiguration {
 
     private static final String COLUMN_VISIBILITY_SETTINGS_KEY = "org.eclipse.kura.settings.column.asset.";
 
     private static final List<String> defaultHiddenColumns = //
-            Arrays.asList(//
+            Arrays.asList( //
                     AssetConstants.VALUE_UNIT.value(), //
                     AssetConstants.VALUE_SCALE.value(), //
                     AssetConstants.VALUE_OFFSET.value(), //
@@ -108,20 +106,23 @@ public class AssetConfigurationUi extends AbstractServicesUi implements HasConfi
     private final GwtSecurityTokenServiceAsync gwtXSRFService = GWT.create(GwtSecurityTokenService.class);
     private final GwtDriverAndAssetServiceAsync gwtAssetService = GWT.create(GwtDriverAndAssetService.class);
 
-    interface AssetConfigurationUiBinder extends UiBinder<Widget, AssetConfigurationUi> {
-    }
+    interface AssetConfigurationUiBinder extends UiBinder<Widget, AssetConfigurationUi> {}
 
     @UiField
     Button btnAdd;
+
     @UiField
     Button btnRemove;
+
     @UiField
     Button btnDownload;
+
     @UiField
     Button btnUpload;
 
     @UiField
     Button btnManageHiddenColumn;
+
     @UiField
     Form columnVisibilityForm;
 
@@ -133,35 +134,46 @@ public class AssetConfigurationUi extends AbstractServicesUi implements HasConfi
 
     CheckBox selectAllColumnCheckbox;
     List<CheckBox> columnVisibilityCheckBoxes = new ArrayList<>();
+
     @UiField
     Anchor resetColumnsAnchor;
 
     @UiField
     FormLabel columnVisibilityError;
+
     @UiField
     FormLabel columnVisibilityLabel;
+
     @UiField
     Button btnCancelSetColumnVisibility;
+
     @UiField
     Button btnSetColumnVisibility;
 
     @UiField
     Strong channelTitle;
+
     @UiField
     FieldSet fields;
 
     @UiField
     Modal newChannelModal;
+
     @UiField
     Modal columnVisibilityModal;
+
     @UiField
     FormLabel newChannelNameLabel;
+
     @UiField
     FormLabel newChannelNameError;
+
     @UiField
     TextBox newChannelNameInput;
+
     @UiField
     Button btnCreateNewChannel;
+
     @UiField
     Button btnCancelCreatingNewChannel;
 
@@ -173,26 +185,37 @@ public class AssetConfigurationUi extends AbstractServicesUi implements HasConfi
 
     @UiField
     Button uploadCancel;
+
     @UiField
     Button uploadUpload;
+
     @UiField
     FileUpload filePath;
+
     @UiField
     CheckBox appendCheck;
+
     @UiField
     CheckBox emptyStringCheck;
+
     @UiField
     Hidden xsrfTokenField;
+
     @UiField
     Hidden assetPidField;
+
     @UiField
     Hidden driverPidField;
+
     @UiField
     Hidden emptyStringCheckField;
+
     @UiField
     Hidden appendCheckField;
+
     @UiField
     Paragraph emptyTableLabel;
+
     @UiField
     PanelFooter tablePanelFooter;
 
@@ -264,23 +287,27 @@ public class AssetConfigurationUi extends AbstractServicesUi implements HasConfi
 
         this.btnUpload.addClickHandler(event -> uploadAndApply());
 
-        this.uploadUpload.addClickHandler(click -> RequestQueue
-                .submit(context -> this.gwtXSRFService.generateSecurityToken(context.callback(token -> {
+        this.uploadUpload.addClickHandler(click ->
+                RequestQueue.submit(context -> this.gwtXSRFService.generateSecurityToken(context.callback(token -> {
                     AssetConfigurationUi.this.xsrfTokenField.setValue(token.getToken());
                     AssetConfigurationUi.this.assetPidField.setValue(AssetConfigurationUi.this.model.getAssetPid());
-                    AssetConfigurationUi.this.driverPidField.setValue(AssetConfigurationUi.this.model.getConfiguration()
+                    AssetConfigurationUi.this.driverPidField.setValue(AssetConfigurationUi.this
+                            .model
+                            .getConfiguration()
                             .getParameterValue(AssetConstants.ASSET_DRIVER_PROP.value()));
-                    AssetConfigurationUi.this.appendCheckField
-                            .setValue(AssetConfigurationUi.this.appendCheck.getValue().toString());
-                    AssetConfigurationUi.this.emptyStringCheckField
-                            .setValue(AssetConfigurationUi.this.emptyStringCheck.getValue().toString());
+                    AssetConfigurationUi.this.appendCheckField.setValue(
+                            AssetConfigurationUi.this.appendCheck.getValue().toString());
+                    AssetConfigurationUi.this.emptyStringCheckField.setValue(AssetConfigurationUi.this
+                            .emptyStringCheck
+                            .getValue()
+                            .toString());
                     AssetConfigurationUi.this.uploadForm.submit();
                     AssetConfigurationUi.this.uploadModal.hide();
                     AssetConfigurationUi.this.formSubmitCallback = context.callback(completeEvent -> {
                         String htmlResponse = completeEvent.getResults();
                         if (htmlResponse == null || htmlResponse.isEmpty()) {
-                            AssetConfigurationUi.this.gwtXSRFService.generateSecurityToken(context
-                                    .callback(t -> fetchUploadedChannels(t, this.appendCheck.getValue(), context)));
+                            AssetConfigurationUi.this.gwtXSRFService.generateSecurityToken(context.callback(
+                                    t -> fetchUploadedChannels(t, this.appendCheck.getValue(), context)));
 
                         } else {
                             EntryClassUi.hideWaitModal();
@@ -288,7 +315,6 @@ public class AssetConfigurationUi extends AbstractServicesUi implements HasConfi
                             FailureHandler.handle(new Exception(htmlResponse));
                         }
                     });
-
                 }))));
 
         this.uploadCancel.addClickHandler(event -> AssetConfigurationUi.this.uploadModal.hide());
@@ -303,8 +329,8 @@ public class AssetConfigurationUi extends AbstractServicesUi implements HasConfi
             AssetConfigurationUi.this.columnVisibilityModal.show();
         });
 
-        this.selectionModel.addSelectionChangeHandler(event -> AssetConfigurationUi.this.btnRemove
-                .setEnabled(AssetConfigurationUi.this.selectionModel.getSelectedObject() != null));
+        this.selectionModel.addSelectionChangeHandler(event -> AssetConfigurationUi.this.btnRemove.setEnabled(
+                AssetConfigurationUi.this.selectionModel.getSelectedObject() != null));
 
         this.uploadForm.addSubmitCompleteHandler(event -> this.formSubmitCallback.onSuccess(event));
 
@@ -318,7 +344,7 @@ public class AssetConfigurationUi extends AbstractServicesUi implements HasConfi
         initNewChannelModal();
         initColumnVisibilityModal();
 
-        this.btnManageHiddenColumn.setText(MSGS.columnVisibilityModalButton(//
+        this.btnManageHiddenColumn.setText(MSGS.columnVisibilityModalButton( //
                 String.valueOf(totalEnabledColumns(this.columnNameVisibilityMap)),
                 String.valueOf(this.columnNameVisibilityMap.size())));
     }
@@ -328,13 +354,12 @@ public class AssetConfigurationUi extends AbstractServicesUi implements HasConfi
 
         this.selectAllColumnCheckbox = new CheckBox(MSGS.columnVisibilitySelectAllColumnCheckbox());
 
-        this.selectAllColumnCheckbox.addClickHandler(event -> this.columnVisibilityCheckBoxes
-                .forEach(checkbox -> checkbox.setValue(this.selectAllColumnCheckbox.getValue())));
+        this.selectAllColumnCheckbox.addClickHandler(event -> this.columnVisibilityCheckBoxes.forEach(
+                checkbox -> checkbox.setValue(this.selectAllColumnCheckbox.getValue())));
 
         this.columnVisibilityForm.add(this.selectAllColumnCheckbox);
 
         this.columnNameVisibilityMap.forEach((columnId, visible) -> {
-
             CheckBox columnCheckBox = new CheckBox(toChannelPropertyName(columnId));
             columnCheckBox.setFormValue(columnId);
             columnCheckBox.setValue(visible);
@@ -342,12 +367,11 @@ public class AssetConfigurationUi extends AbstractServicesUi implements HasConfi
             AssetConfigurationUi.this.columnVisibilityCheckBoxes.add(columnCheckBox);
             AssetConfigurationUi.this.columnVisibilityForm.add(columnCheckBox);
         });
-
     }
 
     private void setColumnVisibilityMap() {
-        this.columnVisibilityCheckBoxes
-                .forEach(checkbox -> this.columnNameVisibilityMap.put(checkbox.getFormValue(), checkbox.getValue()));
+        this.columnVisibilityCheckBoxes.forEach(
+                checkbox -> this.columnNameVisibilityMap.put(checkbox.getFormValue(), checkbox.getValue()));
     }
 
     private void fetchUploadedChannels(GwtXSRFToken token, final boolean replace, final RequestContext context) {
@@ -422,7 +446,6 @@ public class AssetConfigurationUi extends AbstractServicesUi implements HasConfi
 
         this.configurableComponent = nonChannelFields;
         initTable();
-
     }
 
     private void initTable() {
@@ -537,7 +560,6 @@ public class AssetConfigurationUi extends AbstractServicesUi implements HasConfi
                 AssetConfigurationUi.this.setDirty(true);
                 this.channelTable.redrawRow(index);
             });
-
         }
 
         if (param.getType() == GwtConfigParameterType.BOOLEAN) {
@@ -588,7 +610,9 @@ public class AssetConfigurationUi extends AbstractServicesUi implements HasConfi
                         || param.getId().equals(AssetConstants.SCALE_OFFSET_TYPE.value())
                                 && !oldValue.equals(newValue))) {
 
-                    for (Map.Entry<String, Integer> paramEntry : AssetConfigurationUi.this.model.getParameterIndexes()
+                    for (Map.Entry<String, Integer> paramEntry : AssetConfigurationUi.this
+                            .model
+                            .getParameterIndexes()
                             .entrySet()) {
                         String paramIdentifier = channelModel.getChannelName() + '#' + paramEntry.getKey();
                         Integer parameterIndex = paramEntry.getValue();
@@ -600,7 +624,6 @@ public class AssetConfigurationUi extends AbstractServicesUi implements HasConfi
                     }
 
                     this.channelTable.redrawRow(index);
-
                 }
             });
         }
@@ -627,7 +650,8 @@ public class AssetConfigurationUi extends AbstractServicesUi implements HasConfi
         });
 
         this.btnCreateNewChannel.addClickHandler(event -> {
-            final String newChannelName = AssetConfigurationUi.this.newChannelNameInput.getValue().trim();
+            final String newChannelName =
+                    AssetConfigurationUi.this.newChannelNameInput.getValue().trim();
 
             ValidationData isChannelNameValid = validateChannelName(newChannelName);
             if (isChannelNameValid.isInvalid()) {
@@ -684,27 +708,24 @@ public class AssetConfigurationUi extends AbstractServicesUi implements HasConfi
 
             AssetConfigurationUi.this.columnVisibilityError.setText("");
             initTable();
-            this.btnManageHiddenColumn.setText(MSGS.columnVisibilityModalButton(//
+            this.btnManageHiddenColumn.setText(MSGS.columnVisibilityModalButton( //
                     String.valueOf(totalEnabledColumns(this.columnNameVisibilityMap)),
                     String.valueOf(this.columnNameVisibilityMap.size())));
 
             AssetConfigurationUi.this.columnVisibilityModal.hide();
-
         });
 
-        this.btnCancelSetColumnVisibility.addClickHandler(event -> {
-
-        });
+        this.btnCancelSetColumnVisibility.addClickHandler(event -> {});
     }
 
     private void saveColumnVisibility() {
-        this.localStorage.setItem(COLUMN_VISIBILITY_SETTINGS_KEY + this.model.getAssetPid(),
-                this.columnNameVisibilityMap.toString());
+        this.localStorage.setItem(
+                COLUMN_VISIBILITY_SETTINGS_KEY + this.model.getAssetPid(), this.columnNameVisibilityMap.toString());
     }
 
     private void loadColumnVisibilityMap() {
-        String columnVisibilitySettings = this.localStorage
-                .getItem(COLUMN_VISIBILITY_SETTINGS_KEY + this.model.getAssetPid());
+        String columnVisibilitySettings =
+                this.localStorage.getItem(COLUMN_VISIBILITY_SETTINGS_KEY + this.model.getAssetPid());
         if (columnVisibilitySettings != null) {
             this.columnNameVisibilityMap = ColumnVisibilityMap.fromString(columnVisibilitySettings);
         }
@@ -715,7 +736,9 @@ public class AssetConfigurationUi extends AbstractServicesUi implements HasConfi
     }
 
     private long totalEnabledColumns(Map<?, ?> columnVisibilityModel) {
-        return columnVisibilityModel.values().stream().filter(Boolean.TRUE::equals).count();
+        return columnVisibilityModel.values().stream()
+                .filter(Boolean.TRUE::equals)
+                .count();
     }
 
     private void handleChannelTableVisibility() {
@@ -817,11 +840,16 @@ public class AssetConfigurationUi extends AbstractServicesUi implements HasConfi
         final GwtConfigComponent configuration = this.model.getConfiguration();
         final String driverPid = configuration.getParameterValue(AssetConstants.ASSET_DRIVER_PROP.value());
 
-        RequestQueue.submit(c -> this.gwtXSRFService
-                .generateSecurityToken(c.callback(token -> this.gwtAssetService.convertToCsv(token, driverPid,
-                        configuration, c.callback(id -> this.gwtXSRFService.generateSecurityToken(c.callback(token2 -> {
+        RequestQueue.submit(c ->
+                this.gwtXSRFService.generateSecurityToken(c.callback(token -> this.gwtAssetService.convertToCsv(
+                        token,
+                        driverPid,
+                        configuration,
+                        c.callback(id -> this.gwtXSRFService.generateSecurityToken(c.callback(token2 -> {
                             final StringBuilder sbUrl = new StringBuilder();
-                            sbUrl.append("/assetsUpDownload?assetPid=").append(this.model.getAssetPid()).append("&id=")
+                            sbUrl.append("/assetsUpDownload?assetPid=")
+                                    .append(this.model.getAssetPid())
+                                    .append("&id=")
                                     .append(id);
                             DownloadHelper.instance().startDownload(token2, sbUrl.toString());
                         })))))));
@@ -859,7 +887,6 @@ public class AssetConfigurationUi extends AbstractServicesUi implements HasConfi
         this.emptyStringCheckField.setID("doEmptyStringConversion");
         this.emptyStringCheckField.setName("doEmptyStringConversion");
         this.emptyStringCheckField.setValue("");
-
     }
 
     @Override
@@ -877,7 +904,8 @@ public class AssetConfigurationUi extends AbstractServicesUi implements HasConfi
 
         @Override
         public String toString() {
-            return this.entrySet().stream().map(entry -> entry.getKey() + "=" + entry.getValue())
+            return this.entrySet().stream()
+                    .map(entry -> entry.getKey() + "=" + entry.getValue())
                     .collect(Collectors.joining(";"));
         }
 

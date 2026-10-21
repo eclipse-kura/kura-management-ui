@@ -14,8 +14,9 @@
  *******************************************************************************/
 package org.eclipse.kura.web.shared.service;
 
+import com.google.gwt.user.client.rpc.RemoteService;
+import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
 import java.util.List;
-
 import org.eclipse.kura.web.server.Audit;
 import org.eclipse.kura.web.server.RequiredPermissions;
 import org.eclipse.kura.web.shared.GwtKuraException;
@@ -25,9 +26,6 @@ import org.eclipse.kura.web.shared.model.GwtWireComposerStaticInfo;
 import org.eclipse.kura.web.shared.model.GwtWireGraph;
 import org.eclipse.kura.web.shared.model.GwtWireGraphConfiguration;
 import org.eclipse.kura.web.shared.model.GwtXSRFToken;
-
-import com.google.gwt.user.client.rpc.RemoteService;
-import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
 
 /**
  * This is essentially used by GWT to interact with the OSGi WireGraphService for
@@ -62,8 +60,11 @@ public interface GwtWireGraphService extends RemoteService {
     public GwtWireGraphConfiguration getWiresConfiguration(GwtXSRFToken xsrfToken) throws GwtKuraException;
 
     @Audit(componentName = "UI Wires", description = "Update Wire Graph configuration")
-    public void updateWireConfiguration(GwtXSRFToken xsrfToken, GwtWireGraphConfiguration configurations,
-            List<GwtConfigComponent> additionalConfigs) throws GwtKuraException;
+    public void updateWireConfiguration(
+            GwtXSRFToken xsrfToken,
+            GwtWireGraphConfiguration configurations,
+            List<GwtConfigComponent> additionalConfigs)
+            throws GwtKuraException;
 
     public GwtWireComposerStaticInfo getWireComposerStaticInfo(GwtXSRFToken xsrfToken) throws GwtKuraException;
 

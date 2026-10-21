@@ -1,24 +1,25 @@
-
 /*******************************************************************************
  * Copyright (c) 2011, 2025 Eurotech and/or its affiliates and others
- * 
+ *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
  * which is available at https://www.eclipse.org/legal/epl-2.0/
- * 
+ *
  * SPDX-License-Identifier: EPL-2.0
- * 
+ *
  * Contributors:
  *  Eurotech
  *******************************************************************************/
 package org.eclipse.kura.web.server.servlet;
 
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
-
 import org.eclipse.kura.KuraException;
 import org.eclipse.kura.configuration.ComponentConfiguration;
 import org.eclipse.kura.configuration.ConfigurationService;
@@ -31,10 +32,6 @@ import org.eclipse.kura.web.shared.KuraPermission;
 import org.eclipse.kura.web.shared.model.GwtXSRFToken;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import jakarta.servlet.ServletException;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 
 public class DeviceSnapshotsServlet extends AuditServlet {
 
@@ -52,7 +49,7 @@ public class DeviceSnapshotsServlet extends AuditServlet {
     @Override
     public void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
-        KuraRemoteServiceServlet.requirePermissions(request, Mode.ALL, new String[] { KuraPermission.ADMIN });
+        KuraRemoteServiceServlet.requirePermissions(request, Mode.ALL, new String[] {KuraPermission.ADMIN});
 
         try {
             GwtXSRFToken token = new GwtXSRFToken(request.getParameter("xsrfToken"));
@@ -78,7 +75,6 @@ public class DeviceSnapshotsServlet extends AuditServlet {
             logger.error("Error exporting snapshot");
             throw new ServletException(e);
         }
-
     }
 
     private void parseEntireSnapshot(HttpServletResponse response, Long snapshotId, String downloadFormat)
@@ -87,22 +83,24 @@ public class DeviceSnapshotsServlet extends AuditServlet {
         ServiceLocator locator = ServiceLocator.getInstance();
         ConfigurationService cs = locator.getService(ConfigurationService.class);
 
-        GwtServerUtil.writeSnapshot(response, cs.getSnapshot(snapshotId), SNAPSHOT_DOWNLOAD_TAG + snapshotId,
-                downloadFormat);
+        GwtServerUtil.writeSnapshot(
+                response, cs.getSnapshot(snapshotId), SNAPSHOT_DOWNLOAD_TAG + snapshotId, downloadFormat);
     }
 
-    private void parsePartialSnapshot(HttpServletResponse response, Long snapshotId, String downloadFormat,
-            String pidList) throws GwtKuraException, ServletException, KuraException {
+    private void parsePartialSnapshot(
+            HttpServletResponse response, Long snapshotId, String downloadFormat, String pidList)
+            throws GwtKuraException, ServletException, KuraException {
 
         ServiceLocator locator = ServiceLocator.getInstance();
         ConfigurationService cs = locator.getService(ConfigurationService.class);
 
-        List<String> selectedPids = Arrays.asList(pidList.replace("SelectedPids: ", "").split(","));
+        List<String> selectedPids =
+                Arrays.asList(pidList.replace("SelectedPids: ", "").split(","));
 
         List<ComponentConfiguration> configs = cs.getSnapshot(snapshotId).stream()
-                .filter(config -> selectedPids.contains(config.getPid())).collect(Collectors.toList());
+                .filter(config -> selectedPids.contains(config.getPid()))
+                .collect(Collectors.toList());
 
         GwtServerUtil.writeSnapshot(response, configs, SNAPSHOT_DOWNLOAD_TAG + snapshotId, downloadFormat);
     }
-
 }

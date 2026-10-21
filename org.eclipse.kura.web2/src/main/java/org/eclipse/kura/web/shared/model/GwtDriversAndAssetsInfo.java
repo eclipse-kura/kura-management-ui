@@ -69,5 +69,4 @@ public final class GwtDriversAndAssetsInfo extends GwtBaseModel implements Seria
     public void setAllActivePids(List<String> allActivePids) {
         this.allActivePids = allActivePids;
     }
-
 }

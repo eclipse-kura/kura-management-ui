@@ -1,5 +1,9 @@
 package org.eclipse.kura.web.server.servlet;
 
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -10,7 +14,6 @@ import java.net.URL;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
-
 import org.apache.commons.fileupload2.core.DiskFileItem;
 import org.apache.commons.fileupload2.core.FileUploadException;
 import org.apache.commons.fileupload2.jakarta.servlet5.JakartaServletFileUpload;
@@ -23,11 +26,6 @@ import org.eclipse.kura.web.shared.GwtKuraException;
 import org.eclipse.kura.web.shared.KuraPermission;
 import org.eclipse.kura.web.shared.model.GwtSupportedFeatures;
 import org.eclipse.kura.web.shared.model.GwtXSRFToken;
-
-import jakarta.servlet.ServletException;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-import jakarta.servlet.http.HttpSession;
 
 /*
     This class extends the FileServlet to add support for package deployment operations, which require the installation of the kura-deployment addon.
@@ -49,12 +47,11 @@ public class PackagesExtendedFileServlet extends FileServlet {
         }
 
         if (reqPathInfo.startsWith("/deploy")) {
-            KuraRemoteServiceServlet.requirePermissions(req, Mode.ALL, new String[] { KuraPermission.PACKAGES_ADMIN });
+            KuraRemoteServiceServlet.requirePermissions(req, Mode.ALL, new String[] {KuraPermission.PACKAGES_ADMIN});
             doPostDeploy(req);
         } else {
             super.doPost(req, resp);
         }
-
     }
 
     private void doPostDeploy(HttpServletRequest req) throws ServletException, IOException {
@@ -241,5 +238,4 @@ public class PackagesExtendedFileServlet extends FileServlet {
             }
         }
     }
-
 }

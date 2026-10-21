@@ -1,12 +1,12 @@
 /*******************************************************************************
  * Copyright (c) 2016, 2020 Eurotech and/or its affiliates and others
- * 
+ *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
  * which is available at https://www.eclipse.org/legal/epl-2.0/
- * 
+ *
  * SPDX-License-Identifier: EPL-2.0
- * 
+ *
  * Contributors:
  *  Eurotech
  *  Amit Kumar Mondal
@@ -54,7 +54,11 @@ public final class ValidationInputCell extends AbstractInputCell<String, Validat
 
     /** {@inheritDoc} */
     @Override
-    public void onBrowserEvent(final Context context, final Element parent, final String value, final NativeEvent event,
+    public void onBrowserEvent(
+            final Context context,
+            final Element parent,
+            final String value,
+            final NativeEvent event,
             final ValueUpdater<String> valueUpdater) {
         super.onBrowserEvent(context, parent, value, event, valueUpdater);
         final Element target = event.getEventTarget().cast();
@@ -81,8 +85,12 @@ public final class ValidationInputCell extends AbstractInputCell<String, Validat
 
     /** {@inheritDoc} */
     @Override
-    protected void onEnterKeyDown(final Context context, final Element parent, final String value,
-            final NativeEvent event, final ValueUpdater<String> valueUpdater) {
+    protected void onEnterKeyDown(
+            final Context context,
+            final Element parent,
+            final String value,
+            final NativeEvent event,
+            final ValueUpdater<String> valueUpdater) {
         final Element target = event.getEventTarget().cast();
         if (getInputElement(parent).isOrHasChild(target)) {
             finishEditing(parent, value, context.getKey(), valueUpdater);
@@ -102,7 +110,7 @@ public final class ValidationInputCell extends AbstractInputCell<String, Validat
         final boolean invalid = validationViewData != null && validationViewData.isInvalid();
         final String color = invalid ? NONVALIDATED_COLOR : VALIDATED_COLOR;
         final SafeStyles safeColor = SafeStylesUtils.fromTrustedString("color: " + color + ";");
-        shb.append(this.validationTemplate.input(value, safeColor,
-                invalid ? NONVALIDATED_CSS_CLASS_NAME : VALIDATED_CSS_CLASS_NAME));
+        shb.append(this.validationTemplate.input(
+                value, safeColor, invalid ? NONVALIDATED_CSS_CLASS_NAME : VALIDATED_CSS_CLASS_NAME));
     }
 }

@@ -13,18 +13,16 @@
  *******************************************************************************/
 package org.eclipse.kura.web.shared.service;
 
+import com.google.gwt.user.client.rpc.RemoteService;
+import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
 import java.util.List;
 import java.util.Map;
-
 import org.eclipse.kura.web.server.Audit;
 import org.eclipse.kura.web.server.RequiredPermissions;
 import org.eclipse.kura.web.shared.GwtKuraException;
 import org.eclipse.kura.web.shared.KuraPermission;
 import org.eclipse.kura.web.shared.model.GwtConfigComponent;
 import org.eclipse.kura.web.shared.model.GwtXSRFToken;
-
-import com.google.gwt.user.client.rpc.RemoteService;
-import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
 
 /**
  * Set of methods that can be used to get or update component configurations. Those methods will work in relation with a
@@ -173,8 +171,9 @@ public interface GwtComponentService extends RemoteService {
     public void createFactoryComponent(GwtXSRFToken xsrfToken, String factoryPid, String pid) throws GwtKuraException;
 
     @Audit(componentName = "UI Component", description = "Create factory component")
-    public void createFactoryComponent(GwtXSRFToken xsrfToken, String factoryPid, String pid,
-            GwtConfigComponent properties) throws GwtKuraException;
+    public void createFactoryComponent(
+            GwtXSRFToken xsrfToken, String factoryPid, String pid, GwtConfigComponent properties)
+            throws GwtKuraException;
 
     @Audit(componentName = "UI Component", description = "Delete factory configuration")
     public void deleteFactoryConfiguration(GwtXSRFToken xsrfToken, String pid, boolean takeSnapshot)

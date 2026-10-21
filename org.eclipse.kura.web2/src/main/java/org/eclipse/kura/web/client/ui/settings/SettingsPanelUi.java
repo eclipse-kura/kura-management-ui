@@ -1,20 +1,26 @@
 /*******************************************************************************
  * Copyright (c) 2011, 2025 Eurotech and/or its affiliates and others
- * 
+ *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
  * which is available at https://www.eclipse.org/legal/epl-2.0/
- * 
+ *
  * SPDX-License-Identifier: EPL-2.0
- * 
+ *
  * Contributors:
  *  Eurotech
  *******************************************************************************/
 package org.eclipse.kura.web.client.ui.settings;
 
+import com.google.gwt.core.client.GWT;
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.uibinder.client.UiBinder;
+import com.google.gwt.uibinder.client.UiField;
+import com.google.gwt.user.client.ui.Composite;
+import com.google.gwt.user.client.ui.HTMLPanel;
+import com.google.gwt.user.client.ui.Widget;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
 import org.eclipse.kura.web.client.messages.Messages;
 import org.eclipse.kura.web.client.ui.Tab;
 import org.eclipse.kura.web.client.ui.Tab.RefreshHandler;
@@ -32,22 +38,13 @@ import org.gwtbootstrap3.client.ui.TabListItem;
 import org.gwtbootstrap3.client.ui.html.Paragraph;
 import org.gwtbootstrap3.client.ui.html.Span;
 
-import com.google.gwt.core.client.GWT;
-import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.uibinder.client.UiBinder;
-import com.google.gwt.uibinder.client.UiField;
-import com.google.gwt.user.client.ui.Composite;
-import com.google.gwt.user.client.ui.HTMLPanel;
-import com.google.gwt.user.client.ui.Widget;
-
 public class SettingsPanelUi extends Composite {
 
     private static SettingsPanelUiUiBinder uiBinder = GWT.create(SettingsPanelUiUiBinder.class);
     private static final Logger logger = Logger.getLogger(SettingsPanelUi.class.getSimpleName());
     private static final Messages MSGS = GWT.create(Messages.class);
 
-    interface SettingsPanelUiUiBinder extends UiBinder<Widget, SettingsPanelUi> {
-    }
+    interface SettingsPanelUiUiBinder extends UiBinder<Widget, SettingsPanelUi> {}
 
     GwtSession session;
 
@@ -56,8 +53,10 @@ public class SettingsPanelUi extends Composite {
 
     @UiField
     TabListItem snapshots;
+
     @UiField
     TabContent tabContent;
+
     @UiField
     NavTabs navTabs;
 
@@ -158,5 +157,4 @@ public class SettingsPanelUi extends Composite {
     private Tab getTab(TabListItem item) {
         return this.snapshotsPanel;
     }
-
 }

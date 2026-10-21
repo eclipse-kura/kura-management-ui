@@ -12,9 +12,20 @@
  *******************************************************************************/
 package org.eclipse.kura.web.client.ui.firewall;
 
+import com.google.gwt.core.client.GWT;
+import com.google.gwt.editor.client.Editor;
+import com.google.gwt.editor.client.EditorError;
+import com.google.gwt.uibinder.client.UiBinder;
+import com.google.gwt.uibinder.client.UiField;
+import com.google.gwt.user.cellview.client.TextColumn;
+import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.google.gwt.user.client.ui.Composite;
+import com.google.gwt.user.client.ui.Widget;
+import com.google.gwt.view.client.ListDataProvider;
+import com.google.gwt.view.client.SingleSelectionModel;
+import com.google.web.bindery.event.shared.HandlerRegistration;
 import java.util.ArrayList;
 import java.util.List;
-
 import org.eclipse.kura.web.client.messages.Messages;
 import org.eclipse.kura.web.client.ui.AlertDialog;
 import org.eclipse.kura.web.client.ui.AlertDialog.ConfirmListener;
@@ -44,27 +55,13 @@ import org.gwtbootstrap3.client.ui.form.error.BasicEditorError;
 import org.gwtbootstrap3.client.ui.form.validator.Validator;
 import org.gwtbootstrap3.client.ui.gwt.CellTable;
 
-import com.google.gwt.core.client.GWT;
-import com.google.gwt.editor.client.Editor;
-import com.google.gwt.editor.client.EditorError;
-import com.google.gwt.uibinder.client.UiBinder;
-import com.google.gwt.uibinder.client.UiField;
-import com.google.gwt.user.cellview.client.TextColumn;
-import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.google.gwt.user.client.ui.Composite;
-import com.google.gwt.user.client.ui.Widget;
-import com.google.gwt.view.client.ListDataProvider;
-import com.google.gwt.view.client.SingleSelectionModel;
-import com.google.web.bindery.event.shared.HandlerRegistration;
-
 public class PortForwardingTabUi extends Composite implements Tab, ButtonBar.Listener {
 
     private static final String STATUS_TABLE_ROW = "status-table-row";
 
     private static PortForwardingTabUiUiBinder uiBinder = GWT.create(PortForwardingTabUiUiBinder.class);
 
-    interface PortForwardingTabUiUiBinder extends UiBinder<Widget, PortForwardingTabUi> {
-    }
+    interface PortForwardingTabUiUiBinder extends UiBinder<Widget, PortForwardingTabUi> {}
 
     private static final Messages MSGS = GWT.create(Messages.class);
 
@@ -81,8 +78,10 @@ public class PortForwardingTabUi extends Composite implements Tab, ButtonBar.Lis
 
     @UiField
     ButtonBar buttonBar;
+
     @UiField
     Alert notification;
+
     @UiField
     CellTable<GwtFirewallPortForwardEntry> portForwardGrid = new CellTable<>();
 
@@ -94,92 +93,127 @@ public class PortForwardingTabUi extends Composite implements Tab, ButtonBar.Lis
 
     @UiField
     FormLabel labelInput;
+
     @UiField
     FormLabel labelOutput;
+
     @UiField
     FormLabel labelLan;
+
     @UiField
     FormLabel labelProtocol;
+
     @UiField
     FormLabel labelExternal;
+
     @UiField
     FormLabel labelInternal;
+
     @UiField
     FormLabel labelEnable;
+
     @UiField
     FormLabel labelPermitttedNw;
+
     @UiField
     FormLabel labelPermitttedMac;
+
     @UiField
     FormLabel labelSource;
 
     @UiField
     FormGroup groupInput;
+
     @UiField
     FormGroup groupOutput;
+
     @UiField
     FormGroup groupLan;
+
     @UiField
     FormGroup groupExternal;
+
     @UiField
     FormGroup groupInternal;
+
     @UiField
     FormGroup groupPermittedNw;
+
     @UiField
     FormGroup groupPermittedMac;
+
     @UiField
     FormGroup groupSource;
 
     @UiField
     Tooltip tooltipInput;
+
     @UiField
     Tooltip tooltipOutput;
+
     @UiField
     Tooltip tooltipLan;
+
     @UiField
     Tooltip tooltipProtocol;
+
     @UiField
     Tooltip tooltipExternal;
+
     @UiField
     Tooltip tooltipInternal;
+
     @UiField
     Tooltip tooltipEnable;
+
     @UiField
     Tooltip tooltipPermittedNw;
+
     @UiField
     Tooltip tooltipPermittedMac;
+
     @UiField
     Tooltip tooltipSource;
 
     @UiField
     TextBox input;
+
     @UiField
     TextBox output;
+
     @UiField
     TextBox lan;
+
     @UiField
     TextBox external;
+
     @UiField
     TextBox internal;
+
     @UiField
     TextBox permittedNw;
+
     @UiField
     TextBox permittedMac;
+
     @UiField
     TextBox source;
 
     @UiField
     ListBox protocol;
+
     @UiField
     ListBox enable;
 
     @UiField
     Button submit;
+
     @UiField
     Button cancel;
 
     @UiField
     Modal existingRule;
+
     @UiField
     Button close;
 
@@ -187,8 +221,9 @@ public class PortForwardingTabUi extends Composite implements Tab, ButtonBar.Lis
 
     public PortForwardingTabUi() {
         initWidget(uiBinder.createAndBindUi(this));
-        this.selectionModel.addSelectionChangeHandler(event -> PortForwardingTabUi.this.buttonBar
-                .setEditDeleteButtonsDirty(PortForwardingTabUi.this.selectionModel.getSelectedObject() != null));
+        this.selectionModel.addSelectionChangeHandler(
+                event -> PortForwardingTabUi.this.buttonBar.setEditDeleteButtonsDirty(
+                        PortForwardingTabUi.this.selectionModel.getSelectedObject() != null));
         this.portForwardGrid.setSelectionModel(this.selectionModel);
 
         this.buttonBar.setListener(this);
@@ -201,7 +236,6 @@ public class PortForwardingTabUi extends Composite implements Tab, ButtonBar.Lis
         initTable();
         initModal();
         initDuplicateRuleModal();
-
     }
 
     private void initDuplicateRuleModal() {
@@ -228,20 +262,27 @@ public class PortForwardingTabUi extends Composite implements Tab, ButtonBar.Lis
             @Override
             public void onSuccess(GwtXSRFToken token) {
                 PortForwardingTabUi.this.setDirty(false);
-                PortForwardingTabUi.this.gwtNetworkService.findDeviceFirewallPortForwards(token,
-                        new AsyncCallback<List<GwtFirewallPortForwardEntry>>() {
+                PortForwardingTabUi.this.gwtNetworkService.findDeviceFirewallPortForwards(
+                        token, new AsyncCallback<List<GwtFirewallPortForwardEntry>>() {
 
                             @Override
                             public void onFailure(Throwable caught) {
                                 EntryClassUi.hideWaitModal();
-                                FailureHandler.handle(caught,
-                                        PortForwardingTabUi.this.gwtNetworkService.getClass().getSimpleName());
+                                FailureHandler.handle(
+                                        caught,
+                                        PortForwardingTabUi.this
+                                                .gwtNetworkService
+                                                .getClass()
+                                                .getSimpleName());
                             }
 
                             @Override
                             public void onSuccess(List<GwtFirewallPortForwardEntry> result) {
                                 for (GwtFirewallPortForwardEntry pair : result) {
-                                    PortForwardingTabUi.this.portForwardDataProvider.getList().add(pair);
+                                    PortForwardingTabUi.this
+                                            .portForwardDataProvider
+                                            .getList()
+                                            .add(pair);
                                 }
                                 setVisibility();
                                 refreshTable();
@@ -249,7 +290,6 @@ public class PortForwardingTabUi extends Composite implements Tab, ButtonBar.Lis
                             }
                         });
             }
-
         });
     }
 
@@ -453,8 +493,8 @@ public class PortForwardingTabUi extends Composite implements Tab, ButtonBar.Lis
 
             @Override
             public void onSuccess(GwtXSRFToken token) {
-                PortForwardingTabUi.this.gwtNetworkService.updateDeviceFirewallPortForwards(token,
-                        updatedPortForwardConf, new AsyncCallback<Void>() {
+                PortForwardingTabUi.this.gwtNetworkService.updateDeviceFirewallPortForwards(
+                        token, updatedPortForwardConf, new AsyncCallback<Void>() {
 
                             @Override
                             public void onFailure(Throwable ex) {
@@ -472,7 +512,6 @@ public class PortForwardingTabUi extends Composite implements Tab, ButtonBar.Lis
                         });
             }
         });
-
     }
 
     @Override
@@ -486,7 +525,9 @@ public class PortForwardingTabUi extends Composite implements Tab, ButtonBar.Lis
             if (PortForwardingTabUi.this.newPortForwardEntry != null) {
                 // Avoid duplicates
                 if (!duplicateEntry(PortForwardingTabUi.this.newPortForwardEntry)) {
-                    PortForwardingTabUi.this.portForwardDataProvider.getList()
+                    PortForwardingTabUi.this
+                            .portForwardDataProvider
+                            .getList()
                             .add(PortForwardingTabUi.this.newPortForwardEntry);
                     setVisibility();
                     refreshTable();
@@ -516,13 +557,15 @@ public class PortForwardingTabUi extends Composite implements Tab, ButtonBar.Lis
                 PortForwardingTabUi.this.portForwardDataProvider.getList().remove(oldEntry);
                 refreshTable();
                 if (!duplicateEntry(PortForwardingTabUi.this.editPortForwardEntry)) {
-                    PortForwardingTabUi.this.portForwardDataProvider.getList()
+                    PortForwardingTabUi.this
+                            .portForwardDataProvider
+                            .getList()
                             .add(PortForwardingTabUi.this.editPortForwardEntry);
                     PortForwardingTabUi.this.portForwardDataProvider.flush();
                     PortForwardingTabUi.this.buttonBar.setApplyResetButtonsDirty(true);
                     PortForwardingTabUi.this.editPortForwardEntry = null;
                     setVisibility();
-                } else {    // end duplicate
+                } else { // end duplicate
                     this.existingRule.show();
                     PortForwardingTabUi.this.portForwardDataProvider.getList().add(oldEntry);
                     PortForwardingTabUi.this.portForwardDataProvider.flush();
@@ -541,9 +584,12 @@ public class PortForwardingTabUi extends Composite implements Tab, ButtonBar.Lis
     public void onDelete() {
         GwtFirewallPortForwardEntry selection = PortForwardingTabUi.this.selectionModel.getSelectedObject();
         if (selection != null) {
-            PortForwardingTabUi.this.alertDialog
-                    .show(MSGS.firewallOpenPortDeleteConfirmation(String.valueOf(selection.getInPort())), () -> {
-                        PortForwardingTabUi.this.portForwardDataProvider.getList().remove(selection);
+            PortForwardingTabUi.this.alertDialog.show(
+                    MSGS.firewallOpenPortDeleteConfirmation(String.valueOf(selection.getInPort())), () -> {
+                        PortForwardingTabUi.this
+                                .portForwardDataProvider
+                                .getList()
+                                .remove(selection);
                         PortForwardingTabUi.this.buttonBar.setApplyResetButtonsDirty(true);
                         PortForwardingTabUi.this.buttonBar.setEditDeleteButtonsDirty(false);
                         PortForwardingTabUi.this.selectionModel.setSelected(selection, false);
@@ -566,7 +612,6 @@ public class PortForwardingTabUi extends Composite implements Tab, ButtonBar.Lis
 
         this.submit.setText(MSGS.submitButton());
         this.submit.addClickHandler(event -> {
-
             if (!checkEntries()) {
                 return;
             }
@@ -586,11 +631,15 @@ public class PortForwardingTabUi extends Composite implements Tab, ButtonBar.Lis
                 portForwardEntry.setPermittedNetwork("0.0.0.0/0");
             }
             if (PortForwardingTabUi.this.permittedMac.getText() != null
-                    && !"".equals(PortForwardingTabUi.this.permittedMac.getText().trim())) {
+                    && !""
+                            .equals(PortForwardingTabUi.this
+                                    .permittedMac
+                                    .getText()
+                                    .trim())) {
                 portForwardEntry.setPermittedMAC(PortForwardingTabUi.this.permittedMac.getText());
                 PortForwardingTabUi.this.alertDialog.setTitle(MSGS.warning());
-                PortForwardingTabUi.this.alertDialog.show(MSGS.firewallPortForwardFormNotificationMacFiltering(),
-                        (ConfirmListener) null);
+                PortForwardingTabUi.this.alertDialog.show(
+                        MSGS.firewallPortForwardFormNotificationMacFiltering(), (ConfirmListener) null);
             }
             if (PortForwardingTabUi.this.source.getText() != null
                     && !"".equals(PortForwardingTabUi.this.source.getText().trim())) {
@@ -608,7 +657,7 @@ public class PortForwardingTabUi extends Composite implements Tab, ButtonBar.Lis
             setDirty(true);
 
             PortForwardingTabUi.this.portForwardingForm.hide();
-        });// end submit click handler
+        }); // end submit click handler
     }
 
     private void showModal(final GwtFirewallPortForwardEntry existingEntry) {
@@ -619,8 +668,8 @@ public class PortForwardingTabUi extends Composite implements Tab, ButtonBar.Lis
             this.portForwardingForm.setTitle(MSGS.firewallPortForwardFormInformation());
         } else {
             // edit existing entry
-            this.portForwardingForm
-                    .setTitle(MSGS.firewallPortForwardFormUpdate(String.valueOf(existingEntry.getInPort())));
+            this.portForwardingForm.setTitle(
+                    MSGS.firewallPortForwardFormUpdate(String.valueOf(existingEntry.getInPort())));
         }
 
         setModalFieldsValues(existingEntry);
@@ -632,7 +681,7 @@ public class PortForwardingTabUi extends Composite implements Tab, ButtonBar.Lis
         }
 
         this.portForwardingForm.show();
-    }// end initModal
+    } // end initModal
 
     private void resetValidationStates() {
         PortForwardingTabUi.this.groupInput.setValidationState(ValidationState.NONE);
@@ -680,9 +729,11 @@ public class PortForwardingTabUi extends Composite implements Tab, ButtonBar.Lis
                 List<EditorError> result = new ArrayList<>();
                 if (PortForwardingTabUi.this.input.getText().trim().isEmpty()
                         || !PortForwardingTabUi.this.input.getText().trim().matches(FieldType.NIC_NAME.getRegex())
-                        || PortForwardingTabUi.this.input.getText().trim()
-                                .length() > FirewallPanelUtils.INTERFACE_NAME_MAX_LENGTH) {
-                    result.add(new BasicEditorError(PortForwardingTabUi.this.input, value,
+                        || PortForwardingTabUi.this.input.getText().trim().length()
+                                > FirewallPanelUtils.INTERFACE_NAME_MAX_LENGTH) {
+                    result.add(new BasicEditorError(
+                            PortForwardingTabUi.this.input,
+                            value,
                             MSGS.firewallPortForwardFormInboundInterfaceErrorMessage()));
                 }
                 return result;
@@ -703,9 +754,11 @@ public class PortForwardingTabUi extends Composite implements Tab, ButtonBar.Lis
                 List<EditorError> result = new ArrayList<>();
                 if (PortForwardingTabUi.this.output.getText().trim().isEmpty()
                         || !PortForwardingTabUi.this.output.getText().trim().matches(FieldType.NIC_NAME.getRegex())
-                        || PortForwardingTabUi.this.output.getText().trim()
-                                .length() > FirewallPanelUtils.INTERFACE_NAME_MAX_LENGTH) {
-                    result.add(new BasicEditorError(PortForwardingTabUi.this.output, value,
+                        || PortForwardingTabUi.this.output.getText().trim().length()
+                                > FirewallPanelUtils.INTERFACE_NAME_MAX_LENGTH) {
+                    result.add(new BasicEditorError(
+                            PortForwardingTabUi.this.output,
+                            value,
                             MSGS.firewallPortForwardFormOutboundInterfaceErrorMessage()));
                 }
                 return result;
@@ -726,8 +779,8 @@ public class PortForwardingTabUi extends Composite implements Tab, ButtonBar.Lis
                 List<EditorError> result = new ArrayList<>();
                 if (PortForwardingTabUi.this.lan.getText().trim().isEmpty()
                         || !PortForwardingTabUi.this.lan.getText().trim().matches(FieldType.IPV4_ADDRESS.getRegex())) {
-                    result.add(new BasicEditorError(PortForwardingTabUi.this.lan, value,
-                            MSGS.firewallPortForwardFormLanAddressErrorMessage()));
+                    result.add(new BasicEditorError(
+                            PortForwardingTabUi.this.lan, value, MSGS.firewallPortForwardFormLanAddressErrorMessage()));
                 }
                 return result;
             }
@@ -748,7 +801,9 @@ public class PortForwardingTabUi extends Composite implements Tab, ButtonBar.Lis
                 if (PortForwardingTabUi.this.internal.getText().trim().isEmpty()
                         || !FirewallPanelUtils.checkPortRegex(PortForwardingTabUi.this.internal.getText())
                         || !FirewallPanelUtils.isPortInRange(PortForwardingTabUi.this.internal.getText())) {
-                    result.add(new BasicEditorError(PortForwardingTabUi.this.internal, value,
+                    result.add(new BasicEditorError(
+                            PortForwardingTabUi.this.internal,
+                            value,
                             MSGS.firewallPortForwardFormInternalPortErrorMessage()));
                 }
                 return result;
@@ -770,7 +825,9 @@ public class PortForwardingTabUi extends Composite implements Tab, ButtonBar.Lis
                 if (PortForwardingTabUi.this.external.getText().trim().isEmpty()
                         || !FirewallPanelUtils.checkPortRegex(PortForwardingTabUi.this.external.getText())
                         || !FirewallPanelUtils.isPortInRange(PortForwardingTabUi.this.external.getText())) {
-                    result.add(new BasicEditorError(PortForwardingTabUi.this.external, value,
+                    result.add(new BasicEditorError(
+                            PortForwardingTabUi.this.external,
+                            value,
                             MSGS.firewallPortForwardFormExternalPortErrorMessage()));
                 }
                 return result;
@@ -790,9 +847,14 @@ public class PortForwardingTabUi extends Composite implements Tab, ButtonBar.Lis
             public List<EditorError> validate(Editor<String> editor, String value) {
                 List<EditorError> result = new ArrayList<>();
                 if (!PortForwardingTabUi.this.permittedNw.getText().trim().isEmpty()
-                        && !PortForwardingTabUi.this.permittedNw.getText().trim()
+                        && !PortForwardingTabUi.this
+                                .permittedNw
+                                .getText()
+                                .trim()
                                 .matches(FieldType.IPV4_CIDR_NOTATION.getRegex())) {
-                    result.add(new BasicEditorError(PortForwardingTabUi.this.permittedNw, value,
+                    result.add(new BasicEditorError(
+                            PortForwardingTabUi.this.permittedNw,
+                            value,
                             MSGS.firewallPortForwardFormPermittedNetworkErrorMessage()));
                 }
                 return result;
@@ -812,9 +874,14 @@ public class PortForwardingTabUi extends Composite implements Tab, ButtonBar.Lis
             public List<EditorError> validate(Editor<String> editor, String value) {
                 List<EditorError> result = new ArrayList<>();
                 if (!PortForwardingTabUi.this.permittedMac.getText().trim().isEmpty()
-                        && !PortForwardingTabUi.this.permittedMac.getText().trim()
+                        && !PortForwardingTabUi.this
+                                .permittedMac
+                                .getText()
+                                .trim()
                                 .matches(FieldType.MAC_ADDRESS.getRegex())) {
-                    result.add(new BasicEditorError(PortForwardingTabUi.this.permittedMac, value,
+                    result.add(new BasicEditorError(
+                            PortForwardingTabUi.this.permittedMac,
+                            value,
                             MSGS.firewallPortForwardFormPermittedMacAddressErrorMessage()));
                 }
                 return result;
@@ -835,9 +902,12 @@ public class PortForwardingTabUi extends Composite implements Tab, ButtonBar.Lis
                 List<EditorError> result = new ArrayList<>();
                 if (!PortForwardingTabUi.this.source.getText().trim().isEmpty()
                         && (!(FirewallPanelUtils.checkPortRegex(PortForwardingTabUi.this.source.getText())
-                                || FirewallPanelUtils.checkPortRangeRegex(PortForwardingTabUi.this.source.getText()))
+                                        || FirewallPanelUtils.checkPortRangeRegex(
+                                                PortForwardingTabUi.this.source.getText()))
                                 || !FirewallPanelUtils.isPortInRange(PortForwardingTabUi.this.source.getText()))) {
-                    result.add(new BasicEditorError(PortForwardingTabUi.this.source, value,
+                    result.add(new BasicEditorError(
+                            PortForwardingTabUi.this.source,
+                            value,
                             MSGS.firewallPortForwardFormSourcePortRangeErrorMessage()));
                 }
                 return result;
@@ -950,21 +1020,23 @@ public class PortForwardingTabUi extends Composite implements Tab, ButtonBar.Lis
                         && entry.getOutPort().equals(portForwardEntry.getOutPort())
                         && entry.getInPort().equals(portForwardEntry.getInPort())) {
 
-                    String permittedNetwork = entry.getPermittedNetwork() != null ? entry.getPermittedNetwork()
-                            : "0.0.0.0/0";
+                    String permittedNetwork =
+                            entry.getPermittedNetwork() != null ? entry.getPermittedNetwork() : "0.0.0.0/0";
                     String newPermittedNetwork = portForwardEntry.getPermittedNetwork() != null
                             ? portForwardEntry.getPermittedNetwork()
                             : "0.0.0.0/0";
-                    String permittedMAC = entry.getPermittedMAC() != null ? entry.getPermittedMAC().toUpperCase() : "";
+                    String permittedMAC = entry.getPermittedMAC() != null
+                            ? entry.getPermittedMAC().toUpperCase()
+                            : "";
                     String newPermittedMAC = portForwardEntry.getPermittedMAC() != null
                             ? portForwardEntry.getPermittedMAC().toUpperCase()
                             : "";
                     String sourcePortRange = entry.getSourcePortRange() != null ? entry.getSourcePortRange() : "";
-                    String newSourcePortRange = portForwardEntry.getSourcePortRange() != null
-                            ? portForwardEntry.getSourcePortRange()
-                            : "";
+                    String newSourcePortRange =
+                            portForwardEntry.getSourcePortRange() != null ? portForwardEntry.getSourcePortRange() : "";
 
-                    if (permittedNetwork.equals(newPermittedNetwork) && permittedMAC.equals(newPermittedMAC)
+                    if (permittedNetwork.equals(newPermittedNetwork)
+                            && permittedMAC.equals(newPermittedMAC)
                             && sourcePortRange.equals(newSourcePortRange)) {
                         isDuplicateEntry = true;
                         break;
@@ -1045,12 +1117,14 @@ public class PortForwardingTabUi extends Composite implements Tab, ButtonBar.Lis
         }
 
         if (PortForwardingTabUi.this.groupPermittedNw.getValidationState().equals(ValidationState.ERROR)
-                || PortForwardingTabUi.this.groupPermittedMac.getValidationState().equals(ValidationState.ERROR)
+                || PortForwardingTabUi.this
+                        .groupPermittedMac
+                        .getValidationState()
+                        .equals(ValidationState.ERROR)
                 || PortForwardingTabUi.this.groupSource.getValidationState().equals(ValidationState.ERROR)) {
             valid = false;
         }
 
         return valid;
     }
-
 }

@@ -1,17 +1,20 @@
 /*******************************************************************************
  * Copyright (c) 2011, 2025 Eurotech and/or its affiliates and others
- * 
+ *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
  * which is available at https://www.eclipse.org/legal/epl-2.0/
- * 
+ *
  * SPDX-License-Identifier: EPL-2.0
- * 
+ *
  * Contributors:
  *  Eurotech
  *******************************************************************************/
 package org.eclipse.kura.web.server.servlet;
 
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileReader;
@@ -23,16 +26,11 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Optional;
 import java.util.stream.Stream;
-
 import org.eclipse.kura.system.SystemService;
 import org.eclipse.kura.web.server.util.ServiceLocator;
 import org.eclipse.kura.web.shared.GwtKuraException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import jakarta.servlet.http.HttpServlet;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 
 public class SkinServlet extends HttpServlet {
 
@@ -70,11 +68,11 @@ public class SkinServlet extends HttpServlet {
             response.setContentType("image/x-icon");
             streamBinary(fResourceFile, response);
         }
-
     }
 
     private void streamText(File fResourceFile, HttpServletResponse response) {
-        try (FileReader fr = new FileReader(fResourceFile); PrintWriter w = response.getWriter();) {
+        try (FileReader fr = new FileReader(fResourceFile);
+                PrintWriter w = response.getWriter(); ) {
             char[] buffer = new char[1024];
             int iRead = fr.read(buffer);
             while (iRead != -1) {
@@ -87,7 +85,8 @@ public class SkinServlet extends HttpServlet {
     }
 
     private void streamBinary(File fResourceFile, HttpServletResponse response) {
-        try (FileInputStream in = new FileInputStream(fResourceFile); OutputStream o = response.getOutputStream();) {
+        try (FileInputStream in = new FileInputStream(fResourceFile);
+                OutputStream o = response.getOutputStream(); ) {
             byte[] buf = new byte[1024];
             int len = 0;
             while ((len = in.read(buf)) >= 0) {
@@ -108,9 +107,11 @@ public class SkinServlet extends HttpServlet {
             throw new GwtKuraException(null, null, "Style resource directory is not configured");
         }
 
-        try (Stream<Path> kuraStyleDirStream = Files.list(Paths.get(styleDirectory));) {
-            Optional<Path> fResourcePath = kuraStyleDirStream.filter(filePath -> filePath.toFile().isFile())
-                    .filter(filePath -> filePath.toFile().getAbsolutePath().endsWith(resourceName)).findFirst();
+        try (Stream<Path> kuraStyleDirStream = Files.list(Paths.get(styleDirectory)); ) {
+            Optional<Path> fResourcePath = kuraStyleDirStream
+                    .filter(filePath -> filePath.toFile().isFile())
+                    .filter(filePath -> filePath.toFile().getAbsolutePath().endsWith(resourceName))
+                    .findFirst();
 
             if (!fResourcePath.isPresent()) {
                 throw new IOException("Resource File " + resourceName + " does not exist");

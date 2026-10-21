@@ -1,38 +1,16 @@
 /*******************************************************************************
  * Copyright (c) 2011, 2021 Eurotech and/or its affiliates and others
- * 
+ *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
  * which is available at https://www.eclipse.org/legal/epl-2.0/
- * 
+ *
  * SPDX-License-Identifier: EPL-2.0
- * 
+ *
  * Contributors:
  *  Eurotech
  *******************************************************************************/
 package org.eclipse.kura.web.client.ui.device;
-
-import java.util.ArrayList;
-import java.util.List;
-
-import org.eclipse.kura.web.client.messages.Messages;
-import org.eclipse.kura.web.client.messages.ValidationMessages;
-import org.eclipse.kura.web.client.ui.EntryClassUi;
-import org.eclipse.kura.web.client.ui.Tab;
-import org.eclipse.kura.web.client.util.EventService;
-import org.eclipse.kura.web.client.util.FailureHandler;
-import org.eclipse.kura.web.shared.ForwardedEventTopic;
-import org.eclipse.kura.web.shared.model.GwtGroupedNVPair;
-import org.eclipse.kura.web.shared.model.GwtModemInterfaceConfig;
-import org.eclipse.kura.web.shared.model.GwtNetIfType;
-import org.eclipse.kura.web.shared.model.GwtNetInterfaceConfig;
-import org.eclipse.kura.web.shared.model.GwtXSRFToken;
-import org.eclipse.kura.web.shared.service.GwtDeviceService;
-import org.eclipse.kura.web.shared.service.GwtDeviceServiceAsync;
-import org.eclipse.kura.web.shared.service.GwtSecurityTokenService;
-import org.eclipse.kura.web.shared.service.GwtSecurityTokenServiceAsync;
-import org.gwtbootstrap3.client.ui.Button;
-import org.gwtbootstrap3.client.ui.gwt.CellTable;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.uibinder.client.UiBinder;
@@ -45,13 +23,29 @@ import com.google.gwt.user.client.ui.Panel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.gwt.view.client.ListDataProvider;
 import com.google.gwt.view.client.SingleSelectionModel;
+import java.util.ArrayList;
+import java.util.List;
+import org.eclipse.kura.web.client.messages.Messages;
+import org.eclipse.kura.web.client.messages.ValidationMessages;
+import org.eclipse.kura.web.client.ui.EntryClassUi;
+import org.eclipse.kura.web.client.ui.Tab;
+import org.eclipse.kura.web.client.util.EventService;
+import org.eclipse.kura.web.client.util.FailureHandler;
+import org.eclipse.kura.web.shared.ForwardedEventTopic;
+import org.eclipse.kura.web.shared.model.GwtGroupedNVPair;
+import org.eclipse.kura.web.shared.model.GwtXSRFToken;
+import org.eclipse.kura.web.shared.service.GwtDeviceService;
+import org.eclipse.kura.web.shared.service.GwtDeviceServiceAsync;
+import org.eclipse.kura.web.shared.service.GwtSecurityTokenService;
+import org.eclipse.kura.web.shared.service.GwtSecurityTokenServiceAsync;
+import org.gwtbootstrap3.client.ui.Button;
+import org.gwtbootstrap3.client.ui.gwt.CellTable;
 
 public class DockerContainersTabUi extends Composite implements Tab {
 
     private static DockerContainersTabUiUiBinder uiBinder = GWT.create(DockerContainersTabUiUiBinder.class);
 
-    interface DockerContainersTabUiUiBinder extends UiBinder<Widget, DockerContainersTabUi> {
-    }
+    interface DockerContainersTabUiUiBinder extends UiBinder<Widget, DockerContainersTabUi> {}
 
     private static final Messages MSGS = GWT.create(Messages.class);
     private static final ValidationMessages validationMessages = GWT.create(ValidationMessages.class);
@@ -66,7 +60,6 @@ public class DockerContainersTabUi extends Composite implements Tab {
     /**
      * Switcher Related
      */
-
     @UiField
     Panel containerListPanel;
 
@@ -82,30 +75,33 @@ public class DockerContainersTabUi extends Composite implements Tab {
     /**
      * Container View Related
      */
-
     @UiField
     Button containersRefresh;
+
     @UiField
     Button containersStart;
+
     @UiField
     Button containersStop;
 
     @UiField
     CellTable<GwtGroupedNVPair> bundlesGrid = new CellTable<>();
+
     private final ListDataProvider<GwtGroupedNVPair> bundlesDataProvider = new ListDataProvider<>();
     private final SingleSelectionModel<GwtGroupedNVPair> selectionModel = new SingleSelectionModel<>();
 
     /**
      * Images View Related
      */
-
     @UiField
     Button imagesDelete;
+
     @UiField
     Button imagesRefresh;
 
     @UiField
     CellTable<GwtGroupedNVPair> imagesGrid = new CellTable<>();
+
     private final ListDataProvider<GwtGroupedNVPair> imagesDataProvider = new ListDataProvider<>();
     private final SingleSelectionModel<GwtGroupedNVPair> imagesSelectionModel = new SingleSelectionModel<>();
 
@@ -154,7 +150,6 @@ public class DockerContainersTabUi extends Composite implements Tab {
         EventService.subscribe(ForwardedEventTopic.DOCKER_RUNNING, onBundleUpdatedHandler);
         EventService.subscribe(ForwardedEventTopic.DOCKER_STARTED, onBundleUpdatedHandler);
         EventService.subscribe(ForwardedEventTopic.DOCKER_STOPPED, onBundleUpdatedHandler);
-
     }
 
     private void updateButtons() {
@@ -173,7 +168,6 @@ public class DockerContainersTabUi extends Composite implements Tab {
 
         this.containersStart.setEnabled(!isActive);
         this.containersStop.setEnabled(isActive);
-
     }
 
     private void updateSelectedPanels() {
@@ -238,7 +232,6 @@ public class DockerContainersTabUi extends Composite implements Tab {
         boolean isInstalled = "bndInstalled".equals(status);
 
         this.imagesDelete.setEnabled(isInstalled);
-
     }
 
     private void deleteSelectedImage() {
@@ -248,8 +241,12 @@ public class DockerContainersTabUi extends Composite implements Tab {
 
             @Override
             public void onSuccess(GwtXSRFToken token) {
-                DockerContainersTabUi.this.deviceService.deleteImage(token,
-                        DockerContainersTabUi.this.imagesSelectionModel.getSelectedObject().getId(),
+                DockerContainersTabUi.this.deviceService.deleteImage(
+                        token,
+                        DockerContainersTabUi.this
+                                .imagesSelectionModel
+                                .getSelectedObject()
+                                .getId(),
                         new AsyncCallback<Void>() {
 
                             @Override
@@ -263,7 +260,6 @@ public class DockerContainersTabUi extends Composite implements Tab {
                                 EntryClassUi.hideWaitModal();
                             }
                         });
-
             }
 
             @Override
@@ -282,15 +278,18 @@ public class DockerContainersTabUi extends Composite implements Tab {
 
             @Override
             public void onSuccess(GwtXSRFToken token) {
-                DockerContainersTabUi.this.deviceService.startContainer(token,
-                        DockerContainersTabUi.this.selectionModel.getSelectedObject().getId(),
+                DockerContainersTabUi.this.deviceService.startContainer(
+                        token,
+                        DockerContainersTabUi.this
+                                .selectionModel
+                                .getSelectedObject()
+                                .getId(),
                         new AsyncCallback<Void>() {
 
                             @Override
                             public void onFailure(Throwable caught) {
                                 EntryClassUi.hideWaitModal();
                                 FailureHandler.handle(caught);
-
                             }
 
                             @Override
@@ -299,7 +298,6 @@ public class DockerContainersTabUi extends Composite implements Tab {
                                 refresh();
                             }
                         });
-
             }
 
             @Override
@@ -322,15 +320,18 @@ public class DockerContainersTabUi extends Composite implements Tab {
 
             @Override
             public void onSuccess(GwtXSRFToken token) {
-                DockerContainersTabUi.this.deviceService.stopContainer(token,
-                        DockerContainersTabUi.this.selectionModel.getSelectedObject().getId(),
+                DockerContainersTabUi.this.deviceService.stopContainer(
+                        token,
+                        DockerContainersTabUi.this
+                                .selectionModel
+                                .getSelectedObject()
+                                .getId(),
                         new AsyncCallback<Void>() {
 
                             @Override
                             public void onFailure(Throwable caught) {
                                 EntryClassUi.hideWaitModal();
                                 FailureHandler.handle(caught);
-
                             }
 
                             @Override
@@ -344,8 +345,8 @@ public class DockerContainersTabUi extends Composite implements Tab {
         });
     }
 
-    private void loadContainersTable(CellTable<GwtGroupedNVPair> bundlesGrid2,
-            ListDataProvider<GwtGroupedNVPair> dataProvider) {
+    private void loadContainersTable(
+            CellTable<GwtGroupedNVPair> bundlesGrid2, ListDataProvider<GwtGroupedNVPair> dataProvider) {
 
         TextColumn<GwtGroupedNVPair> col1 = new TextColumn<GwtGroupedNVPair>() {
 
@@ -414,8 +415,8 @@ public class DockerContainersTabUi extends Composite implements Tab {
         dataProvider.addDataDisplay(bundlesGrid2);
     }
 
-    private void loadImagesTable(CellTable<GwtGroupedNVPair> bundlesGrid2,
-            ListDataProvider<GwtGroupedNVPair> dataProvider) {
+    private void loadImagesTable(
+            CellTable<GwtGroupedNVPair> bundlesGrid2, ListDataProvider<GwtGroupedNVPair> dataProvider) {
 
         TextColumn<GwtGroupedNVPair> col1 = new TextColumn<GwtGroupedNVPair>() {
 
@@ -506,8 +507,8 @@ public class DockerContainersTabUi extends Composite implements Tab {
                 /**
                  * List Containers
                  */
-                DockerContainersTabUi.this.gwtDeviceService.findContainers(token,
-                        new AsyncCallback<List<GwtGroupedNVPair>>() {
+                DockerContainersTabUi.this.gwtDeviceService.findContainers(
+                        token, new AsyncCallback<List<GwtGroupedNVPair>>() {
 
                             @Override
                             public void onFailure(Throwable caught) {
@@ -522,18 +523,22 @@ public class DockerContainersTabUi extends Composite implements Tab {
                                 DockerContainersTabUi.this.isRequestRunning = false;
                                 EntryClassUi.hideWaitModal();
                                 for (GwtGroupedNVPair resultPair : result) {
-                                    DockerContainersTabUi.this.bundlesDataProvider.getList().add(resultPair);
+                                    DockerContainersTabUi.this
+                                            .bundlesDataProvider
+                                            .getList()
+                                            .add(resultPair);
                                 }
-                                int size = DockerContainersTabUi.this.bundlesDataProvider.getList().size();
+                                int size = DockerContainersTabUi.this
+                                        .bundlesDataProvider
+                                        .getList()
+                                        .size();
                                 DockerContainersTabUi.this.bundlesGrid.setVisibleRange(0, size);
                                 DockerContainersTabUi.this.bundlesDataProvider.flush();
                                 DockerContainersTabUi.this.selectionModel.clear();
                                 updateButtons();
                             }
                         });
-
             }
-
         });
 
         EntryClassUi.showWaitModal();
@@ -555,8 +560,8 @@ public class DockerContainersTabUi extends Composite implements Tab {
                 /**
                  * List Images
                  */
-                DockerContainersTabUi.this.gwtDeviceService.findImages(token,
-                        new AsyncCallback<List<GwtGroupedNVPair>>() {
+                DockerContainersTabUi.this.gwtDeviceService.findImages(
+                        token, new AsyncCallback<List<GwtGroupedNVPair>>() {
 
                             @Override
                             public void onFailure(Throwable caught) {
@@ -571,9 +576,15 @@ public class DockerContainersTabUi extends Composite implements Tab {
                                 DockerContainersTabUi.this.isRequestRunning = false;
                                 EntryClassUi.hideWaitModal();
                                 for (GwtGroupedNVPair resultPair : result) {
-                                    DockerContainersTabUi.this.imagesDataProvider.getList().add(resultPair);
+                                    DockerContainersTabUi.this
+                                            .imagesDataProvider
+                                            .getList()
+                                            .add(resultPair);
                                 }
-                                int size = DockerContainersTabUi.this.imagesDataProvider.getList().size();
+                                int size = DockerContainersTabUi.this
+                                        .imagesDataProvider
+                                        .getList()
+                                        .size();
                                 DockerContainersTabUi.this.imagesGrid.setVisibleRange(0, size);
                                 DockerContainersTabUi.this.imagesDataProvider.flush();
                                 DockerContainersTabUi.this.imagesSelectionModel.clear();
@@ -581,9 +592,7 @@ public class DockerContainersTabUi extends Composite implements Tab {
                             }
                         });
             }
-
         });
-
     }
 
     @Override
@@ -605,5 +614,4 @@ public class DockerContainersTabUi extends Composite implements Tab {
     public boolean isValid() {
         return false;
     }
-
 }

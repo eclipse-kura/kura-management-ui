@@ -372,5 +372,4 @@ public class GwtModemInterfaceConfig extends GwtNetInterfaceConfig {
     public void setHwCI(String ci) {
         set("hwCI", ci);
     }
-
 }

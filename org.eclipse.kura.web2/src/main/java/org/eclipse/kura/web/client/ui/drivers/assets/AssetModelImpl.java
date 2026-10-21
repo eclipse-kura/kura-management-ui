@@ -22,7 +22,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.stream.Collectors;
-
 import org.eclipse.kura.web.client.ui.drivers.assets.LegacyChannelModel.LegacyChannelModelBuilder;
 import org.eclipse.kura.web.client.util.LabelComparator;
 import org.eclipse.kura.web.client.util.ValidationUtil;
@@ -57,7 +56,9 @@ public class AssetModelImpl implements AssetModel {
         loadChannelModels();
     }
 
-    public AssetModelImpl(GwtConfigComponent assetConfiguration, GwtConfigComponent channelDescriptor,
+    public AssetModelImpl(
+            GwtConfigComponent assetConfiguration,
+            GwtConfigComponent channelDescriptor,
             GwtConfigComponent baseChannelDescriptor) {
         this(assetConfiguration, concat(baseChannelDescriptor, channelDescriptor));
     }
@@ -126,13 +127,14 @@ public class AssetModelImpl implements AssetModel {
             }
 
             final int index = i;
-            LegacyChannelModelBuilder modelBuilder = modelBuilders.computeIfAbsent(channelName,
-                    name -> LegacyChannelModel.builder(name, index));
+            LegacyChannelModelBuilder modelBuilder =
+                    modelBuilders.computeIfAbsent(channelName, name -> LegacyChannelModel.builder(name, index));
             modelBuilder.addParameter(channelIndexes.get(propertyName), param);
         }
 
         Map<String, LegacyChannelModel> models = modelBuilders.entrySet().stream()
-                .collect(Collectors.toMap(Map.Entry::getKey, entry -> entry.getValue().build()));
+                .collect(Collectors.toMap(
+                        Map.Entry::getKey, entry -> entry.getValue().build()));
 
         ArrayList<Entry<String, LegacyChannelModel>> sortedModels = new ArrayList<>(models.entrySet());
         Collections.sort(sortedModels, CHANNEL_LABEL_COMPARATOR);
@@ -163,8 +165,8 @@ public class AssetModelImpl implements AssetModel {
             params.add(cloned);
         }
 
-        final LegacyChannelModel result = new LegacyChannelModel(channelName,
-                params.toArray(new GwtConfigParameter[0]));
+        final LegacyChannelModel result =
+                new LegacyChannelModel(channelName, params.toArray(new GwtConfigParameter[0]));
 
         result.setValue(AssetModelImpl.this.paramIndexes.get(AssetConstants.NAME.value()), channelName);
 
@@ -231,7 +233,8 @@ public class AssetModelImpl implements AssetModel {
     public void addAllChannels(final AssetModel other) {
         for (final ChannelModel model : other.getChannels()) {
             final ChannelModel channel = this.channelModels.stream()
-                    .filter(c -> c.getChannelName().contentEquals(model.getChannelName())).findAny()
+                    .filter(c -> c.getChannelName().contentEquals(model.getChannelName()))
+                    .findAny()
                     .orElseGet(() -> createNewChannel(model.getChannelName()));
             for (final Map.Entry<String, Integer> entry : this.paramIndexes.entrySet()) {
                 Integer index = entry.getValue();
@@ -257,5 +260,4 @@ public class AssetModelImpl implements AssetModel {
     public Map<String, Integer> getParameterIndexes() {
         return this.paramIndexes;
     }
-
 }

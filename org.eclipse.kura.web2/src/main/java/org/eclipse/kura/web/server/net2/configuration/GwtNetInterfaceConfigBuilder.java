@@ -17,7 +17,6 @@ package org.eclipse.kura.web.server.net2.configuration;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
-
 import org.eclipse.kura.net.status.NetworkInterfaceType;
 import org.eclipse.kura.net.wifi.WifiBgscanModule;
 import org.eclipse.kura.web.server.net2.utils.EnumsParser;
@@ -230,20 +229,21 @@ public class GwtNetInterfaceConfigBuilder {
         gwtWifiConfig.setWirelessSsid(this.properties.getWifiMasterSsid(this.ifName));
         gwtWifiConfig.setDriver(this.properties.getWifiMasterDriver(this.ifName));
         gwtWifiConfig.setIgnoreSSID(this.properties.getWifiMasterIgnoreSsid(this.ifName));
-        gwtWifiConfig.setPassword(new String(this.properties.getWifiMasterPassphrase(this.ifName).getPassword()));
+        gwtWifiConfig.setPassword(
+                new String(this.properties.getWifiMasterPassphrase(this.ifName).getPassword()));
         gwtWifiConfig.setWirelessMode(GwtWifiWirelessMode.netWifiWirelessModeAccessPoint.name());
-        gwtWifiConfig
-                .setSecurity(EnumsParser.getGwtWifiSecurity(this.properties.getWifiMasterSecurityType(this.ifName)));
+        gwtWifiConfig.setSecurity(
+                EnumsParser.getGwtWifiSecurity(this.properties.getWifiMasterSecurityType(this.ifName)));
         gwtWifiConfig.setPairwiseCiphers(
                 EnumsParser.getGwtWifiCiphers(this.properties.getWifiMasterPairwiseCiphers(this.ifName)));
-        gwtWifiConfig
-                .setGroupCiphers(EnumsParser.getGwtWifiCiphers(this.properties.getWifiMasterGroupCiphers(this.ifName)));
+        gwtWifiConfig.setGroupCiphers(
+                EnumsParser.getGwtWifiCiphers(this.properties.getWifiMasterGroupCiphers(this.ifName)));
         gwtWifiConfig.setChannels(this.properties.getWifiMasterChannel(this.ifName));
 
         // wifi master specific properties
 
-        Optional<String> radioMode = EnumsParser
-                .getGwtWifiRadioMode(this.properties.getWifiMasterRadioMode(this.ifName));
+        Optional<String> radioMode =
+                EnumsParser.getGwtWifiRadioMode(this.properties.getWifiMasterRadioMode(this.ifName));
         if (radioMode.isPresent()) {
             gwtWifiConfig.setRadioMode(radioMode.get());
         }
@@ -259,20 +259,21 @@ public class GwtNetInterfaceConfigBuilder {
         gwtWifiConfig.setWirelessSsid(this.properties.getWifiInfraSsid(this.ifName));
         gwtWifiConfig.setDriver(this.properties.getWifiInfraDriver(this.ifName));
         gwtWifiConfig.setIgnoreSSID(this.properties.getWifiInfraIgnoreSsid(this.ifName));
-        gwtWifiConfig.setPassword(new String(this.properties.getWifiInfraPassphrase(this.ifName).getPassword()));
+        gwtWifiConfig.setPassword(
+                new String(this.properties.getWifiInfraPassphrase(this.ifName).getPassword()));
         gwtWifiConfig.setWirelessMode(GwtWifiWirelessMode.netWifiWirelessModeStation.name());
-        gwtWifiConfig
-                .setSecurity(EnumsParser.getGwtWifiSecurity(this.properties.getWifiInfraSecurityType(this.ifName)));
+        gwtWifiConfig.setSecurity(
+                EnumsParser.getGwtWifiSecurity(this.properties.getWifiInfraSecurityType(this.ifName)));
         gwtWifiConfig.setPairwiseCiphers(
                 EnumsParser.getGwtWifiCiphers(this.properties.getWifiInfraPairwiseCiphers(this.ifName)));
-        gwtWifiConfig
-                .setGroupCiphers(EnumsParser.getGwtWifiCiphers(this.properties.getWifiInfraGroupCiphers(this.ifName)));
+        gwtWifiConfig.setGroupCiphers(
+                EnumsParser.getGwtWifiCiphers(this.properties.getWifiInfraGroupCiphers(this.ifName)));
         gwtWifiConfig.setChannels(this.properties.getWifiInfraChannel(this.ifName));
 
         // wifi infra specific properties
 
-        Optional<String> radioMode = EnumsParser
-                .getGwtWifiRadioMode(this.properties.getWifiInfraRadioMode(this.ifName));
+        Optional<String> radioMode =
+                EnumsParser.getGwtWifiRadioMode(this.properties.getWifiInfraRadioMode(this.ifName));
         if (radioMode.isPresent()) {
             gwtWifiConfig.setRadioMode(radioMode.get());
         }
@@ -315,7 +316,8 @@ public class GwtNetInterfaceConfigBuilder {
 
             gwtModemConfig.setDialString(this.properties.getModemDialString(this.ifName));
             gwtModemConfig.setUsername(this.properties.getModemUsername(this.ifName));
-            gwtModemConfig.setPassword(new String(this.properties.getModemPassword(this.ifName).getPassword()));
+            gwtModemConfig.setPassword(
+                    new String(this.properties.getModemPassword(this.ifName).getPassword()));
             gwtModemConfig.setResetTimeout(this.properties.getModemResetTimeout(this.ifName));
             gwtModemConfig.setPersist(this.properties.getModemPersistEnabled(this.ifName));
             gwtModemConfig.setHoldoff(this.properties.getModemHoldoff(this.ifName));
@@ -342,11 +344,11 @@ public class GwtNetInterfaceConfigBuilder {
         gwt8021xConfig.setEap(this.properties.get8021xEap(this.ifName));
         gwt8021xConfig.setInnerAuth(this.properties.get8021xInnerAuth(this.ifName));
         gwt8021xConfig.setIdentity(this.properties.get8021xIdentity(this.ifName));
-        gwt8021xConfig.setPassword(new String(this.properties.get8021xPassword(this.ifName).getPassword()));
+        gwt8021xConfig.setPassword(
+                new String(this.properties.get8021xPassword(this.ifName).getPassword()));
         gwt8021xConfig.setKeystorePid(this.properties.get8021xKeystorePid(this.ifName));
         gwt8021xConfig.setCaCertName(this.properties.get8021xCaCertName(this.ifName));
         gwt8021xConfig.setPublicPrivateKeyPairName(this.properties.get8021xPublicPrivateKeyPairName(this.ifName));
-
     }
 
     private void setAdvancedProperties() {
@@ -359,5 +361,4 @@ public class GwtNetInterfaceConfigBuilder {
         Optional<Integer> promisc = this.properties.getPromisc(this.ifName);
         this.gwtConfig.setPromisc(promisc.orElse(DEFAULT_PROMISC));
     }
-
 }

@@ -12,17 +12,14 @@
  *******************************************************************************/
 package org.eclipse.kura.web.server;
 
-import java.util.Optional;
-import java.util.UUID;
-
+import com.google.gwt.user.client.rpc.SerializationException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
-
+import java.util.Optional;
+import java.util.UUID;
 import org.eclipse.kura.web.session.Attributes;
 import org.eclipse.kura.web.shared.model.GwtXSRFToken;
 import org.eclipse.kura.web.shared.service.GwtSecurityTokenService;
-
-import com.google.gwt.user.client.rpc.SerializationException;
 
 /**
  * This is the security token service, a concrete implementation to fix the XSFR
@@ -65,9 +62,10 @@ public class GwtSecurityTokenServiceImpl extends OsgiRemoteServiceServlet implem
 
         final HttpSession session = httpServletRequest.getSession(false);
 
-        final Optional<String> existingToken = Optional
-                .ofNullable(session.getAttribute(Attributes.XSRF_TOKEN.getValue()))
-                .filter(String.class::isInstance).map(String.class::cast);
+        final Optional<String> existingToken = Optional.ofNullable(
+                        session.getAttribute(Attributes.XSRF_TOKEN.getValue()))
+                .filter(String.class::isInstance)
+                .map(String.class::cast);
 
         if (existingToken.isPresent()) {
             return new GwtXSRFToken(existingToken.get());

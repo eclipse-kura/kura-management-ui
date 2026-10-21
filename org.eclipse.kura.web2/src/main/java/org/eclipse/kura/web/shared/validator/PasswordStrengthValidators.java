@@ -15,7 +15,6 @@ package org.eclipse.kura.web.shared.validator;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-
 import org.eclipse.kura.web.shared.model.GwtPasswordStrenghtRequirements;
 
 public class PasswordStrengthValidators {
@@ -25,16 +24,17 @@ public class PasswordStrengthValidators {
     private static final String LOWERCASE = ".*[a-z].*";
     private static final String UPPERCASE = ".*[A-Z].*";
 
-    private PasswordStrengthValidators() {
-    }
+    private PasswordStrengthValidators() {}
 
-    public static List<Validator<String>> fromConfig(final Optional<String> identityName,
-            final GwtPasswordStrenghtRequirements userOptions) {
+    public static List<Validator<String>> fromConfig(
+            final Optional<String> identityName, final GwtPasswordStrenghtRequirements userOptions) {
         return fromConfig(identityName, userOptions, new DefaultMessages());
     }
 
-    public static List<Validator<String>> fromConfig(final Optional<String> identityName,
-            final GwtPasswordStrenghtRequirements userOptions, final Messages messages) {
+    public static List<Validator<String>> fromConfig(
+            final Optional<String> identityName,
+            final GwtPasswordStrenghtRequirements userOptions,
+            final Messages messages) {
         final List<Validator<String>> result = new ArrayList<>();
 
         final int minPasswordLength = userOptions.getPasswordMinimumLength();
@@ -61,20 +61,20 @@ public class PasswordStrengthValidators {
     }
 
     private static Validator<String> passwordLengthValidator(final int minPasswordLength, final Messages messages) {
-        return new PredicateValidator(v -> {
-            final int passwordLength = v == null ? 0 : v.length();
-            return passwordLength >= minPasswordLength;
-        }, messages.pwdStrengthMinLength(minPasswordLength));
+        return new PredicateValidator(
+                v -> {
+                    final int passwordLength = v == null ? 0 : v.length();
+                    return passwordLength >= minPasswordLength;
+                },
+                messages.pwdStrengthMinLength(minPasswordLength));
     }
 
     private static Validator<String> containsDigitsValidator(final Messages messages) {
-        return new RegexValidator(CONTAINS_DIGITS, messages.pwdStrengthDigitsRequired()) {
-        };
+        return new RegexValidator(CONTAINS_DIGITS, messages.pwdStrengthDigitsRequired()) {};
     }
 
     private static Validator<String> containsSpecialChars(final Messages messages) {
-        return new RegexValidator(CONTAINS_NOT_ALPHANUMERIC, messages.pwdStrengthNonAlphanumericRequired()) {
-        };
+        return new RegexValidator(CONTAINS_NOT_ALPHANUMERIC, messages.pwdStrengthNonAlphanumericRequired()) {};
     }
 
     private static Validator<String> containsBothCases(final Messages messages) {
@@ -87,16 +87,18 @@ public class PasswordStrengthValidators {
         };
     }
 
-    private static Validator<String> requireDifferentNameAndPassword(final String identityName,
-            final Messages messages) {
+    private static Validator<String> requireDifferentNameAndPassword(
+            final String identityName, final Messages messages) {
 
-        return new PredicateValidator(v -> {
-            if (v == null) {
-                return true;
-            }
+        return new PredicateValidator(
+                v -> {
+                    if (v == null) {
+                        return true;
+                    }
 
-            return !v.equalsIgnoreCase(identityName);
-        }, messages.pwdNotEqualsUsername());
+                    return !v.equalsIgnoreCase(identityName);
+                },
+                messages.pwdNotEqualsUsername());
     }
 
     public interface Messages {
@@ -139,5 +141,4 @@ public class PasswordStrengthValidators {
             return "The password cannot be the same as the identity name";
         }
     }
-
 }

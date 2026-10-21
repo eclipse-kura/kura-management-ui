@@ -13,8 +13,9 @@
  *******************************************************************************/
 package org.eclipse.kura.web.shared.service;
 
+import com.google.gwt.user.client.rpc.RemoteService;
+import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
 import java.util.List;
-
 import org.eclipse.kura.web.server.Audit;
 import org.eclipse.kura.web.server.RequiredPermissions;
 import org.eclipse.kura.web.shared.GwtKuraException;
@@ -23,9 +24,6 @@ import org.eclipse.kura.web.shared.model.GwtCloudComponentFactories;
 import org.eclipse.kura.web.shared.model.GwtCloudEntry;
 import org.eclipse.kura.web.shared.model.GwtConfigComponent;
 import org.eclipse.kura.web.shared.model.GwtXSRFToken;
-
-import com.google.gwt.user.client.rpc.RemoteService;
-import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
 
 /**
  * This interface provide a set of methods to manage cloud services from the web UI.
@@ -59,8 +57,8 @@ public interface GwtCloudConnectionService extends RemoteService {
      */
     public List<GwtCloudEntry> findCloudEntries() throws GwtKuraException;
 
-    public List<GwtConfigComponent> getStackConfigurationsByFactory(final String factoryPid,
-            final String cloudServicePid) throws GwtKuraException;
+    public List<GwtConfigComponent> getStackConfigurationsByFactory(
+            final String factoryPid, final String cloudServicePid) throws GwtKuraException;
 
     /**
      * Returns a string that represents the suggested cloud service PID, for the specified factory. If the factory does

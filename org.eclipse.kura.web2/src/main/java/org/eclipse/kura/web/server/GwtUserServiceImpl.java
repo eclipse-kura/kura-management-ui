@@ -13,7 +13,6 @@
 package org.eclipse.kura.web.server;
 
 import java.util.Set;
-
 import org.eclipse.kura.web.UserManager;
 import org.eclipse.kura.web.shared.GwtKuraException;
 import org.eclipse.kura.web.shared.model.GwtUserConfig;
@@ -41,7 +40,6 @@ public class GwtUserServiceImpl extends OsgiRemoteServiceServlet implements GwtU
         checkXSRFToken(token);
 
         this.userManager.deleteUser(userName);
-
     }
 
     @Override
@@ -63,7 +61,6 @@ public class GwtUserServiceImpl extends OsgiRemoteServiceServlet implements GwtU
         checkXSRFToken(token);
 
         return this.userManager.getUserDefaultConfig(name);
-
     }
 
     @Override
@@ -71,7 +68,5 @@ public class GwtUserServiceImpl extends OsgiRemoteServiceServlet implements GwtU
         checkXSRFToken(token);
 
         this.userManager.setUserConfig(userConfig);
-
     }
-
 }

@@ -12,8 +12,12 @@
  *******************************************************************************/
 package org.eclipse.kura.web.client.ui.drivers.assets;
 
+import com.google.gwt.core.client.GWT;
+import com.google.gwt.uibinder.client.UiBinder;
+import com.google.gwt.uibinder.client.UiField;
+import com.google.gwt.user.client.ui.Composite;
+import com.google.gwt.user.client.ui.Widget;
 import java.util.Optional;
-
 import org.eclipse.kura.web.client.configuration.Configurations;
 import org.eclipse.kura.web.client.configuration.HasConfiguration;
 import org.eclipse.kura.web.client.messages.Messages;
@@ -29,18 +33,11 @@ import org.gwtbootstrap3.client.ui.ListBox;
 import org.gwtbootstrap3.client.ui.Modal;
 import org.gwtbootstrap3.client.ui.TextBox;
 
-import com.google.gwt.core.client.GWT;
-import com.google.gwt.uibinder.client.UiBinder;
-import com.google.gwt.uibinder.client.UiField;
-import com.google.gwt.user.client.ui.Composite;
-import com.google.gwt.user.client.ui.Widget;
-
 public class DriversAndAssetsUi extends Composite implements DriversAndAssetsListUi.Listener {
 
     private static DriversAndAssetsUiUiBinder uiBinder = GWT.create(DriversAndAssetsUiUiBinder.class);
 
-    interface DriversAndAssetsUiUiBinder extends UiBinder<Widget, DriversAndAssetsUi> {
-    }
+    interface DriversAndAssetsUiUiBinder extends UiBinder<Widget, DriversAndAssetsUi> {}
 
     private static final Messages MSGS = GWT.create(Messages.class);
 
@@ -52,30 +49,40 @@ public class DriversAndAssetsUi extends Composite implements DriversAndAssetsLis
 
     @UiField
     Button newDriverButton;
+
     @UiField
     Button newAssetButton;
+
     @UiField
     Button deleteButton;
 
     @UiField
     Modal newDriverModal;
+
     @UiField
     ListBox driverFactoriesList;
+
     @UiField
     PidTextBox driverName;
+
     @UiField
     Button buttonNewDriverCancel;
+
     @UiField
     Button buttonNewDriverApply;
 
     @UiField
     Modal newAssetModal;
+
     @UiField
     PidTextBox assetName;
+
     @UiField
     TextBox driverPid;
+
     @UiField
     Button buttonNewAssetCancel;
+
     @UiField
     Button buttonNewAssetApply;
 
@@ -100,7 +107,6 @@ public class DriversAndAssetsUi extends Composite implements DriversAndAssetsLis
     public void refresh() {
         this.configurations.clear();
         DriversAndAssetsRPC.loadDriverAndAssetInfo(result -> {
-
             this.configurations.setChannelDescriptiors(result.getDriverDescriptors());
 
             final Optional<GwtConfigComponent> baseChannelDescriptor = result.getBaseChannelDescriptor();
@@ -113,9 +119,7 @@ public class DriversAndAssetsUi extends Composite implements DriversAndAssetsLis
             this.configurations.setAllActivePids(result.getAllActivePids());
 
             init();
-
         });
-
     }
 
     private void init() {
@@ -147,7 +151,8 @@ public class DriversAndAssetsUi extends Composite implements DriversAndAssetsLis
         if (supportedFeatures.isAssetAvailable()) {
 
             this.newAssetButton.addClickHandler(event -> {
-                DriversAndAssetsUi.this.driverPid.setValue(this.driverAndAssetsListUi.getSelectedItem().getPid());
+                DriversAndAssetsUi.this.driverPid.setValue(
+                        this.driverAndAssetsListUi.getSelectedItem().getPid());
                 DriversAndAssetsUi.this.newAssetModal.show();
             });
 
@@ -184,8 +189,9 @@ public class DriversAndAssetsUi extends Composite implements DriversAndAssetsLis
             final GwtConfigComponent gwtConfig = hasConfiguration.getConfiguration();
             final String configDriverPid = gwtConfig.getParameterValue(AssetConstants.ASSET_DRIVER_PROP.value());
             if (pid.equals(configDriverPid)) {
-                this.confirmDialog.show(MSGS.driversAssetsDeletingDriverWithAssets(), AlertDialog.Severity.ALERT,
-                        (ConfirmListener) null);
+                this.confirmDialog.show(
+                        MSGS.driversAssetsDeletingDriverWithAssets(), AlertDialog.Severity.ALERT, (ConfirmListener)
+                                null);
                 return;
             }
         }
@@ -198,8 +204,8 @@ public class DriversAndAssetsUi extends Composite implements DriversAndAssetsLis
         final GwtConfigComponent gwtConfig = config.getConfiguration();
 
         if (gwtConfig.isWireComponent()) {
-            this.confirmDialog.show(MSGS.driversAssetsAssetInComposer(), AlertDialog.Severity.ALERT,
-                    (ConfirmListener) null);
+            this.confirmDialog.show(
+                    MSGS.driversAssetsAssetInComposer(), AlertDialog.Severity.ALERT, (ConfirmListener) null);
             return;
         }
 
@@ -208,9 +214,12 @@ public class DriversAndAssetsUi extends Composite implements DriversAndAssetsLis
 
     private void createAsset(final String pid, final String driverPid) {
         final HasConfiguration assetConfig = this.configurations.createConfiguration(pid, ASSET_FACTORY_PID);
-        assetConfig.getConfiguration().getParameter(AssetConstants.ASSET_DRIVER_PROP.value()).setValue(driverPid);
-        DriversAndAssetsRPC.createFactoryConfiguration(pid, ASSET_FACTORY_PID, assetConfig.getConfiguration(),
-                result -> {
+        assetConfig
+                .getConfiguration()
+                .getParameter(AssetConstants.ASSET_DRIVER_PROP.value())
+                .setValue(driverPid);
+        DriversAndAssetsRPC.createFactoryConfiguration(
+                pid, ASSET_FACTORY_PID, assetConfig.getConfiguration(), result -> {
                     this.configurations.setConfiguration(assetConfig.getConfiguration());
                     this.newAssetModal.hide();
                     this.driverAndAssetsListUi.refresh();
@@ -226,14 +235,14 @@ public class DriversAndAssetsUi extends Composite implements DriversAndAssetsLis
             }
 
             if (this.driverFactoriesList.getSelectedIndex() == 0) {
-                this.confirmDialog.show(MSGS.driversAssetsInvalidDriverFactory(), AlertDialog.Severity.ERROR,
-                        (ConfirmListener) null);
+                this.confirmDialog.show(
+                        MSGS.driversAssetsInvalidDriverFactory(), AlertDialog.Severity.ERROR, (ConfirmListener) null);
                 return;
             }
 
             if (this.configurations.isPidExisting(pid)) {
-                this.confirmDialog.show(MSGS.wiresComponentNameAlreadyUsed(pid), AlertDialog.Severity.ERROR,
-                        (ConfirmListener) null);
+                this.confirmDialog.show(
+                        MSGS.wiresComponentNameAlreadyUsed(pid), AlertDialog.Severity.ERROR, (ConfirmListener) null);
                 return;
             }
 
@@ -258,12 +267,13 @@ public class DriversAndAssetsUi extends Composite implements DriversAndAssetsLis
             }
 
             if (this.configurations.isPidExisting(pid)) {
-                this.confirmDialog.show(MSGS.wiresComponentNameAlreadyUsed(pid), AlertDialog.Severity.ALERT,
-                        (ConfirmListener) null);
+                this.confirmDialog.show(
+                        MSGS.wiresComponentNameAlreadyUsed(pid), AlertDialog.Severity.ALERT, (ConfirmListener) null);
                 return;
             }
 
-            final String newDriverPid = this.driverAndAssetsListUi.getSelectedItem().getPid();
+            final String newDriverPid =
+                    this.driverAndAssetsListUi.getSelectedItem().getPid();
 
             createAsset(pid, newDriverPid);
 
@@ -282,5 +292,4 @@ public class DriversAndAssetsUi extends Composite implements DriversAndAssetsLis
             this.newAssetButton.setEnabled(false);
         }
     }
-
 }

@@ -17,6 +17,12 @@ package org.eclipse.kura.web.server.servlet;
 
 import static java.util.Objects.isNull;
 
+import com.google.gson.Gson;
+import jakarta.servlet.ServletContext;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -32,7 +38,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-
 import org.apache.commons.fileupload2.core.DiskFileItem;
 import org.apache.commons.fileupload2.core.DiskFileItemFactory;
 import org.apache.commons.fileupload2.core.FileUploadException;
@@ -73,14 +78,6 @@ import org.osgi.service.metatype.MetaTypeInformation;
 import org.osgi.service.metatype.MetaTypeService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.google.gson.Gson;
-
-import jakarta.servlet.ServletContext;
-import jakarta.servlet.ServletException;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-import jakarta.servlet.http.HttpSession;
 
 public class FileServlet extends AuditServlet {
 
@@ -150,7 +147,9 @@ public class FileServlet extends AuditServlet {
 
         this.diskFileItemFactory = DiskFileItemFactory.builder() //
                 .setBufferSize(sizeThreshold) //
-                .setPath(repository.toPath()).setFileCleaningTracker(this.fileCleaningTracker).get();
+                .setPath(repository.toPath())
+                .setFileCleaningTracker(this.fileCleaningTracker)
+                .get();
     }
 
     @Override
@@ -187,19 +186,18 @@ public class FileServlet extends AuditServlet {
         }
 
         if (reqPathInfo.equals("/configuration/snapshot")) {
-            KuraRemoteServiceServlet.requirePermissions(req, Mode.ALL, new String[] { KuraPermission.ADMIN });
+            KuraRemoteServiceServlet.requirePermissions(req, Mode.ALL, new String[] {KuraPermission.ADMIN});
             doPostConfigurationSnapshot(req);
         } else if (reqPathInfo.equals("/command") && supportedFeatures.isCommandServiceAvailable()) {
-            KuraRemoteServiceServlet.requirePermissions(req, Mode.ALL, new String[] { KuraPermission.DEVICE });
+            KuraRemoteServiceServlet.requirePermissions(req, Mode.ALL, new String[] {KuraPermission.DEVICE});
             doPostCommand(req, resp);
         } else if (reqPathInfo.equals("/asset")) {
-            KuraRemoteServiceServlet.requirePermissions(req, Mode.ALL, new String[] { KuraPermission.WIRES_ADMIN });
+            KuraRemoteServiceServlet.requirePermissions(req, Mode.ALL, new String[] {KuraPermission.WIRES_ADMIN});
             doPostAsset(req, resp);
         } else {
             logger.error("Unknown request path info: {}", reqPathInfo);
             throw new ServletException("Unknown request path info: " + reqPathInfo);
         }
-
     }
 
     private void doGetIcon(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
@@ -259,7 +257,8 @@ public class FileServlet extends AuditServlet {
 
                 for (String p : ids) {
                     if (p.equals(pid)) {
-                        try (InputStream is = mti.getObjectClassDefinition(pid, null).getIcon(32)) {
+                        try (InputStream is =
+                                mti.getObjectClassDefinition(pid, null).getIcon(32)) {
                             if (is == null) {
                                 logger.error("Error reading icon file.");
                                 throw new ServletException("Error reading icon file.");
@@ -278,7 +277,6 @@ public class FileServlet extends AuditServlet {
             logger.error(ERROR_PARSING_QUERY_STRING);
             throw new ServletException(ERROR_PARSING_QUERY_STRING);
         }
-
     }
 
     private Map<String, String> parseQueryString(String queryString) throws UnsupportedEncodingException {
@@ -287,7 +285,8 @@ public class FileServlet extends AuditServlet {
         String[] pairs = queryString.split("&");
         for (String p : pairs) {
             int index = p.indexOf('=');
-            qp.put(URLDecoder.decode(p.substring(0, index), StandardCharsets.UTF_8.name()),
+            qp.put(
+                    URLDecoder.decode(p.substring(0, index), StandardCharsets.UTF_8.name()),
                     URLDecoder.decode(p.substring(index + 1), StandardCharsets.UTF_8.name()));
         }
         return qp;
@@ -330,8 +329,8 @@ public class FileServlet extends AuditServlet {
     }
 
     private void unZipInCommandWorkingDirectory(DiskFileItem archive) throws ServletException, IOException {
-        final ServiceReference<PasswordCommandService> commandServiceReference = this.bundleContext
-                .getServiceReference(PasswordCommandService.class);
+        final ServiceReference<PasswordCommandService> commandServiceReference =
+                this.bundleContext.getServiceReference(PasswordCommandService.class);
 
         if (isNull(commandServiceReference)
                 || !Boolean.TRUE.equals(commandServiceReference.getProperty(COMMAND_ENABLE))) {
@@ -406,8 +405,8 @@ public class FileServlet extends AuditServlet {
             String driverPid = formFields.get("driverPid");
             Boolean nullValueAsEmptyString = Boolean.parseBoolean(formFields.get("doEmptyStringConversion"));
 
-            List<GwtConfigParameter> parametersFromCsv = AssetConfigValidator.get().validateCsv(csvString, driverPid,
-                    errors, nullValueAsEmptyString);
+            List<GwtConfigParameter> parametersFromCsv =
+                    AssetConfigValidator.get().validateCsv(csvString, driverPid, errors, nullValueAsEmptyString);
 
             final GwtConfigComponent config = new GwtConfigComponent();
             config.setParameters(parametersFromCsv);
@@ -435,7 +434,6 @@ public class FileServlet extends AuditServlet {
             resp.getWriter().write("Security error: please retry this operation.");
             throw ex2;
         }
-
     }
 
     private void doPostConfigurationSnapshot(HttpServletRequest req) throws ServletException {
@@ -535,8 +533,10 @@ public class FileServlet extends AuditServlet {
         } catch (Exception e) {
             throw new ServletException("Error unmarshaling device configuration");
         }
-        return configs.getConfigs().stream().map(c -> new ComponentConfigurationImpl(c.getPid(), null,
-                DTOUtil.dtosToConfigurationProperties(c.getProperties()))).collect(Collectors.toList());
+        return configs.getConfigs().stream()
+                .map(c -> new ComponentConfigurationImpl(
+                        c.getPid(), null, DTOUtil.dtosToConfigurationProperties(c.getProperties())))
+                .collect(Collectors.toList());
     }
 
     static long getFileUploadSizeMax() {
@@ -559,8 +559,11 @@ public class FileServlet extends AuditServlet {
         int sizeThreshold = DiskFileItemFactory.DEFAULT_THRESHOLD;
         try {
             SystemService systemService = locator.getService(SystemService.class);
-            sizeThreshold = Integer.parseInt(systemService.getProperties().getProperty(
-                    "file.upload.in.memory.size.threshold", String.valueOf(DiskFileItemFactory.DEFAULT_THRESHOLD)));
+            sizeThreshold = Integer.parseInt(systemService
+                    .getProperties()
+                    .getProperty(
+                            "file.upload.in.memory.size.threshold",
+                            String.valueOf(DiskFileItemFactory.DEFAULT_THRESHOLD)));
         } catch (GwtKuraException e) {
             logger.error(SYSTEM_SERVICE_ERROR_MESSAGE, e);
         }
@@ -569,14 +572,15 @@ public class FileServlet extends AuditServlet {
     }
 
     private ServiceReference<Unmarshaller>[] getXmlUnmarshallers() {
-        String filterString = String.format("(&(kura.service.pid=%s))",
-                "org.eclipse.kura.xml.marshaller.unmarshaller.provider");
-        return ServiceUtil.getServiceReferences(FrameworkUtil.getBundle(FileServlet.class).getBundleContext(),
-                Unmarshaller.class, filterString);
+        String filterString =
+                String.format("(&(kura.service.pid=%s))", "org.eclipse.kura.xml.marshaller.unmarshaller.provider");
+        return ServiceUtil.getServiceReferences(
+                FrameworkUtil.getBundle(FileServlet.class).getBundleContext(), Unmarshaller.class, filterString);
     }
 
     private void ungetServiceReferences(final ServiceReference<?>[] refs) {
-        ServiceUtil.ungetServiceReferences(FrameworkUtil.getBundle(FileServlet.class).getBundleContext(), refs);
+        ServiceUtil.ungetServiceReferences(
+                FrameworkUtil.getBundle(FileServlet.class).getBundleContext(), refs);
     }
 
     protected <T> T unmarshal(String xmlString, Class<T> clazz) throws KuraException {
@@ -584,7 +588,8 @@ public class FileServlet extends AuditServlet {
         ServiceReference<Unmarshaller>[] unmarshallerSRs = getXmlUnmarshallers();
         try {
             for (final ServiceReference<Unmarshaller> unmarshallerSR : unmarshallerSRs) {
-                Unmarshaller unmarshaller = FrameworkUtil.getBundle(FileServlet.class).getBundleContext()
+                Unmarshaller unmarshaller = FrameworkUtil.getBundle(FileServlet.class)
+                        .getBundleContext()
                         .getService(unmarshallerSR);
                 result = unmarshaller.unmarshal(xmlString, clazz);
             }
@@ -651,8 +656,13 @@ class UploadRequest extends JakartaServletFileUpload<DiskFileItem, DiskFileItemF
                 boolean isInMemory = item.isInMemory();
                 long sizeInBytes = item.getSize();
 
-                logger.debug("File upload item name: {}, fileName: {}, contentType: {}, isInMemory: {}, size: {}",
-                        fieldName, fileName, contentType, isInMemory, sizeInBytes);
+                logger.debug(
+                        "File upload item name: {}, fileName: {}, contentType: {}, isInMemory: {}, size: {}",
+                        fieldName,
+                        fileName,
+                        contentType,
+                        isInMemory,
+                        sizeInBytes);
 
                 this.fileItems.add(item);
             }

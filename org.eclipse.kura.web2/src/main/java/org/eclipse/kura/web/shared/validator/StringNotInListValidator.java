@@ -29,5 +29,4 @@ public class StringNotInListValidator extends NotInListValidator<String> {
         }
         super.validate(value.trim(), errorMessageConsumer);
     }
-
 }

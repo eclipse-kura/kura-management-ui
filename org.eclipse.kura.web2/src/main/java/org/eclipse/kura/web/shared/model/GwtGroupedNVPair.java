@@ -1,27 +1,25 @@
 /*******************************************************************************
  * Copyright (c) 2011, 2021 Eurotech and/or its affiliates and others
- * 
+ *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
  * which is available at https://www.eclipse.org/legal/epl-2.0/
- * 
+ *
  * SPDX-License-Identifier: EPL-2.0
- * 
+ *
  * Contributors:
  *  Eurotech
  *******************************************************************************/
 package org.eclipse.kura.web.shared.model;
 
-import java.io.Serializable;
-
 import com.google.gwt.user.client.rpc.IsSerializable;
+import java.io.Serializable;
 
 public class GwtGroupedNVPair extends GwtBaseModel implements IsSerializable, Serializable {
 
     private static final long serialVersionUID = 6017065568183482351L;
 
-    public GwtGroupedNVPair() {
-    }
+    public GwtGroupedNVPair() {}
 
     public GwtGroupedNVPair(String group, String name, String value) {
         setGroup(group);
@@ -96,11 +94,11 @@ public class GwtGroupedNVPair extends GwtBaseModel implements IsSerializable, Se
     public String getType() {
         return get("type");
     }
-    
+
     public void setSigned(boolean signed) {
         set("signed", String.valueOf(signed));
     }
-    
+
     public String isSigned() {
         return (String) get("signed");
     }

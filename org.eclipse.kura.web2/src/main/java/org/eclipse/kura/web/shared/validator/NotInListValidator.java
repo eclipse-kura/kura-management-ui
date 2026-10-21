@@ -31,5 +31,4 @@ public class NotInListValidator<T> implements Validator<T> {
             errorMessageConsumer.accept(this.message);
         }
     }
-
 }

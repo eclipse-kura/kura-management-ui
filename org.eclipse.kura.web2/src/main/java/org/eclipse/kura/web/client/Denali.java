@@ -12,9 +12,12 @@
  *******************************************************************************/
 package org.eclipse.kura.web.client;
 
+import com.google.gwt.core.client.EntryPoint;
+import com.google.gwt.core.client.GWT;
+import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.google.gwt.user.client.ui.RootPanel;
 import java.util.List;
 import java.util.logging.Logger;
-
 import org.eclipse.kura.web.client.ui.EntryClassUi;
 import org.eclipse.kura.web.client.util.FailureHandler;
 import org.eclipse.kura.web.shared.model.GwtGroupedNVPair;
@@ -31,11 +34,6 @@ import org.eclipse.kura.web.shared.service.GwtSecurityTokenService;
 import org.eclipse.kura.web.shared.service.GwtSecurityTokenServiceAsync;
 import org.eclipse.kura.web.shared.service.GwtSessionService;
 import org.eclipse.kura.web.shared.service.GwtSessionServiceAsync;
-
-import com.google.gwt.core.client.EntryPoint;
-import com.google.gwt.core.client.GWT;
-import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.google.gwt.user.client.ui.RootPanel;
 
 /**
  * Entry point classes define <code>onModuleLoad()</code>.
@@ -73,7 +71,6 @@ public class Denali implements EntryPoint {
                 logger.warning("failed to get token" + caught);
             }
         });
-
     }
 
     /**
@@ -81,7 +78,6 @@ public class Denali implements EntryPoint {
      * {@link #onModuleLoad2()} so that the UncaughtExceptionHandler can catch
      * any unexpected exceptions.
      */
-
     public void init(final GwtUserConfig userConfig) {
 
         this.gwtXSRFService.generateSecurityToken(new AsyncCallback<GwtXSRFToken>() {
@@ -130,13 +126,16 @@ public class Denali implements EntryPoint {
                                     gwtSession.setDevelopMode(true);
                                 }
 
-                                Denali.this.gwtDeviceService.getSupportedFeatures(token,
-                                        new AsyncCallback<GwtSupportedFeatures>() {
+                                Denali.this.gwtDeviceService.getSupportedFeatures(
+                                        token, new AsyncCallback<GwtSupportedFeatures>() {
 
                                             @Override
                                             public void onSuccess(GwtSupportedFeatures supportedFeatures) {
-                                                EntryClassUi entryUi = new EntryClassUi(userConfig,
-                                                        securityCapabilities, gwtSession, supportedFeatures);
+                                                EntryClassUi entryUi = new EntryClassUi(
+                                                        userConfig,
+                                                        securityCapabilities,
+                                                        gwtSession,
+                                                        supportedFeatures);
                                                 RootPanel.get().add(entryUi);
                                                 entryUi.init();
                                             }
@@ -144,10 +143,8 @@ public class Denali implements EntryPoint {
                                             @Override
                                             public void onFailure(Throwable caught) {
                                                 FailureHandler.handle(caught, Denali.class.getSimpleName());
-
                                             }
                                         });
-
                             }
                         });
                     }
@@ -160,5 +157,4 @@ public class Denali implements EntryPoint {
             }
         });
     }
-
 }

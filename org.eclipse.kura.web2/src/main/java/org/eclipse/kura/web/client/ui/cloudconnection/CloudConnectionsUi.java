@@ -1,20 +1,25 @@
 /*******************************************************************************
  * Copyright (c) 201, 2022 Eurotech and/or its affiliates and others
- * 
+ *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
  * which is available at https://www.eclipse.org/legal/epl-2.0/
- * 
+ *
  * SPDX-License-Identifier: EPL-2.0
- * 
+ *
  * Contributors:
  *  Eurotech
  *******************************************************************************/
 package org.eclipse.kura.web.client.ui.cloudconnection;
 
+import com.google.gwt.core.client.GWT;
+import com.google.gwt.uibinder.client.UiBinder;
+import com.google.gwt.uibinder.client.UiField;
+import com.google.gwt.user.client.ui.Composite;
+import com.google.gwt.user.client.ui.HTMLPanel;
+import com.google.gwt.user.client.ui.Widget;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
 import org.eclipse.kura.web.client.messages.Messages;
 import org.eclipse.kura.web.client.util.EventService;
 import org.eclipse.kura.web.client.util.request.RequestQueue;
@@ -36,13 +41,6 @@ import org.gwtbootstrap3.client.ui.TabListItem;
 import org.gwtbootstrap3.client.ui.constants.ModalBackdrop;
 import org.gwtbootstrap3.client.ui.html.Span;
 
-import com.google.gwt.core.client.GWT;
-import com.google.gwt.uibinder.client.UiBinder;
-import com.google.gwt.uibinder.client.UiField;
-import com.google.gwt.user.client.ui.Composite;
-import com.google.gwt.user.client.ui.HTMLPanel;
-import com.google.gwt.user.client.ui.Widget;
-
 public class CloudConnectionsUi extends Composite {
 
     private static final Logger logger = Logger.getLogger(CloudConnectionsUi.class.getSimpleName());
@@ -59,15 +57,17 @@ public class CloudConnectionsUi extends Composite {
 
     private static final String CONNECTION_EVENT_PID_PROPERTY_KEY = "cloud.service.pid";
 
-    interface CloudServicesUiUiBinder extends UiBinder<Widget, CloudConnectionsUi> {
-    }
+    interface CloudServicesUiUiBinder extends UiBinder<Widget, CloudConnectionsUi> {}
 
     @UiField
     HTMLPanel cloudServicesIntro;
+
     @UiField
     Panel cloudInstancesPanel;
+
     @UiField
     Panel cloudConfigurationsPanel;
+
     @UiField
     Alert notification;
 
@@ -83,10 +83,12 @@ public class CloudConnectionsUi extends Composite {
         this.cloudServiceConfigurationsBinder = new CloudConnectionConfigurationsUi(this);
         this.cloudConfigurationsPanel.add(this.cloudServiceConfigurationsBinder);
 
-        EventService.subscribe(ForwardedEventTopic.CLOUD_CONNECTION_STATUS_ESTABLISHED,
+        EventService.subscribe(
+                ForwardedEventTopic.CLOUD_CONNECTION_STATUS_ESTABLISHED,
                 eventInfo -> handleConnectionStatusEvent(eventInfo, GwtCloudConnectionState.CONNECTED));
 
-        EventService.subscribe(ForwardedEventTopic.CLOUD_CONNECTION_STATUS_LOST,
+        EventService.subscribe(
+                ForwardedEventTopic.CLOUD_CONNECTION_STATUS_LOST,
                 eventInfo -> handleConnectionStatusEvent(eventInfo, GwtCloudConnectionState.DISCONNECTED));
     }
 
@@ -97,8 +99,8 @@ public class CloudConnectionsUi extends Composite {
             this.currentlySelectedTab = this.cloudServiceConfigurationsBinder.getSelectedTab();
             setVisibility();
 
-            this.gwtCloudService
-                    .getCloudComponentFactories(context.callback(this.cloudInstancesBinder::setFactoryInfo));
+            this.gwtCloudService.getCloudComponentFactories(
+                    context.callback(this.cloudInstancesBinder::setFactoryInfo));
         })));
     }
 
@@ -188,8 +190,8 @@ public class CloudConnectionsUi extends Composite {
                 CloudConnectionsUi.this.cloudServiceConfigurationsBinder.selectEntry(selectedInstanceEntry);
             }
 
-            CloudConnectionConfigurationUi dirtyConfig = CloudConnectionsUi.this.cloudServiceConfigurationsBinder
-                    .getDirtyCloudConfiguration();
+            CloudConnectionConfigurationUi dirtyConfig =
+                    CloudConnectionsUi.this.cloudServiceConfigurationsBinder.getDirtyCloudConfiguration();
             if (dirtyConfig != null) {
                 dirtyConfig.reloadOriginalConfig();
             }

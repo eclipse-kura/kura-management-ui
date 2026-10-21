@@ -12,13 +12,15 @@
  *******************************************************************************/
 package org.eclipse.kura.web.client.ui.validator;
 
+import com.google.gwt.core.client.GWT;
+import com.google.gwt.editor.client.Editor;
+import com.google.gwt.editor.client.EditorError;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-
 import org.eclipse.kura.web.client.messages.Messages;
 import org.eclipse.kura.web.shared.model.GwtPasswordStrenghtRequirements;
 import org.eclipse.kura.web.shared.validator.NoWhitespaceCharactersValidator;
@@ -37,22 +39,17 @@ import org.gwtbootstrap3.client.ui.form.error.BasicEditorError;
 import org.gwtbootstrap3.client.ui.form.validator.Validator;
 import org.gwtbootstrap3.client.ui.form.validator.Validator.Priority;
 
-import com.google.gwt.core.client.GWT;
-import com.google.gwt.editor.client.Editor;
-import com.google.gwt.editor.client.EditorError;
-
 public class GwtValidators {
 
     private static final Messages MSGS = GWT.create(Messages.class);
 
-    private GwtValidators() {
-    }
+    private GwtValidators() {}
 
-    public static List<Validator<String>> newPassword(final Optional<String> identityName,
-            final GwtPasswordStrenghtRequirements userOptions) {
+    public static List<Validator<String>> newPassword(
+            final Optional<String> identityName, final GwtPasswordStrenghtRequirements userOptions) {
 
         final List<Validator<String>> defaultValidators = new ArrayList<>();
-        
+
         defaultValidators.add(nonEmpty(MSGS.pwdEmpty()));
         defaultValidators.add(stringLength(255, MSGS.pwdMaxLength()));
         defaultValidators.add(noWhitespaceCharacters(MSGS.pwdWhitespaceCharacters()));
@@ -60,107 +57,102 @@ public class GwtValidators {
         identityName.ifPresent(
                 id -> defaultValidators.add(notEqualsIdentityName(id, MSGS.pwdStrengthNotEqualsIdentityName())));
 
-        return Stream.concat(PasswordStrengthValidators
-                .fromConfig(identityName, userOptions, new PasswordStrengthValidators.Messages() {
+        return Stream.concat(
+                        PasswordStrengthValidators.fromConfig(
+                                        identityName, userOptions, new PasswordStrengthValidators.Messages() {
 
-                    @Override
-                    public String pwdStrengthDigitsRequired() {
-                        return MSGS.pwdStrengthDigitsRequired();
-                    }
+                                            @Override
+                                            public String pwdStrengthDigitsRequired() {
+                                                return MSGS.pwdStrengthDigitsRequired();
+                                            }
 
-                    @Override
-                    public String pwdStrengthNonAlphanumericRequired() {
-                        return MSGS.pwdStrengthNonAlphanumericRequired();
-                    }
+                                            @Override
+                                            public String pwdStrengthNonAlphanumericRequired() {
+                                                return MSGS.pwdStrengthNonAlphanumericRequired();
+                                            }
 
-                    @Override
-                    public String pwdStrengthBothCasesRequired() {
-                        return MSGS.pwdStrengthBothCasesRequired();
-                    }
+                                            @Override
+                                            public String pwdStrengthBothCasesRequired() {
+                                                return MSGS.pwdStrengthBothCasesRequired();
+                                            }
 
-                    @Override
-                    public String pwdStrengthMinLength(int value) {
-                        return MSGS.pwdStrengthMinLength(Integer.toString(value));
-                    }
+                                            @Override
+                                            public String pwdStrengthMinLength(int value) {
+                                                return MSGS.pwdStrengthMinLength(Integer.toString(value));
+                                            }
 
-                    @Override
-                    public String pwdNotEqualsUsername() {
-                        return MSGS.pwdStrengthNotEqualsIdentityName();
-                    }
-
-                }).stream().map(v -> new ValidatorWrapper<>(v, Priority.MEDIUM)), defaultValidators.stream())
+                                            @Override
+                                            public String pwdNotEqualsUsername() {
+                                                return MSGS.pwdStrengthNotEqualsIdentityName();
+                                            }
+                                        })
+                                .stream()
+                                .map(v -> new ValidatorWrapper<>(v, Priority.MEDIUM)),
+                        defaultValidators.stream())
                 .collect(Collectors.toList());
     }
 
     public static Validator<String> nonEmpty(final String message) {
-        return new ValidatorWrapper<String>(new NotEmptyValidator(message), Priority.HIGHEST) {
-        };
+        return new ValidatorWrapper<String>(new NotEmptyValidator(message), Priority.HIGHEST) {};
     }
 
     public static Validator<String> notEqualsIdentityName(final String identityName, final String message) {
-        return new ValidatorWrapper<>(new PredicateValidator(v -> {
-            if (v == null) {
-                return true;
-            }
+        return new ValidatorWrapper<>(
+                new PredicateValidator(
+                        v -> {
+                            if (v == null) {
+                                return true;
+                            }
 
-            return !v.equalsIgnoreCase(identityName);
-        }, message), Priority.MEDIUM);
+                            return !v.equalsIgnoreCase(identityName);
+                        },
+                        message),
+                Priority.MEDIUM);
     }
 
     public static <T> Validator<T> notInList(final List<T> values, final String message) {
-        return new ValidatorWrapper<T>(new NotInListValidator<>(values, message), Priority.MEDIUM) {
-        };
+        return new ValidatorWrapper<T>(new NotInListValidator<>(values, message), Priority.MEDIUM) {};
     }
 
     public static Validator<String> stringNotInList(final List<String> values, final String message) {
-        return new ValidatorWrapper<String>(new StringNotInListValidator(values, message), Priority.MEDIUM) {
-        };
+        return new ValidatorWrapper<String>(new StringNotInListValidator(values, message), Priority.MEDIUM) {};
     }
 
     public static Validator<String> pem(final String message) {
-        return new ValidatorWrapper<String>(new PEMValidator(message), Priority.MEDIUM) {
-        };
+        return new ValidatorWrapper<String>(new PEMValidator(message), Priority.MEDIUM) {};
     }
 
     public static Validator<String> singlePem(final String message) {
-        return new ValidatorWrapper<String>(new SinglePEMValidator(message), Priority.MEDIUM) {
-        };
+        return new ValidatorWrapper<String>(new SinglePEMValidator(message), Priority.MEDIUM) {};
     }
 
     public static Validator<String> pkcs8(final String message) {
-        return new ValidatorWrapper<String>(new PKCS8Validator(message), Priority.MEDIUM) {
-        };
+        return new ValidatorWrapper<String>(new PKCS8Validator(message), Priority.MEDIUM) {};
     }
 
     public static Validator<String> predicate(final Predicate<String> predicate, final String message) {
-        return new ValidatorWrapper<String>(new PredicateValidator(predicate, message), Priority.MEDIUM) {
-        };
+        return new ValidatorWrapper<String>(new PredicateValidator(predicate, message), Priority.MEDIUM) {};
     }
 
     public static Validator<String> regex(final String regex, final String message) {
-        return new ValidatorWrapper<String>(new RegexValidator(regex, message), Priority.MEDIUM) {
-        };
+        return new ValidatorWrapper<String>(new RegexValidator(regex, message), Priority.MEDIUM) {};
     }
 
     public static Validator<String> stringLength(int maxSize, String message) {
-        return new ValidatorWrapper<String>(new StringLengthValidator(maxSize, message), Priority.MEDIUM) {
-        };
+        return new ValidatorWrapper<String>(new StringLengthValidator(maxSize, message), Priority.MEDIUM) {};
     }
 
     public static Validator<String> stringLength(final int minSize, final int maxSize, final String message) {
-        return new ValidatorWrapper<String>(new StringLengthValidator(minSize, maxSize, message), Priority.MEDIUM) {
-        };
+        return new ValidatorWrapper<String>(new StringLengthValidator(minSize, maxSize, message), Priority.MEDIUM) {};
     }
 
     public static Validator<String> noWhitespaceCharacters(final String message) {
-        return new ValidatorWrapper<String>(new NoWhitespaceCharactersValidator(message), Priority.MEDIUM) {
-        };
+        return new ValidatorWrapper<String>(new NoWhitespaceCharactersValidator(message), Priority.MEDIUM) {};
     }
 
     public static Validator<String> punctuatedAlphanumericSequence(final char[] delimiters, final String message) {
-        return new ValidatorWrapper<String>(new PunctuatedAlphanumericSequenceValidator(delimiters, message),
-                Priority.MEDIUM) {
-        };
+        return new ValidatorWrapper<String>(
+                new PunctuatedAlphanumericSequenceValidator(delimiters, message), Priority.MEDIUM) {};
     }
 
     private static class ValidatorWrapper<T> implements Validator<T> {
