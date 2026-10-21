@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2019, 2025 Eurotech and/or its affiliates and others
+ * Copyright (c) 2019, 2026 Eurotech and/or its affiliates and others
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -12,15 +12,13 @@
  *******************************************************************************/
 package org.eclipse.kura.web.session;
 
-import java.io.IOException;
-
-import org.eclipse.kura.audit.AuditContext;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
+import java.io.IOException;
+import org.eclipse.kura.audit.AuditContext;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class SessionExpirationSecurityHandler implements SecurityHandler {
 
@@ -65,5 +63,4 @@ public class SessionExpirationSecurityHandler implements SecurityHandler {
 
         return (long) lastActivityRaw;
     }
-
 }

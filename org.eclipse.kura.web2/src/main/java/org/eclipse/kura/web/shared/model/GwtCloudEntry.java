@@ -1,12 +1,12 @@
 /*******************************************************************************
- * Copyright (c) 2018, 2020 Eurotech and/or its affiliates and others
- * 
+ * Copyright (c) 2018, 2026 Eurotech and/or its affiliates and others
+ *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
  * which is available at https://www.eclipse.org/legal/epl-2.0/
- * 
+ *
  * SPDX-License-Identifier: EPL-2.0
- * 
+ *
  * Contributors:
  *  Eurotech
  *******************************************************************************/
@@ -17,7 +17,7 @@ import java.io.Serializable;
 public class GwtCloudEntry extends KuraBaseModel implements Serializable {
 
     /**
-     * 
+     *
      */
     private static final long serialVersionUID = -8526545631929926543L;
 
@@ -64,23 +64,17 @@ public class GwtCloudEntry extends KuraBaseModel implements Serializable {
 
     @Override
     public boolean equals(Object obj) {
-        if (this == obj)
-            return true;
-        if (obj == null)
-            return false;
-        if (getClass() != obj.getClass())
-            return false;
+        if (this == obj) return true;
+        if (obj == null) return false;
+        if (getClass() != obj.getClass()) return false;
         GwtCloudEntry other = (GwtCloudEntry) obj;
 
         final String pid = getPid();
         final String otherPid = other.getPid();
 
         if (pid == null) {
-            if (otherPid != null)
-                return false;
-        } else if (!pid.equals(otherPid))
-            return false;
+            if (otherPid != null) return false;
+        } else if (!pid.equals(otherPid)) return false;
         return true;
     }
-
 }

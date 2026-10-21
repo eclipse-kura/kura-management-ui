@@ -16,6 +16,7 @@ package org.eclipse.kura.web.server;
 import static java.lang.String.format;
 import static org.eclipse.kura.configuration.ConfigurationService.KURA_SERVICE_PID;
 
+import jakarta.servlet.http.HttpSession;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.io.Writer;
@@ -30,7 +31,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.concurrent.atomic.AtomicInteger;
-
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
 import org.eclipse.kura.asset.Asset;
@@ -61,8 +61,6 @@ import org.eclipse.kura.web.shared.service.GwtDriverAndAssetService;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.FrameworkUtil;
 import org.osgi.framework.ServiceReference;
-
-import jakarta.servlet.http.HttpSession;
 
 public class GwtDriverAndAssetServiceImpl extends OsgiRemoteServiceServlet implements GwtDriverAndAssetService {
 
@@ -118,8 +116,8 @@ public class GwtDriverAndAssetServiceImpl extends OsgiRemoteServiceServlet imple
     }
 
     @Override
-    public GwtChannelOperationResult write(GwtXSRFToken xsrfToken, String assetPid,
-            List<GwtChannelRecord> gwtChannelRecords) throws GwtKuraException {
+    public GwtChannelOperationResult write(
+            GwtXSRFToken xsrfToken, String assetPid, List<GwtChannelRecord> gwtChannelRecords) throws GwtKuraException {
         checkXSRFToken(xsrfToken);
 
         try {
@@ -137,8 +135,8 @@ public class GwtDriverAndAssetServiceImpl extends OsgiRemoteServiceServlet imple
                 String typedValue = gwtChannelData.getValueType();
                 String value = gwtChannelData.getValue();
                 try {
-                    channelRecords
-                            .add(ChannelRecord.createWriteRecord(channelName, parseTypedValue(value, typedValue)));
+                    channelRecords.add(
+                            ChannelRecord.createWriteRecord(channelName, parseTypedValue(value, typedValue)));
                 } catch (Exception e) {
                     gwtChannelData.setValue(null);
                     gwtChannelData.setExceptionMessage(e.getMessage());
@@ -277,7 +275,8 @@ public class GwtDriverAndAssetServiceImpl extends OsgiRemoteServiceServlet imple
 
         checkXSRFToken(token);
 
-        final List<AD> wireAssetDescriptor = (List<AD>) WireAssetChannelDescriptor.get().getDescriptor();
+        final List<AD> wireAssetDescriptor =
+                (List<AD>) WireAssetChannelDescriptor.get().getDescriptor();
 
         final List<AD> channelDescriptor = new ArrayList<>();
 
@@ -332,7 +331,6 @@ public class GwtDriverAndAssetServiceImpl extends OsgiRemoteServiceServlet imple
                 }
                 printer.println();
             }
-
         }
 
         final int id = NEXT_ID.getAndIncrement();
@@ -355,8 +353,8 @@ public class GwtDriverAndAssetServiceImpl extends OsgiRemoteServiceServlet imple
     }
 
     @Override
-    public void createDriverOrAssetConfiguration(GwtXSRFToken token, String factoryPid, String pid,
-            GwtConfigComponent config) throws GwtKuraException {
+    public void createDriverOrAssetConfiguration(
+            GwtXSRFToken token, String factoryPid, String pid, GwtConfigComponent config) throws GwtKuraException {
         checkXSRFToken(token);
 
         requireIsDriverOrAssetFactory(factoryPid);
@@ -424,8 +422,8 @@ public class GwtDriverAndAssetServiceImpl extends OsgiRemoteServiceServlet imple
 
         final List<GwtConfigComponent> componentConfigurations = new ArrayList<>();
 
-        final List<GwtConfigComponent> driverConfigurations = GwtComponentServiceInternal
-                .findComponentConfigurations("(objectClass=" + Driver.class.getName() + ")");
+        final List<GwtConfigComponent> driverConfigurations =
+                GwtComponentServiceInternal.findComponentConfigurations("(objectClass=" + Driver.class.getName() + ")");
 
         driverConfigurations.forEach(c -> c.setIsDriver(true));
         componentConfigurations.addAll(driverConfigurations);
@@ -434,8 +432,9 @@ public class GwtDriverAndAssetServiceImpl extends OsgiRemoteServiceServlet imple
             result.setBaseChannelDescriptor(GwtWireAssetConstants.WIRE_ASSET_CHANNEL_DESCRIPTOR);
             componentDefinitions.add(GwtWireAssetConstants.WIRE_ASSET_OCD);
 
-            final List<GwtConfigComponent> assetConfigurations = GwtComponentServiceInternal
-                    .findComponentConfigurations("(objectClass=" + Asset.class.getName() + ")");
+            final List<GwtConfigComponent> assetConfigurations =
+                    GwtComponentServiceInternal.findComponentConfigurations(
+                            "(objectClass=" + Asset.class.getName() + ")");
             componentConfigurations.addAll(assetConfigurations);
         }
 

@@ -19,12 +19,25 @@ package org.eclipse.kura.web.client.ui;
 import static org.eclipse.kura.web.client.util.FilterBuilder.not;
 import static org.eclipse.kura.web.client.util.FilterBuilder.or;
 
+import com.google.gwt.core.client.GWT;
+import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.dom.client.KeyUpHandler;
+import com.google.gwt.uibinder.client.UiBinder;
+import com.google.gwt.uibinder.client.UiField;
+import com.google.gwt.user.client.Timer;
+import com.google.gwt.user.client.Window;
+import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.google.gwt.user.client.ui.Composite;
+import com.google.gwt.user.client.ui.Label;
+import com.google.gwt.user.client.ui.PopupPanel;
+import com.google.gwt.user.client.ui.RootPanel;
+import com.google.gwt.user.client.ui.ScrollPanel;
+import com.google.gwt.user.client.ui.Widget;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Consumer;
-
 import org.eclipse.kura.core.configuration.ConfigurationChangeEvent;
 import org.eclipse.kura.web.client.messages.Messages;
 import org.eclipse.kura.web.client.ui.AlertDialog.ConfirmListener;
@@ -83,137 +96,174 @@ import org.gwtbootstrap3.client.ui.constants.IconType;
 import org.gwtbootstrap3.client.ui.html.Span;
 import org.gwtbootstrap3.client.ui.html.Strong;
 
-import com.google.gwt.core.client.GWT;
-import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.event.dom.client.KeyUpHandler;
-import com.google.gwt.uibinder.client.UiBinder;
-import com.google.gwt.uibinder.client.UiField;
-import com.google.gwt.user.client.Timer;
-import com.google.gwt.user.client.Window;
-import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.google.gwt.user.client.ui.Composite;
-import com.google.gwt.user.client.ui.Label;
-import com.google.gwt.user.client.ui.PopupPanel;
-import com.google.gwt.user.client.ui.RootPanel;
-import com.google.gwt.user.client.ui.ScrollPanel;
-import com.google.gwt.user.client.ui.Widget;
-
 public class EntryClassUi extends Composite implements ServicesUi.Listener {
 
-    interface EntryClassUIUiBinder extends UiBinder<Widget, EntryClassUi> {
-    }
+    interface EntryClassUIUiBinder extends UiBinder<Widget, EntryClassUi> {}
 
     // UI elements definition
     @UiField
     static Modal errorModal;
+
     @UiField
     Label footerLeft;
+
     @UiField
     Row footerCenterRow;
+
     @UiField
     Label footerCenter;
+
     @UiField
     Label footerRight;
+
     @UiField
     Panel contentPanel;
+
     @UiField
     Strong errorAlertText;
+
     @UiField
     PanelHeader contentPanelHeader;
+
     @UiField
     PanelBody contentPanelBody;
+
     @UiField
     AnchorListItem status;
+
     @UiField
     AnchorListItem device;
+
     @UiField
     AnchorListItem network;
+
     @UiField
     AnchorListItem firewall;
+
     @UiField
     AnchorListItem packages;
+
     @UiField
     AnchorListItem settings;
+
     @UiField
     AnchorListItem security;
+
     @UiField
     AnchorListItem users;
+
     @UiField
     AnchorListItem wires;
+
     @UiField
     AnchorListItem cloudServices;
+
     @UiField
     AnchorListItem driversAndAssetsServices;
+
     @UiField
     ScrollPanel servicesPanel;
+
     @UiField
     TextBox textSearch;
+
     @UiField
     NavPills servicesMenu;
+
     @UiField
     Modal errorPopup;
+
     @UiField
     Label errorMessage;
+
     @UiField
     Modal newFactoryComponentModal;
+
     @UiField
     FormLabel newFactoryComponentFormLabel;
+
     @UiField
     FormLabel componentInstanceNameLabel;
+
     @UiField
     Button buttonNewComponent;
+
     @UiField
     Button buttonNewComponentCancel;
+
     @UiField
     Button errorModalDismiss;
+
     @UiField
     ListBox factoriesList;
+
     @UiField
     Button factoriesButton;
+
     @UiField
     PidTextBox componentName;
+
     @UiField
     Button sidenavButton;
+
     @UiField
     Column sidenav;
+
     @UiField
     Panel sidenavOverlay;
+
     @UiField
     Label logout;
+
     @UiField
     Label headerLogout;
+
     @UiField
     Label changePassword;
+
     @UiField
     Label headerChangePassword;
+
     @UiField
     NavPills sidenavPills;
+
     @UiField
     AlertDialog alertDialog;
+
     @UiField
     Widget servicesContainer;
+
     @UiField
     Span userNameLarge;
+
     @UiField
     Span userNameSmall;
+
     @UiField
     Row mainContainer;
+
     @UiField
     DropdownNotification dropdownNotification;
+
     @UiField
     Button dropdownButton;
+
     @UiField
     Button dropdownHeaderButton;
+
     @UiField
     Container dropdownContainer;
+
     @UiField
     Container dropdownContainerHeader;
 
     // Post login modal
     @UiField
     Modal postLoginBannerModal;
+
     @UiField
     Button buttonPostLoginBannerModalOk;
+
     @UiField
     Strong postLoginBannerModalPannelBody;
 
@@ -224,11 +274,16 @@ public class EntryClassUi extends Composite implements ServicesUi.Listener {
     private static final String SIDENAV_HIDDEN_STYLE_NAME = "sidenav-hidden";
     private static final String SELECTED_ANCHOR_LIST_ITEM_STYLE_NAME = "selected-item";
     private static final String NOT_SCROLLABLE_STYLE_NAME = "not-scrollable";
-    private static final String SERVICES_FILTER = FilterBuilder.of(not(or("service.pid=*SystemPropertiesService",
-            "service.pid=*NetworkAdminService", "service.pid=*NetworkConfigurationService",
-            "service.pid=*SslManagerService", "service.pid=*FirewallConfigurationService",
-            "service.pid=*WireGraphService", "objectClass=org.eclipse.kura.wire.WireComponent",
-            "objectClass=org.eclipse.kura.driver.Driver", "kura.ui.service.hide=true")));
+    private static final String SERVICES_FILTER = FilterBuilder.of(not(or(
+            "service.pid=*SystemPropertiesService",
+            "service.pid=*NetworkAdminService",
+            "service.pid=*NetworkConfigurationService",
+            "service.pid=*SslManagerService",
+            "service.pid=*FirewallConfigurationService",
+            "service.pid=*WireGraphService",
+            "objectClass=org.eclipse.kura.wire.WireComponent",
+            "objectClass=org.eclipse.kura.driver.Driver",
+            "kura.ui.service.hide=true")));
     private static final String DROPDOWN_MENU_HIDDEN_STYLE_NAME = "hide-dropdown";
 
     private static PopupPanel waitModal;
@@ -271,26 +326,32 @@ public class EntryClassUi extends Composite implements ServicesUi.Listener {
 
         @Override
         public void run() {
-            RequestQueue.submit(c -> EntryClassUi.gwtXSRFService.generateSecurityToken(
-                    c.callback(token -> EntryClassUi.gwtSessionService.getUserConfig(token, c.callback(config -> {
-                        if (config == null) {
-                            logout();
-                            return;
-                        }
+            RequestQueue.submit(
+                    c -> EntryClassUi.gwtXSRFService.generateSecurityToken(c.callback(token ->
+                            EntryClassUi.gwtSessionService.getUserConfig(token, c.callback(config -> {
+                                if (config == null) {
+                                    logout();
+                                    return;
+                                }
 
-                        if (!config.equals(EntryClassUi.this.userData)) {
-                            EntryClassUi.this.alertDialog.show(
-                                    MSGS.usersIdentityConfigChanged(EntryClassUi.this.userData.getUserName()),
-                                    AlertDialog.Severity.ALERT, (ConfirmListener) null);
-                        }
+                                if (!config.equals(EntryClassUi.this.userData)) {
+                                    EntryClassUi.this.alertDialog.show(
+                                            MSGS.usersIdentityConfigChanged(EntryClassUi.this.userData.getUserName()),
+                                            AlertDialog.Severity.ALERT,
+                                            (ConfirmListener) null);
+                                }
 
-                        EntryClassUi.this.userData = config;
-                    })))), false);
+                                EntryClassUi.this.userData = config;
+                            })))),
+                    false);
         }
     };
 
-    public EntryClassUi(final GwtUserData gwtUserData, final GwtSecurityCapabilities securityCapabilities,
-            final GwtSession session, final GwtSupportedFeatures supportedFeatures) {
+    public EntryClassUi(
+            final GwtUserData gwtUserData,
+            final GwtSecurityCapabilities securityCapabilities,
+            final GwtSession session,
+            final GwtSupportedFeatures supportedFeatures) {
         initWidget(uiBinder.createAndBindUi(this));
 
         this.ui = this;
@@ -431,7 +492,6 @@ public class EntryClassUi extends Composite implements ServicesUi.Listener {
         initUsersPanel();
 
         initCloudServicesPanel();
-
     }
 
     private void initDriversAndAssetsPanel() {
@@ -493,7 +553,6 @@ public class EntryClassUi extends Composite implements ServicesUi.Listener {
                 EntryClassUi.this.contentPanelBody.clear();
                 EntryClassUi.this.contentPanelBody.add(EntryClassUi.this.cloudServicesBinder);
                 EntryClassUi.this.cloudServicesBinder.refresh();
-
             });
         });
     }
@@ -705,7 +764,8 @@ public class EntryClassUi extends Composite implements ServicesUi.Listener {
         for (int i = 0; i < this.servicesMenu.getWidgetCount(); i++) {
             ServicesAnchorListItem sl = (ServicesAnchorListItem) this.servicesMenu.getWidget(i);
 
-            sl.setVisible(tmpServiceName == null || sl.getServiceName().toLowerCase().indexOf(tmpServiceName) != -1);
+            sl.setVisible(
+                    tmpServiceName == null || sl.getServiceName().toLowerCase().indexOf(tmpServiceName) != -1);
         }
     }
 
@@ -745,8 +805,8 @@ public class EntryClassUi extends Composite implements ServicesUi.Listener {
             return;
         }
 
-        RequestQueue.submit(c -> gwtXSRFService.generateSecurityToken(c.callback(
-                token -> gwtComponentService.findComponentConfigurations(token, SERVICES_FILTER, c.callback(result -> {
+        RequestQueue.submit(c -> gwtXSRFService.generateSecurityToken(c.callback(token ->
+                gwtComponentService.findComponentConfigurations(token, SERVICES_FILTER, c.callback(result -> {
                     sortConfigurationsByName(result);
                     EntryClassUi.this.servicesMenu.clear();
                     for (GwtConfigComponent configComponent : result) {
@@ -762,7 +822,6 @@ public class EntryClassUi extends Composite implements ServicesUi.Listener {
                     }
                     filterAvailableServices(EntryClassUi.this.textSearch.getValue());
                 })))));
-
     }
 
     private void initDropdownMenu() {
@@ -790,8 +849,8 @@ public class EntryClassUi extends Composite implements ServicesUi.Listener {
             }
         });
 
-        RequestQueue.submit(c -> gwtXSRFService.generateSecurityToken(
-                c.callback(token -> gwtSessionService.getUserConfig(token, new AsyncCallback<GwtUserConfig>() {
+        RequestQueue.submit(c -> gwtXSRFService.generateSecurityToken(c.callback(token ->
+                gwtSessionService.getUserConfig(token, new AsyncCallback<GwtUserConfig>() {
 
                     @Override
                     public void onFailure(Throwable caught) {
@@ -819,8 +878,8 @@ public class EntryClassUi extends Composite implements ServicesUi.Listener {
 
     private void setNewPassword(final String oldPassword, final String newPassword) {
 
-        RequestQueue.submit(c -> gwtXSRFService.generateSecurityToken(c.callback(token -> gwtSessionService
-                .updatePassword(token, oldPassword, newPassword, c.callback(new AsyncCallback<Void>() {
+        RequestQueue.submit(c -> gwtXSRFService.generateSecurityToken(c.callback(token ->
+                gwtSessionService.updatePassword(token, oldPassword, newPassword, c.callback(new AsyncCallback<Void>() {
 
                     @Override
                     public void onFailure(Throwable e) {
@@ -829,25 +888,28 @@ public class EntryClassUi extends Composite implements ServicesUi.Listener {
                             final String message;
 
                             switch (gwtKuraException.getCode()) {
-                            case PASSWORD_CHANGE_SAME_PASSWORD: {
-                                message = MSGS.loginPasswordChangeSame();
-                            }
-                                break;
-                            case INVALID_USERNAME_PASSWORD: {
-                                message = MSGS.loginWrongCredentials();
-                            }
-                                break;
-                            case UNAUTHENTICATED: {
-                                message = MSGS.sessionExpiredError();
-                            }
-                                break;
-                            default: {
-                                message = MSGS.loginInternalError();
-                            }
+                                case PASSWORD_CHANGE_SAME_PASSWORD:
+                                    {
+                                        message = MSGS.loginPasswordChangeSame();
+                                    }
+                                    break;
+                                case INVALID_USERNAME_PASSWORD:
+                                    {
+                                        message = MSGS.loginWrongCredentials();
+                                    }
+                                    break;
+                                case UNAUTHENTICATED:
+                                    {
+                                        message = MSGS.sessionExpiredError();
+                                    }
+                                    break;
+                                default: {
+                                    message = MSGS.loginInternalError();
+                                }
                             }
 
-                            EntryClassUi.this.alertDialog.show(message, AlertDialog.Severity.ERROR,
-                                    (ConfirmListener) null);
+                            EntryClassUi.this.alertDialog.show(
+                                    message, AlertDialog.Severity.ERROR, (ConfirmListener) null);
                         } else {
                             FailureHandler.handle(e);
                         }
@@ -858,7 +920,6 @@ public class EntryClassUi extends Composite implements ServicesUi.Listener {
                         logout();
                     }
                 })))));
-
     }
 
     private void changePassword() {
@@ -924,7 +985,6 @@ public class EntryClassUi extends Composite implements ServicesUi.Listener {
 
         // New factory configuration handler
         this.buttonNewComponent.addClickHandler(event -> {
-
             String factoryPid = EntryClassUi.this.factoriesList.getSelectedValue();
             String pid = EntryClassUi.this.componentName.getPid();
             if (pid == null) {
@@ -937,10 +997,9 @@ public class EntryClassUi extends Composite implements ServicesUi.Listener {
             }
 
             RequestQueue.submit(context -> EntryClassUi.gwtXSRFService.generateSecurityToken(context.callback(token -> {
-
                 EntryClassUi.this.newFactoryComponentModal.hide();
-                EntryClassUi.gwtComponentService.createFactoryComponent(token, factoryPid, pid,
-                        context.callback(new AsyncCallback<Void>() {
+                EntryClassUi.gwtComponentService.createFactoryComponent(
+                        token, factoryPid, pid, context.callback(new AsyncCallback<Void>() {
 
                             @Override
                             public void onFailure(Throwable ex) {
@@ -987,8 +1046,14 @@ public class EntryClassUi extends Composite implements ServicesUi.Listener {
     }
 
     public boolean isUiDirty() {
-        return isServicesUiDirty() || isNetworkDirty() || isFirewallDirty() || isSettingsDirty()
-                || isCloudServicesDirty() || isWiresDirty() || isDriversAndTwinsDirty() || isUsersDirty()
+        return isServicesUiDirty()
+                || isNetworkDirty()
+                || isFirewallDirty()
+                || isSettingsDirty()
+                || isCloudServicesDirty()
+                || isWiresDirty()
+                || isDriversAndTwinsDirty()
+                || isUsersDirty()
                 || isSecurityDirty();
     }
 
@@ -1218,7 +1283,5 @@ public class EntryClassUi extends Composite implements ServicesUi.Listener {
                 });
             }
         });
-
     }
-
 }

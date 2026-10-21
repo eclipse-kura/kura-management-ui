@@ -1,22 +1,34 @@
 /*******************************************************************************
- * Copyright (c) 2011, 2025 Eurotech and/or its affiliates and others
- * 
+ * Copyright (c) 2011, 2026 Eurotech and/or its affiliates and others
+ *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
  * which is available at https://www.eclipse.org/legal/epl-2.0/
- * 
+ *
  * SPDX-License-Identifier: EPL-2.0
- * 
+ *
  * Contributors:
  *  Eurotech
  *  Red Hat Inc
  *******************************************************************************/
 package org.eclipse.kura.web.client.ui.settings;
 
+import com.google.gwt.core.client.GWT;
+import com.google.gwt.uibinder.client.UiBinder;
+import com.google.gwt.uibinder.client.UiField;
+import com.google.gwt.user.cellview.client.TextColumn;
+import com.google.gwt.user.client.Window;
+import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.google.gwt.user.client.ui.Composite;
+import com.google.gwt.user.client.ui.FileUpload;
+import com.google.gwt.user.client.ui.FormPanel;
+import com.google.gwt.user.client.ui.Hidden;
+import com.google.gwt.user.client.ui.Widget;
+import com.google.gwt.view.client.ListDataProvider;
+import com.google.gwt.view.client.SingleSelectionModel;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
 import org.eclipse.kura.web.Console;
 import org.eclipse.kura.web.client.messages.Messages;
 import org.eclipse.kura.web.client.ui.EntryClassUi;
@@ -35,35 +47,20 @@ import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.Modal;
 import org.gwtbootstrap3.client.ui.gwt.CellTable;
 
-import com.google.gwt.core.client.GWT;
-import com.google.gwt.uibinder.client.UiBinder;
-import com.google.gwt.uibinder.client.UiField;
-import com.google.gwt.user.cellview.client.TextColumn;
-import com.google.gwt.user.client.Window;
-import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.google.gwt.user.client.ui.Composite;
-import com.google.gwt.user.client.ui.FileUpload;
-import com.google.gwt.user.client.ui.FormPanel;
-import com.google.gwt.user.client.ui.Hidden;
-import com.google.gwt.user.client.ui.Widget;
-import com.google.gwt.view.client.ListDataProvider;
-import com.google.gwt.view.client.SingleSelectionModel;
-
 public class SnapshotsTabUi extends Composite implements Tab {
 
     private static SnapshotsTabUiUiBinder uiBinder = GWT.create(SnapshotsTabUiUiBinder.class);
     private static final Logger logger = Logger.getLogger(SnapshotsTabUi.class.getSimpleName());
 
-    interface SnapshotsTabUiUiBinder extends UiBinder<Widget, SnapshotsTabUi> {
-    }
+    interface SnapshotsTabUiUiBinder extends UiBinder<Widget, SnapshotsTabUi> {}
 
     private static final Messages MSGS = GWT.create(Messages.class);
 
     private final GwtSecurityTokenServiceAsync gwtXSRFService = GWT.create(GwtSecurityTokenService.class);
     private final GwtSnapshotServiceAsync gwtSnapshotService = GWT.create(GwtSnapshotService.class);
 
-    private static final String SERVLET_URL = Console.ADMIN_ROOT + '/' + GWT.getModuleName()
-            + "/file/configuration/snapshot";
+    private static final String SERVLET_URL =
+            Console.ADMIN_ROOT + '/' + GWT.getModuleName() + "/file/configuration/snapshot";
 
     @UiField
     Modal uploadModal;
@@ -73,15 +70,19 @@ public class SnapshotsTabUi extends Composite implements Tab {
 
     @UiField
     Button uploadCancel;
+
     @UiField
     Button uploadUpload;
 
     @UiField
     Button refresh;
+
     @UiField
     Button download;
+
     @UiField
     Button rollback;
+
     @UiField
     Button upload;
 
@@ -96,6 +97,7 @@ public class SnapshotsTabUi extends Composite implements Tab {
 
     @UiField
     SnapshotDownloadModal snapshotDownloadModal;
+
     @UiField
     SnapshotRollbackModal snapshotRollbackModal;
 
@@ -135,8 +137,7 @@ public class SnapshotsTabUi extends Composite implements Tab {
     }
 
     @Override
-    public void setDirty(boolean flag) {
-    }
+    public void setDirty(boolean flag) {}
 
     @Override
     public boolean isDirty() {
@@ -162,8 +163,8 @@ public class SnapshotsTabUi extends Composite implements Tab {
 
             @Override
             public void onSuccess(GwtXSRFToken token) {
-                SnapshotsTabUi.this.gwtSnapshotService.findDeviceSnapshots(token,
-                        new AsyncCallback<List<GwtSnapshot>>() {
+                SnapshotsTabUi.this.gwtSnapshotService.findDeviceSnapshots(
+                        token, new AsyncCallback<List<GwtSnapshot>>() {
 
                             @Override
                             public void onFailure(Throwable ex) {
@@ -173,11 +174,20 @@ public class SnapshotsTabUi extends Composite implements Tab {
 
                             @Override
                             public void onSuccess(List<GwtSnapshot> result) {
-                                SnapshotsTabUi.this.snapshotsDataProvider.getList().clear();
+                                SnapshotsTabUi.this
+                                        .snapshotsDataProvider
+                                        .getList()
+                                        .clear();
                                 for (GwtSnapshot pair : result) {
-                                    SnapshotsTabUi.this.snapshotsDataProvider.getList().add(pair);
+                                    SnapshotsTabUi.this
+                                            .snapshotsDataProvider
+                                            .getList()
+                                            .add(pair);
                                 }
-                                int snapshotsDataSize = SnapshotsTabUi.this.snapshotsDataProvider.getList().size();
+                                int snapshotsDataSize = SnapshotsTabUi.this
+                                        .snapshotsDataProvider
+                                        .getList()
+                                        .size();
                                 if (snapshotsDataSize == 0) {
                                     SnapshotsTabUi.this.snapshotsGrid.setVisible(false);
                                     SnapshotsTabUi.this.notification.setVisible(true);
@@ -195,7 +205,6 @@ public class SnapshotsTabUi extends Composite implements Tab {
                             }
                         });
             }
-
         });
     }
 
@@ -312,31 +321,28 @@ public class SnapshotsTabUi extends Composite implements Tab {
     }
 
     private void downloadSnapshot(GwtXSRFToken token) {
-        this.gwtSnapshotService.getSnapshotConfigurationFromSid(token, this.selected.getSnapshotId(),
-                new AsyncCallback<List<String>>() {
+        this.gwtSnapshotService.getSnapshotConfigurationFromSid(
+                token, this.selected.getSnapshotId(), new AsyncCallback<List<String>>() {
 
                     @Override
                     public void onFailure(Throwable caught) {
                         FailureHandler.handle(caught);
-
                     }
 
                     @Override
                     public void onSuccess(List<String> pidList) {
                         snapshotDownloadModal.showModal(selected, pidList);
-
                     }
                 });
     }
 
     private void rollbackSnapshot(GwtXSRFToken token) {
-        this.gwtSnapshotService.getSnapshotConfigurationFromSid(token, this.selected.getSnapshotId(),
-                new AsyncCallback<List<String>>() {
+        this.gwtSnapshotService.getSnapshotConfigurationFromSid(
+                token, this.selected.getSnapshotId(), new AsyncCallback<List<String>>() {
 
                     @Override
                     public void onFailure(Throwable caught) {
                         FailureHandler.handle(caught);
-
                     }
 
                     @Override
@@ -358,7 +364,6 @@ public class SnapshotsTabUi extends Composite implements Tab {
         this.xsrfTokenField.setID("xsrfToken");
         this.xsrfTokenField.setName("xsrfToken");
         this.xsrfTokenField.setValue("");
-
     }
 
     private void updateButtons() {

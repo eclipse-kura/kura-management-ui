@@ -1,12 +1,12 @@
 /*******************************************************************************
- * Copyright (c) 2018, 2020 Eurotech and/or its affiliates and others
- * 
+ * Copyright (c) 2018, 2026 Eurotech and/or its affiliates and others
+ *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
  * which is available at https://www.eclipse.org/legal/epl-2.0/
- * 
+ *
  * SPDX-License-Identifier: EPL-2.0
- * 
+ *
  * Contributors:
  *  Eurotech
  *******************************************************************************/
@@ -23,8 +23,7 @@ public class GwtCloudConnectionInfo extends KuraBaseModel implements Serializabl
     private static final String CONNECTION_NAME_KEY = "Connection Name";
     private static final long serialVersionUID = -8403881748695073659L;
 
-    public GwtCloudConnectionInfo() {
-    }
+    public GwtCloudConnectionInfo() {}
 
     public String getCloudServicePid() {
         return get(CONNECTION_NAME_KEY);
@@ -40,8 +39,10 @@ public class GwtCloudConnectionInfo extends KuraBaseModel implements Serializabl
         Map<String, Object> result = new HashMap<>(properties);
         result.remove(CONNECTION_NAME_KEY);
 
-        return result.entrySet().stream().sorted(Map.Entry.comparingByKey()).collect(Collectors.toMap(Map.Entry::getKey,
-                Map.Entry::getValue, (oldValue, newValue) -> oldValue, LinkedHashMap::new));
+        return result.entrySet().stream()
+                .sorted(Map.Entry.comparingByKey())
+                .collect(Collectors.toMap(
+                        Map.Entry::getKey, Map.Entry::getValue, (oldValue, newValue) -> oldValue, LinkedHashMap::new));
     }
 
     public void setConnectionProperties(Map<String, Object> connectionProperties) {
@@ -51,5 +52,4 @@ public class GwtCloudConnectionInfo extends KuraBaseModel implements Serializabl
     public void addConnectionProperty(String key, String property) {
         set(key, property);
     }
-
 }

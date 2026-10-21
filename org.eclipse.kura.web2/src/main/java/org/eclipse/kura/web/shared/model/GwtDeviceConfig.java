@@ -1,12 +1,12 @@
 /*******************************************************************************
- * Copyright (c) 2011, 2020 Eurotech and/or its affiliates and others
- * 
+ * Copyright (c) 2011, 2026 Eurotech and/or its affiliates and others
+ *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
  * which is available at https://www.eclipse.org/legal/epl-2.0/
- * 
+ *
  * SPDX-License-Identifier: EPL-2.0
- * 
+ *
  * Contributors:
  *  Eurotech
  *******************************************************************************/
@@ -14,18 +14,16 @@ package org.eclipse.kura.web.shared.model;
 
 import java.io.Serializable;
 import java.util.Date;
-
 import org.eclipse.kura.web.shared.DateUtils;
 
 public class GwtDeviceConfig extends GwtBaseModel implements Serializable {
 
     private static final long serialVersionUID = 1708831984640005284L;
 
-    public GwtDeviceConfig() {
-    }
+    public GwtDeviceConfig() {}
 
     @Override
-    @SuppressWarnings({ "unchecked" })
+    @SuppressWarnings({"unchecked"})
     public <X> X get(String property) {
         if ("lastEventOnFormatted".equals(property)) {
             return (X) DateUtils.formatDateTime((Date) get("lastEventOn"));

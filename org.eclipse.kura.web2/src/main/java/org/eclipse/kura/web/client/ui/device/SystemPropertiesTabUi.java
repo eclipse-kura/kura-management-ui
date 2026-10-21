@@ -1,19 +1,27 @@
 /*******************************************************************************
- * Copyright (c) 2011, 2021 Eurotech and/or its affiliates and others
- * 
+ * Copyright (c) 2011, 2026 Eurotech and/or its affiliates and others
+ *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
  * which is available at https://www.eclipse.org/legal/epl-2.0/
- * 
+ *
  * SPDX-License-Identifier: EPL-2.0
- * 
+ *
  * Contributors:
  *  Eurotech
  *******************************************************************************/
 package org.eclipse.kura.web.client.ui.device;
 
+import com.google.gwt.core.client.GWT;
+import com.google.gwt.uibinder.client.UiBinder;
+import com.google.gwt.uibinder.client.UiField;
+import com.google.gwt.user.cellview.client.TextColumn;
+import com.google.gwt.user.cellview.client.TextHeader;
+import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.google.gwt.user.client.ui.Composite;
+import com.google.gwt.user.client.ui.Widget;
+import com.google.gwt.view.client.ListDataProvider;
 import java.util.List;
-
 import org.eclipse.kura.web.client.messages.Messages;
 import org.eclipse.kura.web.client.ui.EntryClassUi;
 import org.eclipse.kura.web.client.ui.Tab;
@@ -26,22 +34,11 @@ import org.eclipse.kura.web.shared.service.GwtSecurityTokenService;
 import org.eclipse.kura.web.shared.service.GwtSecurityTokenServiceAsync;
 import org.gwtbootstrap3.client.ui.gwt.CellTable;
 
-import com.google.gwt.core.client.GWT;
-import com.google.gwt.uibinder.client.UiBinder;
-import com.google.gwt.uibinder.client.UiField;
-import com.google.gwt.user.cellview.client.TextColumn;
-import com.google.gwt.user.cellview.client.TextHeader;
-import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.google.gwt.user.client.ui.Composite;
-import com.google.gwt.user.client.ui.Widget;
-import com.google.gwt.view.client.ListDataProvider;
-
 public class SystemPropertiesTabUi extends Composite implements Tab {
 
     private static SystemPropertiesTabUiUiBinder uiBinder = GWT.create(SystemPropertiesTabUiUiBinder.class);
 
-    interface SystemPropertiesTabUiUiBinder extends UiBinder<Widget, SystemPropertiesTabUi> {
-    }
+    interface SystemPropertiesTabUiUiBinder extends UiBinder<Widget, SystemPropertiesTabUi> {}
 
     private static final Messages MSGS = GWT.create(Messages.class);
     private static final String ROW_HEADER_STYLE = "rowHeader";
@@ -51,6 +48,7 @@ public class SystemPropertiesTabUi extends Composite implements Tab {
 
     @UiField
     CellTable<GwtGroupedNVPair> systemPropertiesGrid = new CellTable<>();
+
     private final ListDataProvider<GwtGroupedNVPair> systemPropertiesDataProvider = new ListDataProvider<>();
 
     public SystemPropertiesTabUi() {
@@ -61,8 +59,8 @@ public class SystemPropertiesTabUi extends Composite implements Tab {
         loadSystemPropertiesTable(this.systemPropertiesGrid, this.systemPropertiesDataProvider);
     }
 
-    private void loadSystemPropertiesTable(CellTable<GwtGroupedNVPair> grid,
-            ListDataProvider<GwtGroupedNVPair> dataProvider) {
+    private void loadSystemPropertiesTable(
+            CellTable<GwtGroupedNVPair> grid, ListDataProvider<GwtGroupedNVPair> dataProvider) {
         TextColumn<GwtGroupedNVPair> col1 = new TextColumn<GwtGroupedNVPair>() {
 
             @Override
@@ -91,8 +89,7 @@ public class SystemPropertiesTabUi extends Composite implements Tab {
     }
 
     @Override
-    public void setDirty(boolean flag) {
-    }
+    public void setDirty(boolean flag) {}
 
     @Override
     public boolean isDirty() {
@@ -119,13 +116,16 @@ public class SystemPropertiesTabUi extends Composite implements Tab {
 
             @Override
             public void onSuccess(GwtXSRFToken token) {
-                SystemPropertiesTabUi.this.gwtDeviceService.findSystemProperties(token,
-                        new AsyncCallback<List<GwtGroupedNVPair>>() {
+                SystemPropertiesTabUi.this.gwtDeviceService.findSystemProperties(
+                        token, new AsyncCallback<List<GwtGroupedNVPair>>() {
 
                             @Override
                             public void onFailure(Throwable caught) {
                                 EntryClassUi.hideWaitModal();
-                                SystemPropertiesTabUi.this.systemPropertiesDataProvider.getList().clear();
+                                SystemPropertiesTabUi.this
+                                        .systemPropertiesDataProvider
+                                        .getList()
+                                        .clear();
                                 FailureHandler.handle(caught);
                                 SystemPropertiesTabUi.this.systemPropertiesDataProvider.flush();
                             }
@@ -133,17 +133,21 @@ public class SystemPropertiesTabUi extends Composite implements Tab {
                             @Override
                             public void onSuccess(List<GwtGroupedNVPair> result) {
                                 for (GwtGroupedNVPair resultPair : result) {
-                                    SystemPropertiesTabUi.this.systemPropertiesDataProvider.getList().add(resultPair);
+                                    SystemPropertiesTabUi.this
+                                            .systemPropertiesDataProvider
+                                            .getList()
+                                            .add(resultPair);
                                 }
-                                int size = SystemPropertiesTabUi.this.systemPropertiesDataProvider.getList().size();
+                                int size = SystemPropertiesTabUi.this
+                                        .systemPropertiesDataProvider
+                                        .getList()
+                                        .size();
                                 SystemPropertiesTabUi.this.systemPropertiesGrid.setVisibleRange(0, size);
                                 SystemPropertiesTabUi.this.systemPropertiesDataProvider.flush();
                                 EntryClassUi.hideWaitModal();
                             }
-
                         });
             }
-
         });
     }
 

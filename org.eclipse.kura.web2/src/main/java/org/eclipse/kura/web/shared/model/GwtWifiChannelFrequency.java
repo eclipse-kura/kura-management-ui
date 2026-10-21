@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2021 Sterwen-Technology and others
+ * Copyright (c) 2021, 2026 Sterwen-Technology and others
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -25,9 +25,7 @@ public class GwtWifiChannelFrequency extends KuraBaseModel implements Serializab
     private static final String NO_IR = "no-ir";
     private static final String RADAR_DETECTION = "radar-detection";
 
-    public GwtWifiChannelFrequency() {
-
-    }
+    public GwtWifiChannelFrequency() {}
 
     public GwtWifiChannelFrequency(int channel, int frequency) {
         setChannel(channel);

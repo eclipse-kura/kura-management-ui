@@ -1,20 +1,25 @@
 /*******************************************************************************
- * Copyright (c) 2011, 2022 Eurotech and/or its affiliates and others
- * 
+ * Copyright (c) 2011, 2026 Eurotech and/or its affiliates and others
+ *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
  * which is available at https://www.eclipse.org/legal/epl-2.0/
- * 
+ *
  * SPDX-License-Identifier: EPL-2.0
- * 
+ *
  * Contributors:
  *  Eurotech
  *******************************************************************************/
 package org.eclipse.kura.web.client.ui.network;
 
+import com.google.gwt.core.client.GWT;
+import com.google.gwt.uibinder.client.UiBinder;
+import com.google.gwt.uibinder.client.UiField;
+import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.google.gwt.user.client.ui.Composite;
+import com.google.gwt.user.client.ui.Widget;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
 import org.eclipse.kura.web.client.messages.Messages;
 import org.eclipse.kura.web.client.ui.AlertDialog;
 import org.eclipse.kura.web.client.ui.EntryClassUi;
@@ -31,20 +36,12 @@ import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.Modal;
 import org.gwtbootstrap3.client.ui.html.Text;
 
-import com.google.gwt.core.client.GWT;
-import com.google.gwt.uibinder.client.UiBinder;
-import com.google.gwt.uibinder.client.UiField;
-import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.google.gwt.user.client.ui.Composite;
-import com.google.gwt.user.client.ui.Widget;
-
 public class NetworkButtonBarUi extends Composite {
 
     private static NetworkButtonBarUiUiBinder uiBinder = GWT.create(NetworkButtonBarUiUiBinder.class);
     private static final Logger logger = Logger.getLogger(NetworkButtonBarUi.class.getSimpleName());
 
-    interface NetworkButtonBarUiUiBinder extends UiBinder<Widget, NetworkButtonBarUi> {
-    }
+    interface NetworkButtonBarUiUiBinder extends UiBinder<Widget, NetworkButtonBarUi> {}
 
     private final GwtSecurityTokenServiceAsync gwtXSRFService = GWT.create(GwtSecurityTokenService.class);
     private final GwtNetworkServiceAsync gwtNetworkService = GWT.create(GwtNetworkService.class);
@@ -57,17 +54,22 @@ public class NetworkButtonBarUi extends Composite {
 
     @UiField
     Button apply;
+
     @UiField
     Button reset;
+
     @UiField
     Button refresh;
 
     @UiField
     Modal incompleteFieldsModal;
+
     @UiField
     Alert incompleteFields;
+
     @UiField
     Text incompleteFieldsText;
+
     @UiField
     AlertDialog alertDialog;
 
@@ -116,14 +118,17 @@ public class NetworkButtonBarUi extends Composite {
                     NetworkButtonBarUi.this.table.reset();
                     NetworkButtonBarUi.this.apply.setEnabled(false);
                 } else {
-                    alertDialog.show(MSGS.confirm(), MSGS.netConfigChangeConfirm(), AlertDialog.Severity.INFO,
+                    alertDialog.show(
+                            MSGS.confirm(),
+                            MSGS.netConfigChangeConfirm(),
+                            AlertDialog.Severity.INFO,
                             confirmed -> {
                                 if (confirmed) {
                                     EntryClassUi.showWaitModal();
                                     updateNetConfiguration(updatedNetIf);
                                 }
-                            }, new String[] { MSGS.netConfigConsoleUnavailable(), MSGS.netConfigURLChange() });
-
+                            },
+                            new String[] {MSGS.netConfigConsoleUnavailable(), MSGS.netConfigURLChange()});
                 }
             } else {
                 logger.log(Level.FINER, MSGS.information() + ": " + MSGS.deviceConfigError());
@@ -144,8 +149,8 @@ public class NetworkButtonBarUi extends Composite {
 
             @Override
             public void onSuccess(GwtXSRFToken token) {
-                NetworkButtonBarUi.this.gwtNetworkService.updateNetInterfaceConfigurations(token, updatedNetIf,
-                        new AsyncCallback<Void>() {
+                NetworkButtonBarUi.this.gwtNetworkService.updateNetInterfaceConfigurations(
+                        token, updatedNetIf, new AsyncCallback<Void>() {
 
                             @Override
                             public void onFailure(Throwable ex) {
@@ -161,10 +166,8 @@ public class NetworkButtonBarUi extends Composite {
                                 NetworkButtonBarUi.this.tabs.refresh();
                                 NetworkButtonBarUi.this.apply.setEnabled(false);
                             }
-
                         });
             }
-
         });
     }
 
@@ -172,5 +175,4 @@ public class NetworkButtonBarUi extends Composite {
         this.incompleteFieldsModal.setTitle(MSGS.warning());
         this.incompleteFieldsText.setText(MSGS.formWithErrorsOrIncomplete());
     }
-
 }

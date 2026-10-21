@@ -1,20 +1,28 @@
 /*******************************************************************************
- * Copyright (c) 2021 Eurotech and/or its affiliates and others
- * 
+ * Copyright (c) 2021, 2026 Eurotech and/or its affiliates and others
+ *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
  * which is available at https://www.eclipse.org/legal/epl-2.0/
- * 
+ *
  * SPDX-License-Identifier: EPL-2.0
- * 
+ *
  * Contributors:
  *  Eurotech
  *******************************************************************************/
 package org.eclipse.kura.web.client.ui.device;
 
+import com.google.gwt.core.client.GWT;
+import com.google.gwt.uibinder.client.UiBinder;
+import com.google.gwt.uibinder.client.UiField;
+import com.google.gwt.user.cellview.client.TextColumn;
+import com.google.gwt.user.cellview.client.TextHeader;
+import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.google.gwt.user.client.ui.Composite;
+import com.google.gwt.user.client.ui.Widget;
+import com.google.gwt.view.client.ListDataProvider;
 import java.util.Collections;
 import java.util.List;
-
 import org.eclipse.kura.web.client.messages.Messages;
 import org.eclipse.kura.web.client.ui.EntryClassUi;
 import org.eclipse.kura.web.client.ui.Tab;
@@ -28,22 +36,11 @@ import org.eclipse.kura.web.shared.service.GwtSecurityTokenServiceAsync;
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.gwt.CellTable;
 
-import com.google.gwt.core.client.GWT;
-import com.google.gwt.uibinder.client.UiBinder;
-import com.google.gwt.uibinder.client.UiField;
-import com.google.gwt.user.cellview.client.TextColumn;
-import com.google.gwt.user.cellview.client.TextHeader;
-import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.google.gwt.user.client.ui.Composite;
-import com.google.gwt.user.client.ui.Widget;
-import com.google.gwt.view.client.ListDataProvider;
-
 public class SystemPackagesTabUi extends Composite implements Tab {
 
     private static SystemPackagesTabUiUiBinder uiBinder = GWT.create(SystemPackagesTabUiUiBinder.class);
 
-    interface SystemPackagesTabUiUiBinder extends UiBinder<Widget, SystemPackagesTabUi> {
-    }
+    interface SystemPackagesTabUiUiBinder extends UiBinder<Widget, SystemPackagesTabUi> {}
 
     private static final Messages MSGS = GWT.create(Messages.class);
     private static final String ROW_HEADER_STYLE = "rowHeader";
@@ -59,6 +56,7 @@ public class SystemPackagesTabUi extends Composite implements Tab {
 
     @UiField
     CellTable<GwtGroupedNVPair> systemPackagesGrid = new CellTable<>();
+
     private final ListDataProvider<GwtGroupedNVPair> systemPackagesDataProvider = new ListDataProvider<>();
 
     public SystemPackagesTabUi() {
@@ -69,8 +67,8 @@ public class SystemPackagesTabUi extends Composite implements Tab {
         this.systemPackagesRefresh.addClickHandler(event -> refresh());
     }
 
-    private void loadSystemPackagesTable(CellTable<GwtGroupedNVPair> systemPackagesGrid2,
-            ListDataProvider<GwtGroupedNVPair> dataProvider) {
+    private void loadSystemPackagesTable(
+            CellTable<GwtGroupedNVPair> systemPackagesGrid2, ListDataProvider<GwtGroupedNVPair> dataProvider) {
 
         TextColumn<GwtGroupedNVPair> col1 = new TextColumn<GwtGroupedNVPair>() {
 
@@ -147,8 +145,8 @@ public class SystemPackagesTabUi extends Composite implements Tab {
 
             @Override
             public void onSuccess(GwtXSRFToken token) {
-                SystemPackagesTabUi.this.gwtDeviceService.findSystemPackages(token,
-                        new AsyncCallback<List<GwtGroupedNVPair>>() {
+                SystemPackagesTabUi.this.gwtDeviceService.findSystemPackages(
+                        token, new AsyncCallback<List<GwtGroupedNVPair>>() {
 
                             @Override
                             public void onFailure(Throwable caught) {
@@ -163,17 +161,23 @@ public class SystemPackagesTabUi extends Composite implements Tab {
                                 EntryClassUi.hideWaitModal();
                                 SystemPackagesTabUi.this.isRequestRunning = false;
                                 for (GwtGroupedNVPair resultPair : result) {
-                                    SystemPackagesTabUi.this.systemPackagesDataProvider.getList().add(resultPair);
+                                    SystemPackagesTabUi.this
+                                            .systemPackagesDataProvider
+                                            .getList()
+                                            .add(resultPair);
                                 }
-                                Collections.sort(SystemPackagesTabUi.this.systemPackagesDataProvider.getList(),
+                                Collections.sort(
+                                        SystemPackagesTabUi.this.systemPackagesDataProvider.getList(),
                                         (o1, o2) -> o1.getName().compareToIgnoreCase(o2.getName()));
-                                int size = SystemPackagesTabUi.this.systemPackagesDataProvider.getList().size();
+                                int size = SystemPackagesTabUi.this
+                                        .systemPackagesDataProvider
+                                        .getList()
+                                        .size();
                                 SystemPackagesTabUi.this.systemPackagesGrid.setVisibleRange(0, size);
                                 SystemPackagesTabUi.this.systemPackagesDataProvider.flush();
                             }
                         });
             }
-
         });
     }
 
@@ -181,5 +185,4 @@ public class SystemPackagesTabUi extends Composite implements Tab {
     public void clear() {
         // Not needed
     }
-
 }

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2020, 2025 Eurotech and/or its affiliates and others
+ * Copyright (c) 2020, 2026 Eurotech and/or its affiliates and others
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -12,11 +12,10 @@
  *******************************************************************************/
 package org.eclipse.kura.web.shared.service;
 
-import org.eclipse.kura.web.shared.GwtKuraException;
-import org.eclipse.kura.web.shared.model.GwtLoginInfo;
-
 import com.google.gwt.user.client.rpc.RemoteService;
 import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
+import org.eclipse.kura.web.shared.GwtKuraException;
+import org.eclipse.kura.web.shared.model.GwtLoginInfo;
 
 @RemoteServiceRelativePath("loginInfo")
 public interface GwtLoginInfoService extends RemoteService {

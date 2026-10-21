@@ -12,12 +12,26 @@
  *******************************************************************************/
 package org.eclipse.kura.web.client.ui.users;
 
+import com.google.gwt.core.client.GWT;
+import com.google.gwt.uibinder.client.UiBinder;
+import com.google.gwt.uibinder.client.UiField;
+import com.google.gwt.user.cellview.client.CellTable;
+import com.google.gwt.user.cellview.client.ColumnSortEvent;
+import com.google.gwt.user.cellview.client.ColumnSortEvent.ListHandler;
+import com.google.gwt.user.cellview.client.SimplePager;
+import com.google.gwt.user.cellview.client.SimplePager.TextLocation;
+import com.google.gwt.user.cellview.client.TextColumn;
+import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.google.gwt.user.client.ui.Composite;
+import com.google.gwt.user.client.ui.Widget;
+import com.google.gwt.view.client.HasRows;
+import com.google.gwt.view.client.ListDataProvider;
+import com.google.gwt.view.client.SingleSelectionModel;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-
 import org.eclipse.kura.web.client.messages.Messages;
 import org.eclipse.kura.web.client.ui.AlertDialog;
 import org.eclipse.kura.web.client.ui.Picker;
@@ -38,49 +52,41 @@ import org.gwtbootstrap3.client.ui.PanelFooter;
 import org.gwtbootstrap3.client.ui.Row;
 import org.gwtbootstrap3.client.ui.html.Paragraph;
 
-import com.google.gwt.core.client.GWT;
-import com.google.gwt.uibinder.client.UiBinder;
-import com.google.gwt.uibinder.client.UiField;
-import com.google.gwt.user.cellview.client.CellTable;
-import com.google.gwt.user.cellview.client.ColumnSortEvent;
-import com.google.gwt.user.cellview.client.ColumnSortEvent.ListHandler;
-import com.google.gwt.user.cellview.client.SimplePager;
-import com.google.gwt.user.cellview.client.SimplePager.TextLocation;
-import com.google.gwt.user.cellview.client.TextColumn;
-import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.google.gwt.user.client.ui.Composite;
-import com.google.gwt.user.client.ui.Widget;
-import com.google.gwt.view.client.HasRows;
-import com.google.gwt.view.client.ListDataProvider;
-import com.google.gwt.view.client.SingleSelectionModel;
-
 public class UsersPanelUi extends Composite implements Tab, UserConfigUi.Listener {
 
     protected static final Messages MSGS = GWT.create(Messages.class);
 
     private static UsersPanelUiUiBinder uiBinder = GWT.create(UsersPanelUiUiBinder.class);
 
-    interface UsersPanelUiUiBinder extends UiBinder<Widget, UsersPanelUi> {
-    }
+    interface UsersPanelUiUiBinder extends UiBinder<Widget, UsersPanelUi> {}
 
     @UiField
     Button apply;
+
     @UiField
     Button reset;
+
     @UiField
     Button newIdentity;
+
     @UiField
     Button delete;
+
     @UiField
     Row config;
+
     @UiField
     Paragraph emptyLabel;
+
     @UiField
     Picker picker;
+
     @UiField
     AlertDialog alertDialog;
+
     @UiField
     CellTable<GwtUserConfig> userTable;
+
     @UiField
     PanelFooter tablePanelFooter;
 
@@ -156,28 +162,27 @@ public class UsersPanelUi extends Composite implements Tab, UserConfigUi.Listene
 
             updateButtonState();
         });
-
     }
 
     private void initInterfaceButtons() {
-        this.newIdentity.addClickHandler(e -> this.picker.builder() //
+        this.newIdentity.addClickHandler(e -> this.picker
+                .builder() //
                 .setTitle(MSGS.usersCreateIdentity()) //
                 .setMessage(MSGS.usersIdentityName()) //
                 .setValidators(Arrays.asList(
                         GwtValidators.nonEmpty(MSGS.usersIdentityNameEmpty()), //
-                        GwtValidators.punctuatedAlphanumericSequence(new char[] { '.', '_' },
-                                MSGS.usersIdentityNameAllowedCharacters()), //
+                        GwtValidators.punctuatedAlphanumericSequence(
+                                new char[] {'.', '_'}, MSGS.usersIdentityNameAllowedCharacters()), //
                         GwtValidators.stringLength(3, 255, MSGS.usersIdentityNameLength()), //
                         GwtValidators.predicate(
                                 userName -> this.dataProvider.getList().stream()
                                         .noneMatch(d -> d.getUserName().equals(userName)),
                                 MSGS.usersIdentityAlreadyExists())))
-                .setOnPick(user -> RequestQueue.submit(
-                        c -> this.gwtXsrfService.generateSecurityToken(c.callback(token -> this.gwtUserService
-                                .getUserConfigOrDefault(token, user, c.callback(userConfig -> {
-                                    this.dataProvider.getList().add(userConfig);
-                                    setDirty(true);
-                                }))))))
+                .setOnPick(user -> RequestQueue.submit(c -> this.gwtXsrfService.generateSecurityToken(c.callback(
+                        token -> this.gwtUserService.getUserConfigOrDefault(token, user, c.callback(userConfig -> {
+                            this.dataProvider.getList().add(userConfig);
+                            setDirty(true);
+                        }))))))
                 .pick(Input.class));
 
         this.delete.addClickHandler(e -> this.alertDialog.show(MSGS.usersConfirmDeleteIdentity(), () -> {
@@ -190,18 +195,25 @@ public class UsersPanelUi extends Composite implements Tab, UserConfigUi.Listene
         this.apply.addClickHandler(e -> {
             final List<String> warnings = getWarnings();
 
-            this.alertDialog.show(MSGS.confirm(), MSGS.usersConfirmApply(), AlertDialog.Severity.INFO, ok -> {
-                if (ok) {
-                    apply();
-                }
-            }, warnings.toArray(new String[warnings.size()]));
+            this.alertDialog.show(
+                    MSGS.confirm(),
+                    MSGS.usersConfirmApply(),
+                    AlertDialog.Severity.INFO,
+                    ok -> {
+                        if (ok) {
+                            apply();
+                        }
+                    },
+                    warnings.toArray(new String[warnings.size()]));
         });
     }
 
     private ListHandler<GwtUserConfig> getUserNameSortHandler(TextColumn<GwtUserConfig> userNameColumn) {
         ListHandler<GwtUserConfig> handler = new ListHandler<>(this.dataProvider.getList());
-        handler.setComparator(userNameColumn,
-                (GwtUserConfig conf1, GwtUserConfig conf2) -> conf1.getUserName().compareTo(conf2.getUserName()));
+        handler.setComparator(
+                userNameColumn,
+                (GwtUserConfig conf1, GwtUserConfig conf2) ->
+                        conf1.getUserName().compareTo(conf2.getUserName()));
 
         return handler;
     }
@@ -214,11 +226,13 @@ public class UsersPanelUi extends Composite implements Tab, UserConfigUi.Listene
             return result;
         }
 
-        if (this.dataProvider.getList().stream().noneMatch(u -> u.getPermissions().contains(KuraPermission.ADMIN))) {
+        if (this.dataProvider.getList().stream()
+                .noneMatch(u -> u.getPermissions().contains(KuraPermission.ADMIN))) {
             result.add(MSGS.usersNoAdmin());
         }
 
-        this.dataProvider.getList().stream().filter(u -> u.getPermissions().isEmpty())
+        this.dataProvider.getList().stream()
+                .filter(u -> u.getPermissions().isEmpty())
                 .forEach(u -> result.add(MSGS.usersNoPermissions(u.getUserNameEllipsed())));
 
         return result;
@@ -232,23 +246,19 @@ public class UsersPanelUi extends Composite implements Tab, UserConfigUi.Listene
 
     private void apply() {
         final Set<GwtUserConfig> asSet = new HashSet<>(this.dataProvider.getList());
-        RequestQueue.submit(c -> this.gwtXsrfService.generateSecurityToken(
-                c.callback(token -> this.gwtUserService.setUserConfig(token, asSet, c.callback(
+        RequestQueue.submit(c -> this.gwtXsrfService.generateSecurityToken(c.callback(token ->
+                this.gwtUserService.setUserConfig(token, asSet, c.callback(new AsyncCallback<Void>() {
+                    @Override
+                    public void onSuccess(Void result) {
+                        refresh();
+                    }
 
-                        new AsyncCallback<Void>() {
-                            @Override
-                            public void onSuccess(Void result) {
-                                refresh();
-                            }
-
-                            @Override
-                            public void onFailure(Throwable caught) {
-                                refresh();
-                                FailureHandler.showErrorMessage(caught.getMessage());
-                            }
-                        }
-
-                )))));
+                    @Override
+                    public void onFailure(Throwable caught) {
+                        refresh();
+                        FailureHandler.showErrorMessage(caught.getMessage());
+                    }
+                })))));
     }
 
     private void showConfigUi(final UserConfigUi ui) {
@@ -283,15 +293,16 @@ public class UsersPanelUi extends Composite implements Tab, UserConfigUi.Listene
     public void refresh() {
         clearConfigUi();
 
-        RequestQueue.submit(c -> this.gwtXsrfService.generateSecurityToken(
-                c.callback(token -> this.gwtUserService.getUserConfig(token, c.callback(result -> {
+        RequestQueue.submit(c -> this.gwtXsrfService.generateSecurityToken(c.callback(token ->
+                this.gwtUserService.getUserConfig(token, c.callback(result -> {
                     final List<GwtUserConfig> list = this.dataProvider.getList();
                     list.clear();
                     list.addAll(result);
                     ColumnSortEvent.fire(this.userTable, this.userTable.getColumnSortList());
                 })))));
-        RequestQueue.submit(c -> this.gwtXsrfService.generateSecurityToken(c.callback(token -> this.gwtUserService
-                .getDefinedPermissions(token, c.callback(result -> this.definedPermissions = result)))));
+        RequestQueue.submit(c ->
+                this.gwtXsrfService.generateSecurityToken(c.callback(token -> this.gwtUserService.getDefinedPermissions(
+                        token, c.callback(result -> this.definedPermissions = result)))));
 
         setDirty(false);
     }

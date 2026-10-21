@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2019, 2025 Eurotech and/or its affiliates and others
+ * Copyright (c) 2019, 2026 Eurotech and/or its affiliates and others
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -12,14 +12,13 @@
  *******************************************************************************/
 package org.eclipse.kura.web.shared.service;
 
+import com.google.gwt.user.client.rpc.RemoteService;
+import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
 import org.eclipse.kura.web.server.Audit;
 import org.eclipse.kura.web.shared.GwtKuraException;
 import org.eclipse.kura.web.shared.model.GwtPasswordStrenghtRequirements;
 import org.eclipse.kura.web.shared.model.GwtUserConfig;
 import org.eclipse.kura.web.shared.model.GwtXSRFToken;
-
-import com.google.gwt.user.client.rpc.RemoteService;
-import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
 
 @RemoteServiceRelativePath("session")
 public interface GwtSessionService extends RemoteService {

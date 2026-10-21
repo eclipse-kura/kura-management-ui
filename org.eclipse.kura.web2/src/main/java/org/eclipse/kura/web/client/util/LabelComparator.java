@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2018, 2023 Eurotech and/or its affiliates and others
+ * Copyright (c) 2018, 2026 Eurotech and/or its affiliates and others
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -87,5 +87,4 @@ public class LabelComparator<T> implements Comparator<Entry<String, T>> {
 
         return 0;
     }
-
 }

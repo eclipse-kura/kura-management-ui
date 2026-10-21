@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2021 Eurotech and/or its affiliates and others
+ * Copyright (c) 2021, 2026 Eurotech and/or its affiliates and others
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -19,12 +19,11 @@ import org.eclipse.kura.web.shared.service.GwtSslManagerService;
 public class GwtSslManagerServiceImpl extends BaseGwtRestrictedComponentService implements GwtSslManagerService {
 
     /**
-     * 
+     *
      */
     private static final long serialVersionUID = -1480613592267828475L;
 
     public GwtSslManagerServiceImpl() {
         super(i -> i.contains(SslManagerService.class.getName()) && i.contains(ConfigurableComponent.class.getName()));
     }
-
 }

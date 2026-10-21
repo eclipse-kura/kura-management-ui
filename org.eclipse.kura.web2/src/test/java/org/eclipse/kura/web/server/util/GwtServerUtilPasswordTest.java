@@ -21,7 +21,6 @@ import static org.junit.Assert.assertNull;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
-
 import org.eclipse.kura.configuration.Password;
 import org.eclipse.kura.core.configuration.ComponentConfigurationImpl;
 import org.eclipse.kura.web.shared.model.GwtConfigComponent;

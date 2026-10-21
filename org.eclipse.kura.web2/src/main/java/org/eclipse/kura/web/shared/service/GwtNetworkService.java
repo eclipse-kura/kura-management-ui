@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2011, 2025 Eurotech and/or its affiliates and others
+ * Copyright (c) 2011, 2026 Eurotech and/or its affiliates and others
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -12,8 +12,9 @@
  *******************************************************************************/
 package org.eclipse.kura.web.shared.service;
 
+import com.google.gwt.user.client.rpc.RemoteService;
+import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
 import java.util.List;
-
 import org.eclipse.kura.web.server.Audit;
 import org.eclipse.kura.web.server.RequiredPermissions;
 import org.eclipse.kura.web.shared.GwtKuraException;
@@ -26,9 +27,6 @@ import org.eclipse.kura.web.shared.model.GwtWifiChannelFrequency;
 import org.eclipse.kura.web.shared.model.GwtWifiHotspotEntry;
 import org.eclipse.kura.web.shared.model.GwtWifiRadioMode;
 import org.eclipse.kura.web.shared.model.GwtXSRFToken;
-
-import com.google.gwt.user.client.rpc.RemoteService;
-import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
 
 @RemoteServiceRelativePath("network")
 @RequiredPermissions(KuraPermission.NETWORK_ADMIN)
@@ -83,12 +81,13 @@ public interface GwtNetworkService extends RemoteService {
     public void renewDhcpLease(GwtXSRFToken xsrfToken, String interfaceName) throws GwtKuraException;
 
     @Audit(componentName = "UI Network", description = "WiFi scan")
-    public List<GwtWifiHotspotEntry> findWifiHotspots(GwtXSRFToken xsrfToken, String interfaceName, String wirelessSsid,
-            boolean recompute) throws GwtKuraException;
+    public List<GwtWifiHotspotEntry> findWifiHotspots(
+            GwtXSRFToken xsrfToken, String interfaceName, String wirelessSsid, boolean recompute)
+            throws GwtKuraException;
 
     @Audit(componentName = "UI Network", description = "Get Wifi channels and frequencies")
-    public List<GwtWifiChannelFrequency> findFrequencies(GwtXSRFToken xsrfToken, String interfaceName,
-            GwtWifiRadioMode radiomode) throws GwtKuraException;
+    public List<GwtWifiChannelFrequency> findFrequencies(
+            GwtXSRFToken xsrfToken, String interfaceName, GwtWifiRadioMode radiomode) throws GwtKuraException;
 
     @Audit(componentName = "UI Network", description = "Get Wifi Country Code")
     public String getWifiCountryCode(GwtXSRFToken xsrfToken) throws GwtKuraException;

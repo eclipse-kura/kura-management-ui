@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2011, 2024 Eurotech and/or its affiliates and others
+ * Copyright (c) 2011, 2026 Eurotech and/or its affiliates and others
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -12,15 +12,13 @@
  *******************************************************************************/
 package org.eclipse.kura.web.shared.model;
 
+import com.google.gwt.user.client.rpc.IsSerializable;
 import java.util.Arrays;
 import java.util.Map;
-
-import com.google.gwt.user.client.rpc.IsSerializable;
 
 public class GwtConfigParameter implements IsSerializable {
 
     public enum GwtConfigParameterType {
-
         STRING,
         LONG,
         DOUBLE,
@@ -32,8 +30,7 @@ public class GwtConfigParameter implements IsSerializable {
         SHORT,
         PASSWORD;
 
-        GwtConfigParameterType() {
-        }
+        GwtConfigParameterType() {}
     }
 
     private String id;
@@ -48,11 +45,10 @@ public class GwtConfigParameter implements IsSerializable {
     private Map<String, String> options;
     private String min;
     private String max;
-    private String value;  // used for fields with single cardinality
+    private String value; // used for fields with single cardinality
     private String[] values; // used for fields with multiple cardinality
 
-    public GwtConfigParameter() {
-    }
+    public GwtConfigParameter() {}
 
     public GwtConfigParameter(GwtConfigParameter reference) {
         this.id = reference.getId();

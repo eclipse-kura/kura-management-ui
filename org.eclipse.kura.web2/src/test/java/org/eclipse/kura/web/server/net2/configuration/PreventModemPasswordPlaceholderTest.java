@@ -18,7 +18,6 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import java.util.Map;
-
 import org.eclipse.kura.configuration.Password;
 import org.eclipse.kura.web.server.util.GwtServerUtil;
 import org.eclipse.kura.web.shared.GwtKuraException;
@@ -113,8 +112,8 @@ public class PreventModemPasswordPlaceholderTest {
     }
 
     private void whenBuildingProperties() throws GwtKuraException {
-        NetworkConfigurationServicePropertiesBuilder builder = new NetworkConfigurationServicePropertiesBuilder(
-                modemConfig, oldConfig);
+        NetworkConfigurationServicePropertiesBuilder builder =
+                new NetworkConfigurationServicePropertiesBuilder(modemConfig, oldConfig);
         result = builder.build();
     }
 
@@ -126,7 +125,8 @@ public class PreventModemPasswordPlaceholderTest {
     }
 
     private void thenModemPasswordIsNotStored() {
-        assertFalse("Modem password should not be stored when placeholder detected and old config is not modem",
+        assertFalse(
+                "Modem password should not be stored when placeholder detected and old config is not modem",
                 result.containsKey(PASSWORD_KEY));
     }
 }

@@ -25,7 +25,6 @@ import java.util.Hashtable;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Supplier;
-
 import org.eclipse.kura.deployment.agent.DeploymentAgentService;
 import org.eclipse.kura.deployment.agent.MarketplacePackageDescriptor;
 import org.eclipse.kura.ssl.SslManagerService;
@@ -82,7 +81,8 @@ public class GwtPackageServiceImpl extends OsgiRemoteServiceServlet implements G
         for (DeploymentPackage deploymentPackage : deploymentPackages) {
             GwtDeploymentPackage gwtDeploymentPackage = new GwtDeploymentPackage();
             gwtDeploymentPackage.setName(GwtSafeHtmlUtils.htmlEscape(deploymentPackage.getName()));
-            gwtDeploymentPackage.setVersion(GwtSafeHtmlUtils.htmlEscape(deploymentPackage.getVersion().toString()));
+            gwtDeploymentPackage.setVersion(
+                    GwtSafeHtmlUtils.htmlEscape(deploymentPackage.getVersion().toString()));
             gwtDeploymentPackage.setSigned(true);
 
             BundleInfo[] bundleInfos = deploymentPackage.getBundleInfos();
@@ -90,10 +90,15 @@ public class GwtPackageServiceImpl extends OsgiRemoteServiceServlet implements G
                 for (BundleInfo bundleInfo : bundleInfos) {
                     Optional<Bundle> bundle = bundles.stream()
                             .filter(b -> b.getSymbolicName().equals(bundleInfo.getSymbolicName())
-                                    && b.getVersion().toString().equals(bundleInfo.getVersion().toString()))
+                                    && b.getVersion()
+                                            .toString()
+                                            .equals(bundleInfo.getVersion().toString()))
                             .findFirst();
 
-                    if (bundle.isPresent() && bundle.get().getSignerCertificates(Bundle.SIGNERS_ALL).isEmpty()) {
+                    if (bundle.isPresent()
+                            && bundle.get()
+                                    .getSignerCertificates(Bundle.SIGNERS_ALL)
+                                    .isEmpty()) {
                         gwtDeploymentPackage.setSigned(false);
                         break;
                     }
@@ -110,8 +115,8 @@ public class GwtPackageServiceImpl extends OsgiRemoteServiceServlet implements G
     public void uninstallDeploymentPackage(GwtXSRFToken xsrfToken, String packageName) throws GwtKuraException {
         checkXSRFToken(xsrfToken);
 
-        DeploymentAgentService deploymentAgentService = ServiceLocator.getInstance()
-                .getService(DeploymentAgentService.class);
+        DeploymentAgentService deploymentAgentService =
+                ServiceLocator.getInstance().getService(DeploymentAgentService.class);
         try {
             deploymentAgentService.uninstallDeploymentPackageAsync(GwtSafeHtmlUtils.htmlEscape(packageName));
         } catch (Exception e) {
@@ -126,15 +131,16 @@ public class GwtPackageServiceImpl extends OsgiRemoteServiceServlet implements G
 
         GwtMarketplacePackageDescriptor descriptor = new GwtMarketplacePackageDescriptor();
         try {
-            final SslManagerService sslManagerService = this.sslManagerServiceSupplier.get()
+            final SslManagerService sslManagerService = this.sslManagerServiceSupplier
+                    .get()
                     .orElseThrow(() -> new IllegalStateException(
                             "Failed to download package from Eclipse Marketplace, SslManagerService is not bound"));
 
             String url = String.format(MARKETPLACE_URL, nodeId);
-            DeploymentAgentService deploymentAgentService = ServiceLocator.getInstance()
-                    .getService(DeploymentAgentService.class);
-            MarketplacePackageDescriptor marketplacePackageDescriptor = deploymentAgentService
-                    .getMarketplacePackageDescriptor(url, sslManagerService);
+            DeploymentAgentService deploymentAgentService =
+                    ServiceLocator.getInstance().getService(DeploymentAgentService.class);
+            MarketplacePackageDescriptor marketplacePackageDescriptor =
+                    deploymentAgentService.getMarketplacePackageDescriptor(url, sslManagerService);
 
             descriptor.setCompatible(marketplacePackageDescriptor.isCompatible());
             descriptor.setDpUrl(marketplacePackageDescriptor.getDpUrl());
@@ -186,14 +192,15 @@ public class GwtPackageServiceImpl extends OsgiRemoteServiceServlet implements G
         private static Hashtable<String, Object> serviceProperties;
 
         static {
-            final String[] topics = new String[] { DeploymentAgentService.EVENT_INSTALLED_TOPIC };
+            final String[] topics = new String[] {DeploymentAgentService.EVENT_INSTALLED_TOPIC};
             serviceProperties = new Hashtable<>();
             serviceProperties.put(EventConstants.EVENT_TOPIC, topics);
         }
 
         private MarketplaceFeedbackEventHandler(GwtMarketplacePackageDescriptor descriptor) {
             this.descriptor = descriptor;
-            this.registration = FrameworkUtil.getBundle(GwtPackageServiceImpl.class).getBundleContext()
+            this.registration = FrameworkUtil.getBundle(GwtPackageServiceImpl.class)
+                    .getBundleContext()
                     .registerService(EventHandler.class, this, serviceProperties);
         }
 
@@ -241,8 +248,6 @@ public class GwtPackageServiceImpl extends OsgiRemoteServiceServlet implements G
                     this.registration.unregister();
                 }
             }
-
         }
     }
-
 }

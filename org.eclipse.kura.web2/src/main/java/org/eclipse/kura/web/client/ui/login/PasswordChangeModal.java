@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2022, 2025 Eurotech and/or its affiliates and others
+ * Copyright (c) 2022, 2026 Eurotech and/or its affiliates and others
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -12,12 +12,19 @@
  *******************************************************************************/
 package org.eclipse.kura.web.client.ui.login;
 
+import com.google.gwt.core.client.GWT;
+import com.google.gwt.editor.client.Editor;
+import com.google.gwt.editor.client.EditorError;
+import com.google.gwt.uibinder.client.UiBinder;
+import com.google.gwt.uibinder.client.UiField;
+import com.google.gwt.user.client.ui.Composite;
+import com.google.gwt.user.client.ui.FormPanel;
+import com.google.gwt.user.client.ui.Widget;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-
 import org.eclipse.kura.web.client.messages.Messages;
 import org.eclipse.kura.web.client.ui.validator.GwtValidators;
 import org.eclipse.kura.web.shared.model.GwtPasswordStrenghtRequirements;
@@ -27,33 +34,28 @@ import org.gwtbootstrap3.client.ui.Modal;
 import org.gwtbootstrap3.client.ui.form.error.BasicEditorError;
 import org.gwtbootstrap3.client.ui.form.validator.Validator;
 
-import com.google.gwt.core.client.GWT;
-import com.google.gwt.editor.client.Editor;
-import com.google.gwt.editor.client.EditorError;
-import com.google.gwt.uibinder.client.UiBinder;
-import com.google.gwt.uibinder.client.UiField;
-import com.google.gwt.user.client.ui.Composite;
-import com.google.gwt.user.client.ui.FormPanel;
-import com.google.gwt.user.client.ui.Widget;
-
 public class PasswordChangeModal extends Composite {
 
-    interface PasswordChangeModalUiBinder extends UiBinder<Widget, PasswordChangeModal> {
-    }
+    interface PasswordChangeModalUiBinder extends UiBinder<Widget, PasswordChangeModal> {}
 
     private static final PasswordChangeModalUiBinder uiBinder = GWT.create(PasswordChangeModalUiBinder.class);
     private static final Messages MSGS = GWT.create(Messages.class);
 
     @UiField
     Modal passwordChangeModal;
+
     @UiField
     Input oldPassword;
+
     @UiField
     Input newPassword;
+
     @UiField
     Input confirmNewPassword;
+
     @UiField
     Button okButton;
+
     @UiField
     FormPanel passwordChangeForm;
 
@@ -79,12 +81,11 @@ public class PasswordChangeModal extends Composite {
             @Override
             public List<EditorError> validate(Editor<String> editor, String value) {
                 if (value == null || value.trim().isEmpty()) {
-                    return Collections
-                            .singletonList(new BasicEditorError(editor, value, MSGS.loginEnterCurrentPassword()));
+                    return Collections.singletonList(
+                            new BasicEditorError(editor, value, MSGS.loginEnterCurrentPassword()));
                 }
                 return Collections.emptyList();
             }
-
         });
 
         this.confirmNewPassword.addValidator(new Validator<String>() {
@@ -92,8 +93,8 @@ public class PasswordChangeModal extends Composite {
             @Override
             public List<EditorError> validate(final Editor<String> editor, final String value) {
                 if (!Objects.equals(value, PasswordChangeModal.this.newPassword.getValue())) {
-                    return Collections
-                            .singletonList(new BasicEditorError(editor, value, MSGS.loginNotMatchingPasswords()));
+                    return Collections.singletonList(
+                            new BasicEditorError(editor, value, MSGS.loginNotMatchingPasswords()));
                 }
                 return Collections.emptyList();
             }
@@ -102,7 +103,6 @@ public class PasswordChangeModal extends Composite {
             public int getPriority() {
                 return 0;
             }
-
         });
 
         this.passwordChangeForm.addSubmitHandler(e -> {
@@ -131,7 +131,7 @@ public class PasswordChangeModal extends Composite {
     }
 
     @SuppressWarnings("unchecked")
-    private void setUserOptions(final Optional<String> identityName,  final GwtPasswordStrenghtRequirements options) {
+    private void setUserOptions(final Optional<String> identityName, final GwtPasswordStrenghtRequirements options) {
         this.newPassword.setValidators(new Validator<String>() {
 
             @Override
@@ -149,11 +149,11 @@ public class PasswordChangeModal extends Composite {
 
                 return result;
             }
-
         });
     }
 
-    public void pickPassword(Optional<String> identityName, final GwtPasswordStrenghtRequirements options, final Callback callback) {
+    public void pickPassword(
+            Optional<String> identityName, final GwtPasswordStrenghtRequirements options, final Callback callback) {
         this.oldPassword.setValue("");
         this.newPassword.setValue("");
         this.confirmNewPassword.setValue("");

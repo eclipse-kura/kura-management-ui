@@ -1,12 +1,12 @@
 /*******************************************************************************
- * Copyright (c) 2021 Eurotech and/or its affiliates and others
- * 
+ * Copyright (c) 2021, 2026 Eurotech and/or its affiliates and others
+ *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
  * which is available at https://www.eclipse.org/legal/epl-2.0/
- * 
+ *
  * SPDX-License-Identifier: EPL-2.0
- * 
+ *
  * Contributors:
  *  Eurotech
  *******************************************************************************/
@@ -17,7 +17,7 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-@Target({ ElementType.METHOD })
+@Target({ElementType.METHOD})
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Audit {
 

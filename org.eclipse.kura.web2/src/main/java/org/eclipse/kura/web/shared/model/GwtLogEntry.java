@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2021, 2022 Eurotech and/or its affiliates and others
+ * Copyright (c) 2021, 2026 Eurotech and/or its affiliates and others
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -21,7 +21,6 @@ public class GwtLogEntry extends KuraBaseModel implements Serializable {
     private String timestamp;
 
     public enum LogEntryKeys {
-
         SOURCE_LOGPROVIDER_PID("SOURCE_LOGPROVIDER_PID"),
         PID("_PID"),
         SYSLOG_ID("SYSLOG_IDENTIFIER"),

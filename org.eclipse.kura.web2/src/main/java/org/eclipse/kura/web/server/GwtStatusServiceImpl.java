@@ -28,7 +28,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
-
 import org.eclipse.kura.cloud.CloudService;
 import org.eclipse.kura.cloudconnection.CloudConnectionManager;
 import org.eclipse.kura.cloudconnection.CloudEndpoint;
@@ -99,20 +98,22 @@ public class GwtStatusServiceImpl extends OsgiRemoteServiceServlet implements Gw
 
         try {
             ServiceLocator.applyToAllServices(TamperDetectionService.class, t -> {
-
                 final TamperStatus tamperStatus = t.getTamperStatus();
 
-                result.add(new GwtGroupedNVPair("tamperDetection", t.getDisplayName(),
+                result.add(new GwtGroupedNVPair(
+                        "tamperDetection",
+                        t.getDisplayName(),
                         tamperStatus.isDeviceTampered() ? "Tampered" : "Not Tampered"));
 
-                final TypedValue<?> timestamp = tamperStatus.getProperties()
-                        .get(TamperDetectionProperties.TIMESTAMP_PROPERTY_KEY.getValue());
+                final TypedValue<?> timestamp =
+                        tamperStatus.getProperties().get(TamperDetectionProperties.TIMESTAMP_PROPERTY_KEY.getValue());
 
                 if (timestamp != null && timestamp.getValue() instanceof Number timestampValue) {
-                    result.add(new GwtGroupedNVPair("tamperDetection", "Last Tamper Event Timestamp",
+                    result.add(new GwtGroupedNVPair(
+                            "tamperDetection",
+                            "Last Tamper Event Timestamp",
                             new Date(timestampValue.longValue()).toString()));
                 }
-
             });
 
         } catch (final GwtKuraException e) {
@@ -128,11 +129,11 @@ public class GwtStatusServiceImpl extends OsgiRemoteServiceServlet implements Gw
         final List<GwtCloudConnectionInfo> connectionInfos = new ArrayList<>();
 
         try {
-            final Collection<ServiceReference<CloudEndpoint>> cloudEndpointReferences = ServiceLocator.getInstance()
-                    .getServiceReferences(CloudEndpoint.class, null);
+            final Collection<ServiceReference<CloudEndpoint>> cloudEndpointReferences =
+                    ServiceLocator.getInstance().getServiceReferences(CloudEndpoint.class, null);
 
-            List<ServiceReference<CloudEndpoint>> cloudEndpointReferencesList = new ArrayList<>(
-                    cloudEndpointReferences);
+            List<ServiceReference<CloudEndpoint>> cloudEndpointReferencesList =
+                    new ArrayList<>(cloudEndpointReferences);
 
             for (ServiceReference<CloudEndpoint> cloudEndpointReference : cloudEndpointReferencesList) {
                 GwtCloudConnectionInfo cloudConnectionInfo = new GwtCloudConnectionInfo();
@@ -141,20 +142,19 @@ public class GwtStatusServiceImpl extends OsgiRemoteServiceServlet implements Gw
                 cloudConnectionInfo.setCloudServicePid(cloudServicePid);
 
                 final String filter = format("(%s=%s)", KURA_SERVICE_PID, cloudServicePid);
-                final Collection<ServiceReference<CloudConnectionManager>> cloudConnectionManagerReferences = ServiceLocator
-                        .getInstance().getServiceReferences(CloudConnectionManager.class, filter);
+                final Collection<ServiceReference<CloudConnectionManager>> cloudConnectionManagerReferences =
+                        ServiceLocator.getInstance().getServiceReferences(CloudConnectionManager.class, filter);
 
                 cloudConnectionManagerReferences.forEach(cloudConnectionManagerReference -> {
                     CloudConnectionManager cloudConnectionManager;
                     try {
-                        cloudConnectionManager = ServiceLocator.getInstance()
-                                .getService(cloudConnectionManagerReference);
-                        cloudConnectionInfo.addConnectionProperty("Service Status",
-                                cloudConnectionManager.isConnected() ? "CONNECTED" : "DISCONNECTED");
+                        cloudConnectionManager =
+                                ServiceLocator.getInstance().getService(cloudConnectionManagerReference);
+                        cloudConnectionInfo.addConnectionProperty(
+                                "Service Status", cloudConnectionManager.isConnected() ? "CONNECTED" : "DISCONNECTED");
                     } catch (GwtKuraException e) {
                         // endpoint not connection oriented
                     }
-
                 });
 
                 CloudEndpoint cloudEndpoint = ServiceLocator.getInstance().getService(cloudEndpointReference);
@@ -169,8 +169,8 @@ public class GwtStatusServiceImpl extends OsgiRemoteServiceServlet implements Gw
         }
 
         try {
-            final Collection<ServiceReference<CloudService>> cloudServiceReferences = ServiceLocator.getInstance()
-                    .getServiceReferences(CloudService.class, null);
+            final Collection<ServiceReference<CloudService>> cloudServiceReferences =
+                    ServiceLocator.getInstance().getServiceReferences(CloudService.class, null);
 
             List<ServiceReference<CloudService>> cloudServiceReferencesList = new ArrayList<>(cloudServiceReferences);
 
@@ -178,9 +178,10 @@ public class GwtStatusServiceImpl extends OsgiRemoteServiceServlet implements Gw
                 String cloudServicePid = (String) cloudServiceReference.getProperty(KURA_SERVICE_PID);
 
                 if (connectionInfos.stream()
-                        .noneMatch(connectionInfo -> connectionInfo.getCloudServicePid().equals(cloudServicePid))) {
-                    GwtCloudConnectionInfo cloudConnectionInfo = fillFromCloudService(cloudServiceReference,
-                            cloudServicePid);
+                        .noneMatch(connectionInfo ->
+                                connectionInfo.getCloudServicePid().equals(cloudServicePid))) {
+                    GwtCloudConnectionInfo cloudConnectionInfo =
+                            fillFromCloudService(cloudServiceReference, cloudServicePid);
                     connectionInfos.add(cloudConnectionInfo);
                 }
             }
@@ -199,13 +200,13 @@ public class GwtStatusServiceImpl extends OsgiRemoteServiceServlet implements Gw
             pairs.add(new GwtGroupedNVPair("cloudStatus", "Connection Name", connectionInfo.getCloudServicePid()));
 
             Map<String, Object> connectionProperties = connectionInfo.getConnectionProperties();
-            connectionProperties
-                    .forEach((key, value) -> pairs.add(new GwtGroupedNVPair("cloudStatus", key, (String) value)));
+            connectionProperties.forEach(
+                    (key, value) -> pairs.add(new GwtGroupedNVPair("cloudStatus", key, (String) value)));
         });
     }
 
-    private GwtCloudConnectionInfo fillFromCloudService(ServiceReference<CloudService> cloudServiceReference,
-            String cloudServicePid) throws GwtKuraException {
+    private GwtCloudConnectionInfo fillFromCloudService(
+            ServiceReference<CloudService> cloudServiceReference, String cloudServicePid) throws GwtKuraException {
 
         GwtCloudConnectionInfo result = new GwtCloudConnectionInfo();
         result.setCloudServicePid(cloudServicePid);
@@ -214,8 +215,8 @@ public class GwtStatusServiceImpl extends OsgiRemoteServiceServlet implements Gw
         try {
             result.addConnectionProperty("Service Status", cloudService.isConnected() ? "CONNECTED" : "DISCONNECTED");
 
-            final String dataServiceRef = (String) cloudServiceReference
-                    .getProperty(DATA_SERVICE_REFERENCE_NAME + ComponentConstants.REFERENCE_TARGET_SUFFIX);
+            final String dataServiceRef = (String) cloudServiceReference.getProperty(
+                    DATA_SERVICE_REFERENCE_NAME + ComponentConstants.REFERENCE_TARGET_SUFFIX);
             if (dataServiceRef != null) {
                 fillFromDataService(result, dataServiceRef);
             }
@@ -227,14 +228,15 @@ public class GwtStatusServiceImpl extends OsgiRemoteServiceServlet implements Gw
 
     private void fillFromDataService(GwtCloudConnectionInfo cloudConnectionInfo, final String dataServiceRef)
             throws GwtKuraException {
-        final Collection<ServiceReference<DataService>> dataServiceReferences = ServiceLocator.getInstance()
-                .getServiceReferences(DataService.class, dataServiceRef);
+        final Collection<ServiceReference<DataService>> dataServiceReferences =
+                ServiceLocator.getInstance().getServiceReferences(DataService.class, dataServiceRef);
 
         for (ServiceReference<DataService> dataServiceReference : dataServiceReferences) {
             final DataService dataService = ServiceLocator.getInstance().getService(dataServiceReference);
             try {
                 if (dataService != null) {
-                    cloudConnectionInfo.addConnectionProperty("Auto-connect",
+                    cloudConnectionInfo.addConnectionProperty(
+                            "Auto-connect",
                             dataService.isAutoConnectEnabled()
                                     ? "ON (Retry Interval is " + Integer.toString(dataService.getRetryInterval()) + "s)"
                                     : "OFF");
@@ -242,8 +244,8 @@ public class GwtStatusServiceImpl extends OsgiRemoteServiceServlet implements Gw
 
                 final String dataTransportRef = (String) dataServiceReference.getProperty(
                         DATA_TRANSPORT_SERVICE_REFERENCE_NAME + ComponentConstants.REFERENCE_TARGET_SUFFIX);
-                final List<DataTransportService> dataTransportServices = ServiceLocator.getInstance()
-                        .getServices(DataTransportService.class, dataTransportRef);
+                final List<DataTransportService> dataTransportServices =
+                        ServiceLocator.getInstance().getServices(DataTransportService.class, dataTransportRef);
                 for (DataTransportService dataTransportService : dataTransportServices) {
                     cloudConnectionInfo.addConnectionProperty("Broker URL", dataTransportService.getBrokerUrl());
                     cloudConnectionInfo.addConnectionProperty("Account", dataTransportService.getAccountName());
@@ -285,7 +287,6 @@ public class GwtStatusServiceImpl extends OsgiRemoteServiceServlet implements Gw
             if (statusGroup.isPresent() && statusName.isPresent() && statusValue.isPresent()) {
                 pairs.add(new GwtGroupedNVPair(statusGroup.get(), statusName.get(), statusValue.get()));
             }
-
         }
 
         networkStatus = pairs;
@@ -339,7 +340,6 @@ public class GwtStatusServiceImpl extends OsgiRemoteServiceServlet implements Gw
         } else {
             return Optional.of(sb.toString());
         }
-
     }
 
     private static Optional<String> getIPv4Status(GwtNetInterfaceConfig gwtNetInterfaceConfig) {
@@ -369,23 +369,45 @@ public class GwtStatusServiceImpl extends OsgiRemoteServiceServlet implements Gw
             if (gwtNetInterfaceConfig.getStatusEnum() == GwtNetIfStatus.netIPv4StatusDisabled
                     || gwtNetInterfaceConfig.getStatusEnum() == GwtNetIfStatus.netIPv4StatusUnmanaged
                     || gwtNetInterfaceConfig.getStatusEnum() == GwtNetIfStatus.netIPv4StatusL2Only) {
-                sb.append("<b>IPv4</b>").append(NL).append(TAB)
+                sb.append("<b>IPv4</b>")
+                        .append(NL)
+                        .append(TAB)
                         .append(gwtNetInterfaceConfig.getStatusEnum().getValue());
             } else {
-                sb.append("<b>IPv4</b>").append(NL).append(TAB).append(currentAddress).append(NL).append(TAB)
-                        .append(TAB).append(SUBNET_MASK).append(currentSubnetMask).append(NL).append(TAB).append(TAB)
-                        .append(MODE).append(gwtNetInterfaceConfig.getStatusEnum().getValue()).append(NL).append(TAB)
-                        .append(TAB).append(IP_ACQUISITION).append(currentConfigMode).append(NL).append(TAB).append(TAB)
-                        .append("Router Mode: ").append(currentRouterMode);
+                sb.append("<b>IPv4</b>")
+                        .append(NL)
+                        .append(TAB)
+                        .append(currentAddress)
+                        .append(NL)
+                        .append(TAB)
+                        .append(TAB)
+                        .append(SUBNET_MASK)
+                        .append(currentSubnetMask)
+                        .append(NL)
+                        .append(TAB)
+                        .append(TAB)
+                        .append(MODE)
+                        .append(gwtNetInterfaceConfig.getStatusEnum().getValue())
+                        .append(NL)
+                        .append(TAB)
+                        .append(TAB)
+                        .append(IP_ACQUISITION)
+                        .append(currentConfigMode)
+                        .append(NL)
+                        .append(TAB)
+                        .append(TAB)
+                        .append("Router Mode: ")
+                        .append(currentRouterMode);
             }
             return Optional.of(sb.toString());
         } else if (gwtNetInterfaceConfig.getHwTypeEnum() == GwtNetIfType.WIFI
                 && !gwtNetInterfaceConfig.getName().startsWith("mon")) {
-            String currentWifiMode = ((GwtWifiNetInterfaceConfig) gwtNetInterfaceConfig)
-                    .getWirelessModeEnum() == GwtWifiWirelessMode.netWifiWirelessModeStation ? "Station Mode"
-                            : "Access Point";
-            GwtWifiConfig gwtActiveWifiConfig = ((GwtWifiNetInterfaceConfig) gwtNetInterfaceConfig)
-                    .getActiveWifiConfig();
+            String currentWifiMode = ((GwtWifiNetInterfaceConfig) gwtNetInterfaceConfig).getWirelessModeEnum()
+                            == GwtWifiWirelessMode.netWifiWirelessModeStation
+                    ? "Station Mode"
+                    : "Access Point";
+            GwtWifiConfig gwtActiveWifiConfig =
+                    ((GwtWifiNetInterfaceConfig) gwtNetInterfaceConfig).getActiveWifiConfig();
             String currentWifiSsid = null;
             if (gwtActiveWifiConfig != null) {
                 currentWifiSsid = gwtActiveWifiConfig.getWirelessSsid();
@@ -393,16 +415,46 @@ public class GwtStatusServiceImpl extends OsgiRemoteServiceServlet implements Gw
             if (gwtNetInterfaceConfig.getStatusEnum() == GwtNetIfStatus.netIPv4StatusDisabled
                     || gwtNetInterfaceConfig.getStatusEnum() == GwtNetIfStatus.netIPv4StatusUnmanaged
                     || gwtNetInterfaceConfig.getStatusEnum() == GwtNetIfStatus.netIPv4StatusL2Only) {
-                sb.append("<b>IPv4</b>").append(NL).append(TAB)
+                sb.append("<b>IPv4</b>")
+                        .append(NL)
+                        .append(TAB)
                         .append(gwtNetInterfaceConfig.getStatusEnum().getValue());
             } else {
-                sb.append("<b>IPv4</b>").append(NL).append(TAB).append(currentAddress).append(NL).append(TAB)
-                        .append(TAB).append(SUBNET_MASK).append(currentSubnetMask).append(NL).append(TAB).append(TAB)
-                        .append(MODE).append(gwtNetInterfaceConfig.getStatusEnum().getValue()).append(NL).append(TAB)
-                        .append(TAB).append(IP_ACQUISITION).append(currentConfigMode).append(NL).append(TAB).append(TAB)
-                        .append("Router Mode: ").append(currentRouterMode).append(NL).append(TAB).append(TAB)
-                        .append("Wireless Mode:").append(currentWifiMode).append(NL).append(TAB).append(TAB)
-                        .append("SSID: ").append(currentWifiSsid).append(NL);
+                sb.append("<b>IPv4</b>")
+                        .append(NL)
+                        .append(TAB)
+                        .append(currentAddress)
+                        .append(NL)
+                        .append(TAB)
+                        .append(TAB)
+                        .append(SUBNET_MASK)
+                        .append(currentSubnetMask)
+                        .append(NL)
+                        .append(TAB)
+                        .append(TAB)
+                        .append(MODE)
+                        .append(gwtNetInterfaceConfig.getStatusEnum().getValue())
+                        .append(NL)
+                        .append(TAB)
+                        .append(TAB)
+                        .append(IP_ACQUISITION)
+                        .append(currentConfigMode)
+                        .append(NL)
+                        .append(TAB)
+                        .append(TAB)
+                        .append("Router Mode: ")
+                        .append(currentRouterMode)
+                        .append(NL)
+                        .append(TAB)
+                        .append(TAB)
+                        .append("Wireless Mode:")
+                        .append(currentWifiMode)
+                        .append(NL)
+                        .append(TAB)
+                        .append(TAB)
+                        .append("SSID: ")
+                        .append(currentWifiSsid)
+                        .append(NL);
             }
             return Optional.of(sb.toString());
         } else if (gwtNetInterfaceConfig.getHwTypeEnum() == GwtNetIfType.MODEM) {
@@ -415,15 +467,40 @@ public class GwtStatusServiceImpl extends OsgiRemoteServiceServlet implements Gw
             if (gwtNetInterfaceConfig.getStatusEnum() == GwtNetIfStatus.netIPv4StatusDisabled
                     || gwtNetInterfaceConfig.getStatusEnum() == GwtNetIfStatus.netIPv4StatusUnmanaged
                     || gwtNetInterfaceConfig.getStatusEnum() == GwtNetIfStatus.netIPv4StatusL2Only) {
-                sb.append("<b>IPv4</b>").append(NL).append(TAB)
+                sb.append("<b>IPv4</b>")
+                        .append(NL)
+                        .append(TAB)
                         .append(gwtNetInterfaceConfig.getStatusEnum().getValue());
             } else {
-                sb.append("<b>IPv4</b>").append(NL).append(TAB).append(currentAddress).append(NL).append(TAB)
-                        .append(TAB).append(SUBNET_MASK).append(currentSubnetMask).append(NL).append(TAB).append(TAB)
-                        .append(MODE).append(gwtNetInterfaceConfig.getStatusEnum().getValue()).append(NL).append(TAB)
-                        .append(TAB).append(IP_ACQUISITION).append(currentConfigMode).append(NL).append(TAB).append(TAB)
-                        .append("APN: ").append(currentModemApn).append(NL).append(TAB).append(TAB)
-                        .append("Interface: ").append(interfaceName);
+                sb.append("<b>IPv4</b>")
+                        .append(NL)
+                        .append(TAB)
+                        .append(currentAddress)
+                        .append(NL)
+                        .append(TAB)
+                        .append(TAB)
+                        .append(SUBNET_MASK)
+                        .append(currentSubnetMask)
+                        .append(NL)
+                        .append(TAB)
+                        .append(TAB)
+                        .append(MODE)
+                        .append(gwtNetInterfaceConfig.getStatusEnum().getValue())
+                        .append(NL)
+                        .append(TAB)
+                        .append(TAB)
+                        .append(IP_ACQUISITION)
+                        .append(currentConfigMode)
+                        .append(NL)
+                        .append(TAB)
+                        .append(TAB)
+                        .append("APN: ")
+                        .append(currentModemApn)
+                        .append(NL)
+                        .append(TAB)
+                        .append(TAB)
+                        .append("Interface: ")
+                        .append(interfaceName);
             }
             return Optional.of(sb.toString());
         } else {
@@ -452,42 +529,83 @@ public class GwtStatusServiceImpl extends OsgiRemoteServiceServlet implements Gw
         String statusIPv6 = gwtNetInterfaceConfig.getIpv6Status();
         if (Objects.isNull(statusIPv6)) {
             statusIPv6 = "netIPv6StatusDisabled";
-
         }
 
         StringBuilder sb = new StringBuilder();
         if (gwtNetInterfaceConfig.getHwTypeEnum() == GwtNetIfType.ETHERNET) {
-            if (statusIPv6.equals("netIPv6StatusDisabled") || statusIPv6.equals("netIPv6StatusUnmanaged")
+            if (statusIPv6.equals("netIPv6StatusDisabled")
+                    || statusIPv6.equals("netIPv6StatusUnmanaged")
                     || statusIPv6.equals("netIPv6StatusL2Only")) {
                 sb.append("<b>IPv6</b>").append(NL).append(TAB).append(convertIPv6Status(statusIPv6));
             } else {
-                sb.append("<b>IPv6</b>").append(NL).append(TAB).append(currentIPv6Address).append(NL).append(TAB)
-                        .append(TAB).append(SUBNET_MASK).append(currentIPv6SubnetMask).append(NL).append(TAB)
-                        .append(TAB).append(MODE).append(convertIPv6Status(statusIPv6)).append(NL).append(TAB)
-                        .append(TAB).append(IP_ACQUISITION).append(currentIPv6ConfigMode);
+                sb.append("<b>IPv6</b>")
+                        .append(NL)
+                        .append(TAB)
+                        .append(currentIPv6Address)
+                        .append(NL)
+                        .append(TAB)
+                        .append(TAB)
+                        .append(SUBNET_MASK)
+                        .append(currentIPv6SubnetMask)
+                        .append(NL)
+                        .append(TAB)
+                        .append(TAB)
+                        .append(MODE)
+                        .append(convertIPv6Status(statusIPv6))
+                        .append(NL)
+                        .append(TAB)
+                        .append(TAB)
+                        .append(IP_ACQUISITION)
+                        .append(currentIPv6ConfigMode);
             }
             return Optional.of(sb.toString());
         } else if (gwtNetInterfaceConfig.getHwTypeEnum() == GwtNetIfType.WIFI
                 && !gwtNetInterfaceConfig.getName().startsWith("mon")) {
-            String currentWifiMode = ((GwtWifiNetInterfaceConfig) gwtNetInterfaceConfig)
-                    .getWirelessModeEnum() == GwtWifiWirelessMode.netWifiWirelessModeStation ? "Station Mode"
-                            : "Access Point";
-            GwtWifiConfig gwtActiveWifiConfig = ((GwtWifiNetInterfaceConfig) gwtNetInterfaceConfig)
-                    .getActiveWifiConfig();
+            String currentWifiMode = ((GwtWifiNetInterfaceConfig) gwtNetInterfaceConfig).getWirelessModeEnum()
+                            == GwtWifiWirelessMode.netWifiWirelessModeStation
+                    ? "Station Mode"
+                    : "Access Point";
+            GwtWifiConfig gwtActiveWifiConfig =
+                    ((GwtWifiNetInterfaceConfig) gwtNetInterfaceConfig).getActiveWifiConfig();
             String currentWifiSsid = null;
             if (gwtActiveWifiConfig != null) {
                 currentWifiSsid = gwtActiveWifiConfig.getWirelessSsid();
             }
-            if (statusIPv6.equals("netIPv6StatusDisabled") || statusIPv6.equals("netIPv6StatusUnmanaged")
+            if (statusIPv6.equals("netIPv6StatusDisabled")
+                    || statusIPv6.equals("netIPv6StatusUnmanaged")
                     || statusIPv6.equals("netIPv6StatusL2Only")) {
                 sb.append("<b>IPv6</b>").append(NL).append(TAB).append(convertIPv6Status(statusIPv6));
             } else {
-                sb.append("<b>IPv6</b>").append(NL).append(TAB).append(currentIPv6Address).append(NL).append(TAB)
-                        .append(TAB).append(SUBNET_MASK).append(currentIPv6SubnetMask).append(NL).append(TAB)
-                        .append(TAB).append(MODE).append(convertIPv6Status(statusIPv6)).append(NL).append(TAB)
-                        .append(TAB).append(IP_ACQUISITION).append(currentIPv6ConfigMode).append(NL).append(TAB)
-                        .append(TAB).append("Wireless Mode:").append(currentWifiMode).append(NL).append(TAB).append(TAB)
-                        .append("SSID: ").append(currentWifiSsid).append(NL);
+                sb.append("<b>IPv6</b>")
+                        .append(NL)
+                        .append(TAB)
+                        .append(currentIPv6Address)
+                        .append(NL)
+                        .append(TAB)
+                        .append(TAB)
+                        .append(SUBNET_MASK)
+                        .append(currentIPv6SubnetMask)
+                        .append(NL)
+                        .append(TAB)
+                        .append(TAB)
+                        .append(MODE)
+                        .append(convertIPv6Status(statusIPv6))
+                        .append(NL)
+                        .append(TAB)
+                        .append(TAB)
+                        .append(IP_ACQUISITION)
+                        .append(currentIPv6ConfigMode)
+                        .append(NL)
+                        .append(TAB)
+                        .append(TAB)
+                        .append("Wireless Mode:")
+                        .append(currentWifiMode)
+                        .append(NL)
+                        .append(TAB)
+                        .append(TAB)
+                        .append("SSID: ")
+                        .append(currentWifiSsid)
+                        .append(NL);
             }
             return Optional.of(sb.toString());
         } else if (gwtNetInterfaceConfig.getHwTypeEnum() == GwtNetIfType.MODEM) {
@@ -497,22 +615,45 @@ public class GwtStatusServiceImpl extends OsgiRemoteServiceServlet implements Gw
             if (Objects.nonNull(interfaceName) && !interfaceName.isEmpty()) {
                 name = name + " (" + interfaceName + ")";
             }
-            if (statusIPv6.equals("netIPv6StatusDisabled") || statusIPv6.equals("netIPv6StatusUnmanaged")
+            if (statusIPv6.equals("netIPv6StatusDisabled")
+                    || statusIPv6.equals("netIPv6StatusUnmanaged")
                     || statusIPv6.equals("netIPv6StatusL2Only")) {
                 sb.append("<b>IPv6</b>").append(NL).append(TAB).append(convertIPv6Status(statusIPv6));
             } else {
-                sb.append("<b>IPv6</b>").append(NL).append(TAB).append(currentIPv6Address).append(NL).append(TAB)
-                        .append(TAB).append(SUBNET_MASK).append(currentIPv6SubnetMask).append(NL).append(TAB)
-                        .append(TAB).append(MODE).append(convertIPv6Status(statusIPv6)).append(NL).append(TAB)
-                        .append(TAB).append(IP_ACQUISITION).append(currentIPv6ConfigMode).append(NL).append(TAB)
-                        .append(TAB).append("APN: ").append(currentModemApn).append(NL).append(TAB).append(TAB)
-                        .append("Interface: ").append(interfaceName);
+                sb.append("<b>IPv6</b>")
+                        .append(NL)
+                        .append(TAB)
+                        .append(currentIPv6Address)
+                        .append(NL)
+                        .append(TAB)
+                        .append(TAB)
+                        .append(SUBNET_MASK)
+                        .append(currentIPv6SubnetMask)
+                        .append(NL)
+                        .append(TAB)
+                        .append(TAB)
+                        .append(MODE)
+                        .append(convertIPv6Status(statusIPv6))
+                        .append(NL)
+                        .append(TAB)
+                        .append(TAB)
+                        .append(IP_ACQUISITION)
+                        .append(currentIPv6ConfigMode)
+                        .append(NL)
+                        .append(TAB)
+                        .append(TAB)
+                        .append("APN: ")
+                        .append(currentModemApn)
+                        .append(NL)
+                        .append(TAB)
+                        .append(TAB)
+                        .append("Interface: ")
+                        .append(interfaceName);
             }
             return Optional.of(sb.toString());
         } else {
             return Optional.empty();
         }
-
     }
 
     private static String convertIPv6Status(String status) {
@@ -520,22 +661,21 @@ public class GwtStatusServiceImpl extends OsgiRemoteServiceServlet implements Gw
             return "netIPv6StatusDisabled";
         }
         switch (status) {
-        case "netIPv6StatusDisabled":
-            return "Disabled";
-        case "netIPv6StatusUnmanaged":
-            return "Unmanaged";
-        case "netIPv6StatusL2Only":
-            return "L2Only";
-        case "netIPv6StatusEnabledLAN":
-            return "LAN";
-        case "netIPv6StatusEnabledWAN":
-            return "WAN";
-        case "netIPv6StatusUnknown":
-            return "Unknown";
-        default:
-            return "Unknown";
+            case "netIPv6StatusDisabled":
+                return "Disabled";
+            case "netIPv6StatusUnmanaged":
+                return "Unmanaged";
+            case "netIPv6StatusL2Only":
+                return "L2Only";
+            case "netIPv6StatusEnabledLAN":
+                return "LAN";
+            case "netIPv6StatusEnabledWAN":
+                return "WAN";
+            case "netIPv6StatusUnknown":
+                return "Unknown";
+            default:
+                return "Unknown";
         }
-
     }
 
     private List<GwtGroupedNVPair> getPositionStatus() throws GwtKuraException {
@@ -543,11 +683,19 @@ public class GwtStatusServiceImpl extends OsgiRemoteServiceServlet implements Gw
 
         ServiceLocator.applyToServiceOptionally(PositionService.class, positionService -> {
             if (positionService != null) {
-                pairs.add(new GwtGroupedNVPair(POSITION_STATUS, "Longitude",
-                        Double.toString(Math.toDegrees(positionService.getPosition().getLongitude().getValue()))));
-                pairs.add(new GwtGroupedNVPair(POSITION_STATUS, "Latitude",
-                        Double.toString(Math.toDegrees(positionService.getPosition().getLatitude().getValue()))));
-                pairs.add(new GwtGroupedNVPair(POSITION_STATUS, "Altitude",
+                pairs.add(new GwtGroupedNVPair(
+                        POSITION_STATUS,
+                        "Longitude",
+                        Double.toString(Math.toDegrees(
+                                positionService.getPosition().getLongitude().getValue()))));
+                pairs.add(new GwtGroupedNVPair(
+                        POSITION_STATUS,
+                        "Latitude",
+                        Double.toString(Math.toDegrees(
+                                positionService.getPosition().getLatitude().getValue()))));
+                pairs.add(new GwtGroupedNVPair(
+                        POSITION_STATUS,
+                        "Altitude",
                         positionService.getPosition().getAltitude().toString()));
             }
             return null;

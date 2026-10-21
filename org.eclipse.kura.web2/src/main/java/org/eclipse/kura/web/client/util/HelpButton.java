@@ -1,25 +1,24 @@
 /*******************************************************************************
- * Copyright (c) 2016, 2020 Eurotech and/or its affiliates and others
- * 
+ * Copyright (c) 2016, 2026 Eurotech and/or its affiliates and others
+ *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
  * which is available at https://www.eclipse.org/legal/epl-2.0/
- * 
+ *
  * SPDX-License-Identifier: EPL-2.0
- * 
+ *
  * Contributors:
  *  Eurotech
  *******************************************************************************/
 package org.eclipse.kura.web.client.util;
-
-import org.gwtbootstrap3.client.ui.Button;
-import org.gwtbootstrap3.client.ui.constants.DeviceSize;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.Widget;
+import org.gwtbootstrap3.client.ui.Button;
+import org.gwtbootstrap3.client.ui.constants.DeviceSize;
 
 public class HelpButton extends Composite {
 
@@ -31,8 +30,7 @@ public class HelpButton extends Composite {
 
     private static HelpButtonUiBinder uiBinder = GWT.create(HelpButtonUiBinder.class);
 
-    interface HelpButtonUiBinder extends UiBinder<Widget, HelpButton> {
-    }
+    interface HelpButtonUiBinder extends UiBinder<Widget, HelpButton> {}
 
     public HelpButton() {
         initWidget(uiBinder.createAndBindUi(this));

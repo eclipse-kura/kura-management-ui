@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2023, 2025 Eurotech and/or its affiliates and others
+ * Copyright (c) 2023, 2026 Eurotech and/or its affiliates and others
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -13,9 +13,14 @@
  *******************************************************************************/
 package org.eclipse.kura.web.client.ui.network;
 
+import com.google.gwt.core.client.GWT;
+import com.google.gwt.uibinder.client.UiBinder;
+import com.google.gwt.uibinder.client.UiField;
+import com.google.gwt.user.client.ui.Composite;
+import com.google.gwt.user.client.ui.ScrollPanel;
+import com.google.gwt.user.client.ui.Widget;
 import java.util.Optional;
 import java.util.logging.Logger;
-
 import org.eclipse.kura.web.client.messages.Messages;
 import org.eclipse.kura.web.client.util.HelpButton;
 import org.eclipse.kura.web.client.util.request.RequestQueue;
@@ -49,18 +54,12 @@ import org.gwtbootstrap3.client.ui.constants.Toggle;
 import org.gwtbootstrap3.client.ui.constants.ValidationState;
 import org.gwtbootstrap3.client.ui.html.Span;
 
-import com.google.gwt.core.client.GWT;
-import com.google.gwt.uibinder.client.UiBinder;
-import com.google.gwt.uibinder.client.UiField;
-import com.google.gwt.user.client.ui.Composite;
-import com.google.gwt.user.client.ui.ScrollPanel;
-import com.google.gwt.user.client.ui.Widget;
-
 public class Tab8021xUi extends Composite implements NetworkTab {
 
     protected static final Logger logger = Logger.getLogger(Tab8021xUi.class.getSimpleName());
 
-    private static final String KURA_SERVICE_PID_OSGI_FILTER = "(objectClass=org.eclipse.kura.security.keystore.KeystoreService)";
+    private static final String KURA_SERVICE_PID_OSGI_FILTER =
+            "(objectClass=org.eclipse.kura.security.keystore.KeystoreService)";
 
     private final GwtComponentServiceAsync gwtComponentService = GWT.create(GwtComponentService.class);
     private final GwtSecurityTokenServiceAsync gwtXSRFService = GWT.create(GwtSecurityTokenService.class);
@@ -70,8 +69,7 @@ public class Tab8021xUi extends Composite implements NetworkTab {
 
     private static final Messages MSGS = GWT.create(Messages.class);
 
-    interface Tab8021xUiUiBinder extends UiBinder<Widget, Tab8021xUi> {
-    }
+    interface Tab8021xUiUiBinder extends UiBinder<Widget, Tab8021xUi> {}
 
     private final NetworkTabsUi netTabs;
 
@@ -253,16 +251,16 @@ public class Tab8021xUi extends Composite implements NetworkTab {
 
         this.keystorePidDropdown.add(dropDownMenu);
 
-        RequestQueue.submit(context -> this.gwtXSRFService
-                .generateSecurityToken(context.callback(token -> Tab8021xUi.this.gwtComponentService
-                        .findComponentConfigurations(token, KURA_SERVICE_PID_OSGI_FILTER, context.callback(data -> {
+        RequestQueue.submit(context -> this.gwtXSRFService.generateSecurityToken(context.callback(token ->
+                Tab8021xUi.this.gwtComponentService.findComponentConfigurations(
+                        token, KURA_SERVICE_PID_OSGI_FILTER, context.callback(data -> {
                             if (data.isEmpty()) {
                                 dropDownHeader.setText(MSGS.noTargetsAvailable());
                             } else {
                                 dropDownHeader.setText(MSGS.targetsAvailable());
                                 data.forEach(targetEntry -> {
-                                    AnchorListItem listItem = createListItem(this.keystorePid,
-                                            targetEntry.getComponentId());
+                                    AnchorListItem listItem =
+                                            createListItem(this.keystorePid, targetEntry.getComponentId());
                                     dropDownMenu.add(listItem);
                                 });
                             }
@@ -278,7 +276,6 @@ public class Tab8021xUi extends Composite implements NetworkTab {
             textBox.setText(eventGenerator.getText());
             textBox.setValue(targetServicePid, true);
             setDirty(true);
-
         });
         return listItem;
     }
@@ -332,7 +329,6 @@ public class Tab8021xUi extends Composite implements NetworkTab {
             } else {
                 this.formgroupIdentityUsername.setValidationState(ValidationState.NONE);
             }
-
         });
     }
 
@@ -355,7 +351,6 @@ public class Tab8021xUi extends Composite implements NetworkTab {
             } else {
                 this.formgroupPassword.setValidationState(ValidationState.NONE);
             }
-
         });
     }
 
@@ -387,7 +382,6 @@ public class Tab8021xUi extends Composite implements NetworkTab {
                 loadcaCertNameList(this.keystorePid.getValue(), Optional.empty());
                 loadPrivateKeyNameList(this.keystorePid.getValue(), Optional.empty());
             }
-
         });
 
         this.keystorePid.setReadOnly(true);
@@ -410,20 +404,18 @@ public class Tab8021xUi extends Composite implements NetworkTab {
     private void loadcaCertNameList(String keystorePidValue, Optional<String> selectedValue) {
         this.caCertName.clear();
         this.caCertName.addItem("");
-        RequestQueue
-                .submit(context -> this.gwtCertificatesService.listKeystoreEntriesByKeystorePidAndKind(keystorePidValue,
-                        GwtKeystoreEntry.Kind.TRUSTED_CERT, context.callback(data -> {
-                            if (!data.isEmpty()) {
-                                for (int i = 0; i < data.size(); ++i) {
-                                    GwtKeystoreEntry certName = data.get(i);
-                                    this.caCertName.addItem(certName.getAlias());
-                                    if (selectedValue.isPresent() && certName.getAlias().equals(selectedValue.get())) {
-                                        this.caCertName.setSelectedIndex(i + 1); // +1 because of the empty item
-                                    }
-
-                                }
+        RequestQueue.submit(context -> this.gwtCertificatesService.listKeystoreEntriesByKeystorePidAndKind(
+                keystorePidValue, GwtKeystoreEntry.Kind.TRUSTED_CERT, context.callback(data -> {
+                    if (!data.isEmpty()) {
+                        for (int i = 0; i < data.size(); ++i) {
+                            GwtKeystoreEntry certName = data.get(i);
+                            this.caCertName.addItem(certName.getAlias());
+                            if (selectedValue.isPresent() && certName.getAlias().equals(selectedValue.get())) {
+                                this.caCertName.setSelectedIndex(i + 1); // +1 because of the empty item
                             }
-                        })));
+                        }
+                    }
+                })));
     }
 
     private void initPrivateKeyNameListBox() {
@@ -439,20 +431,18 @@ public class Tab8021xUi extends Composite implements NetworkTab {
 
     private void loadPrivateKeyNameList(String keystorePidValue, Optional<String> selectedValue) {
         this.publicPrivateKeyPairName.clear();
-        RequestQueue
-                .submit(context -> this.gwtCertificatesService.listKeystoreEntriesByKeystorePidAndKind(keystorePidValue,
-                        GwtKeystoreEntry.Kind.KEY_PAIR, context.callback(data -> {
-                            if (!data.isEmpty()) {
-                                for (int i = 0; i < data.size(); ++i) {
-                                    GwtKeystoreEntry keyPair = data.get(i);
-                                    this.publicPrivateKeyPairName.addItem(keyPair.getAlias());
-                                    if (selectedValue.isPresent() && keyPair.getAlias().equals(selectedValue.get())) {
-                                        this.publicPrivateKeyPairName.setSelectedIndex(i);
-                                    }
-
-                                }
+        RequestQueue.submit(context -> this.gwtCertificatesService.listKeystoreEntriesByKeystorePidAndKind(
+                keystorePidValue, GwtKeystoreEntry.Kind.KEY_PAIR, context.callback(data -> {
+                    if (!data.isEmpty()) {
+                        for (int i = 0; i < data.size(); ++i) {
+                            GwtKeystoreEntry keyPair = data.get(i);
+                            this.publicPrivateKeyPairName.addItem(keyPair.getAlias());
+                            if (selectedValue.isPresent() && keyPair.getAlias().equals(selectedValue.get())) {
+                                this.publicPrivateKeyPairName.setSelectedIndex(i);
                             }
-                        })));
+                        }
+                    }
+                })));
     }
 
     private void update() {
@@ -479,25 +469,24 @@ public class Tab8021xUi extends Composite implements NetworkTab {
         this.publicPrivateKeyPairName.setEnabled(true);
 
         switch (Gwt8021xEap.valueOf(this.eap.getSelectedValue())) {
-        case PEAP:
-        case TTLS:
-            this.innerAuth.setEnabled(false);
-            setInnerAuthTo(Gwt8021xInnerAuth.MSCHAPV2);
-            this.identityKeystorePid.setVisible(false);
-            this.identityCaCertName.setVisible(false);
-            this.identityPublicPrivateKeyPairName.setVisible(false);
-            break;
-        case TLS:
-            this.innerAuth.setEnabled(false);
-            setInnerAuthTo(Gwt8021xInnerAuth.NONE);
-            this.identityKeystorePid.setVisible(true);
-            this.identityCaCertName.setVisible(true);
-            this.identityPublicPrivateKeyPairName.setVisible(true);
-            break;
-        default:
-            break;
+            case PEAP:
+            case TTLS:
+                this.innerAuth.setEnabled(false);
+                setInnerAuthTo(Gwt8021xInnerAuth.MSCHAPV2);
+                this.identityKeystorePid.setVisible(false);
+                this.identityCaCertName.setVisible(false);
+                this.identityPublicPrivateKeyPairName.setVisible(false);
+                break;
+            case TLS:
+                this.innerAuth.setEnabled(false);
+                setInnerAuthTo(Gwt8021xInnerAuth.NONE);
+                this.identityKeystorePid.setVisible(true);
+                this.identityCaCertName.setVisible(true);
+                this.identityPublicPrivateKeyPairName.setVisible(true);
+                break;
+            default:
+                break;
         }
-
     }
 
     private void reset() {
@@ -534,7 +523,9 @@ public class Tab8021xUi extends Composite implements NetworkTab {
         }
 
         for (int i = 0; i < this.innerAuth.getItemCount(); i++) {
-            if (this.innerAuth.getValue(i).equals(this.activeConfig.getInnerAuthEnum().name())) {
+            if (this.innerAuth
+                    .getValue(i)
+                    .equals(this.activeConfig.getInnerAuthEnum().name())) {
                 this.innerAuth.setSelectedIndex(i);
                 break;
             }
@@ -546,7 +537,8 @@ public class Tab8021xUi extends Composite implements NetworkTab {
         this.keystorePid.setValue(this.activeConfig.getKeystorePid());
 
         loadcaCertNameList(this.activeConfig.getKeystorePid(), Optional.ofNullable(this.activeConfig.getCaCertName()));
-        loadPrivateKeyNameList(this.activeConfig.getKeystorePid(),
+        loadPrivateKeyNameList(
+                this.activeConfig.getKeystorePid(),
                 Optional.ofNullable(this.activeConfig.getPublicPrivateKeyPairName()));
     }
 
@@ -606,7 +598,8 @@ public class Tab8021xUi extends Composite implements NetworkTab {
                 result = false;
             }
 
-            if (this.password.getValue() == null || this.password.getValue().trim().isEmpty()) {
+            if (this.password.getValue() == null
+                    || this.password.getValue().trim().isEmpty()) {
                 this.formgroupPassword.setValidationState(ValidationState.ERROR);
                 result = false;
             }
@@ -683,5 +676,4 @@ public class Tab8021xUi extends Composite implements NetworkTab {
         this.helpText.clear();
         this.helpText.add(new Span(MSGS.netHelpDefaultHint()));
     }
-
 }

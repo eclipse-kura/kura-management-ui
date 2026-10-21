@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2020, 2024 Eurotech and/or its affiliates and others
+ * Copyright (c) 2020, 2026 Eurotech and/or its affiliates and others
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -26,11 +26,13 @@ public class GwtUserConfig extends GwtUserData {
 
     private Map<String, GwtConfigComponent> additionalConfigurations;
 
-    public GwtUserConfig() {
-    }
+    public GwtUserConfig() {}
 
-    public GwtUserConfig(final String userName, final Set<String> permissions,
-            final Map<String, GwtConfigComponent> additionalConfigurations, final boolean isPasswordAuthEnabled,
+    public GwtUserConfig(
+            final String userName,
+            final Set<String> permissions,
+            final Map<String, GwtConfigComponent> additionalConfigurations,
+            final boolean isPasswordAuthEnabled,
             final boolean isPasswordChangeNeeded) {
         super(userName, permissions);
         setPasswordAuthEnabled(isPasswordAuthEnabled);
@@ -97,5 +99,4 @@ public class GwtUserConfig extends GwtUserData {
         return isPasswordAuthEnabled() == other.isPasswordAuthEnabled()
                 && Objects.equals(getNewPassword(), other.getNewPassword());
     }
-
 }

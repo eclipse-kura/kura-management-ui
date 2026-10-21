@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2011, 2025 Eurotech and/or its affiliates and others
+ * Copyright (c) 2011, 2026 Eurotech and/or its affiliates and others
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -13,10 +13,16 @@
  *******************************************************************************/
 package org.eclipse.kura.web.client.ui.network;
 
+import com.google.gwt.core.client.GWT;
+import com.google.gwt.uibinder.client.UiBinder;
+import com.google.gwt.uibinder.client.UiField;
+import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.google.gwt.user.client.ui.Composite;
+import com.google.gwt.user.client.ui.ScrollPanel;
+import com.google.gwt.user.client.ui.Widget;
 import java.util.Objects;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
 import org.eclipse.kura.web.client.messages.Messages;
 import org.eclipse.kura.web.client.messages.ValidationMessages;
 import org.eclipse.kura.web.client.ui.EntryClassUi;
@@ -48,14 +54,6 @@ import org.gwtbootstrap3.client.ui.TextBox;
 import org.gwtbootstrap3.client.ui.constants.ValidationState;
 import org.gwtbootstrap3.client.ui.html.Span;
 
-import com.google.gwt.core.client.GWT;
-import com.google.gwt.uibinder.client.UiBinder;
-import com.google.gwt.uibinder.client.UiField;
-import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.google.gwt.user.client.ui.Composite;
-import com.google.gwt.user.client.ui.ScrollPanel;
-import com.google.gwt.user.client.ui.Widget;
-
 public class TabIp4Ui extends Composite implements NetworkTab {
 
     private static final String DNS_REGEX = "[\\s,;\\n\\t]+";
@@ -84,8 +82,7 @@ public class TabIp4Ui extends Composite implements NetworkTab {
     private final GwtSecurityTokenServiceAsync gwtXSRFService = GWT.create(GwtSecurityTokenService.class);
     private final GwtNetworkServiceAsync gwtNetworkService = GWT.create(GwtNetworkService.class);
 
-    interface TabTcpIpUiUiBinder extends UiBinder<Widget, TabIp4Ui> {
-    }
+    interface TabTcpIpUiUiBinder extends UiBinder<Widget, TabIp4Ui> {}
 
     boolean dirty;
     private GwtNetInterfaceConfig selectedNetIfConfig;
@@ -93,53 +90,73 @@ public class TabIp4Ui extends Composite implements NetworkTab {
 
     @UiField
     FormGroup groupPriority;
+
     @UiField
     FormGroup groupIp;
+
     @UiField
     FormGroup groupSubnet;
+
     @UiField
     FormGroup groupGateway;
+
     @UiField
     FormGroup groupDns;
 
     @UiField
     FormLabel labelStatus;
+
     @UiField
     FormLabel labelPriority;
+
     @UiField
     FormLabel labelConfigure;
+
     @UiField
     FormLabel labelIp;
+
     @UiField
     FormLabel labelSubnet;
+
     @UiField
     FormLabel labelGateway;
+
     @UiField
     FormLabel labelDns;
 
     @UiField
     HelpBlock helpPriority;
+
     @UiField
     HelpBlock helpIp;
+
     @UiField
     HelpBlock helpSubnet;
+
     @UiField
     HelpBlock helpGateway;
+
     @UiField
     HelpBlock helpDns;
 
     @UiField
     TextBox ip;
+
     @UiField
     TextBox subnet;
+
     @UiField
     TextBox gateway;
+
     @UiField
     TextArea dns;
+
     @UiField
     ListBox status;
+
     @UiField
     IntegerBox priority;
+
     @UiField
     ListBox configure;
 
@@ -160,16 +177,22 @@ public class TabIp4Ui extends Composite implements NetworkTab {
 
     @UiField
     HelpButton statusHelp;
+
     @UiField
     HelpButton priorityHelp;
+
     @UiField
     HelpButton configureHelp;
+
     @UiField
     HelpButton ipHelp;
+
     @UiField
     HelpButton subnetHelp;
+
     @UiField
     HelpButton gatewayHelp;
+
     @UiField
     HelpButton dnsHelp;
 
@@ -252,12 +275,14 @@ public class TabIp4Ui extends Composite implements NetworkTab {
             } else {
                 updatedNetIf.setIpAddress("");
             }
-            if (this.subnet.getValue() != null && !"".equals(this.subnet.getValue().trim())) {
+            if (this.subnet.getValue() != null
+                    && !"".equals(this.subnet.getValue().trim())) {
                 updatedNetIf.setSubnetMask(this.subnet.getValue());
             } else {
                 updatedNetIf.setSubnetMask("");
             }
-            if (this.gateway.getValue() != null && !"".equals(this.gateway.getValue().trim())) {
+            if (this.gateway.getValue() != null
+                    && !"".equals(this.gateway.getValue().trim())) {
                 updatedNetIf.setGateway(this.gateway.getValue());
             } else {
                 updatedNetIf.setGateway("");
@@ -277,13 +302,15 @@ public class TabIp4Ui extends Composite implements NetworkTab {
         // or STATIC and a gateway is set
         if (!IPV4_STATUS_DISABLED_MESSAGE.equals(this.status.getSelectedValue())
                 && this.configure.getSelectedItemText().equalsIgnoreCase(VMSGS.netIPv4ConfigModeManual())) {
-            if ((this.gateway.getValue() == null || "".equals(this.gateway.getValue().trim()))
+            if ((this.gateway.getValue() == null
+                            || "".equals(this.gateway.getValue().trim()))
                     && IPV4_STATUS_WAN_MESSAGE.equals(this.status.getSelectedValue())) {
                 this.groupGateway.setValidationState(ValidationState.ERROR);
                 this.helpGateway.setText(MSGS.netIPv4InvalidAddress());
                 flag = false;
             }
-            if (this.subnet.getValue() == null || "".equals(this.subnet.getValue().trim())) {
+            if (this.subnet.getValue() == null
+                    || "".equals(this.subnet.getValue().trim())) {
                 this.groupSubnet.setValidationState(ValidationState.ERROR);
                 this.helpSubnet.setText(MSGS.netIPv4InvalidAddress());
             }
@@ -449,8 +476,8 @@ public class TabIp4Ui extends Composite implements NetworkTab {
 
                 @Override
                 public void onSuccess(GwtXSRFToken token) {
-                    TabIp4Ui.this.gwtNetworkService.renewDhcpLease(token, TabIp4Ui.this.selectedNetIfConfig.getName(),
-                            new AsyncCallback<Void>() {
+                    TabIp4Ui.this.gwtNetworkService.renewDhcpLease(
+                            token, TabIp4Ui.this.selectedNetIfConfig.getName(), new AsyncCallback<Void>() {
 
                                 @Override
                                 public void onFailure(Throwable ex) {
@@ -465,7 +492,6 @@ public class TabIp4Ui extends Composite implements NetworkTab {
                                 }
                             });
                 }
-
             });
         });
 
@@ -674,7 +700,7 @@ public class TabIp4Ui extends Composite implements NetworkTab {
             this.gateway.setText(this.selectedNetIfConfig.getGateway());
             if (this.selectedNetIfConfig.getReadOnlyDnsServers() != null) {
                 this.dnsRead.setText(this.selectedNetIfConfig.getReadOnlyDnsServers());
-                this.dnsRead.setVisible(true);// ???
+                this.dnsRead.setVisible(true); // ???
             } else {
                 this.dnsRead.setText("");
                 this.dnsRead.setVisible(false);
@@ -797,5 +823,4 @@ public class TabIp4Ui extends Composite implements NetworkTab {
         this.groupDns.setValidationState(ValidationState.NONE);
         this.helpDns.setText("");
     }
-
 }

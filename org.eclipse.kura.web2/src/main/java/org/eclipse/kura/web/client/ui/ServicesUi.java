@@ -19,6 +19,14 @@
  */
 package org.eclipse.kura.web.client.ui;
 
+import com.google.gwt.core.client.GWT;
+import com.google.gwt.uibinder.client.UiBinder;
+import com.google.gwt.uibinder.client.UiField;
+import com.google.gwt.user.client.Timer;
+import com.google.gwt.user.client.Window;
+import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.google.gwt.user.client.ui.Label;
+import com.google.gwt.user.client.ui.Widget;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
@@ -26,7 +34,6 @@ import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.logging.Level;
 import java.util.stream.Collectors;
-
 import org.eclipse.kura.web.client.ui.AlertDialog.ConfirmListener;
 import org.eclipse.kura.web.client.util.FailureHandler;
 import org.eclipse.kura.web.client.util.request.RequestQueue;
@@ -55,21 +62,11 @@ import org.gwtbootstrap3.client.ui.constants.ModalBackdrop;
 import org.gwtbootstrap3.client.ui.html.Span;
 import org.gwtbootstrap3.client.ui.html.Text;
 
-import com.google.gwt.core.client.GWT;
-import com.google.gwt.uibinder.client.UiBinder;
-import com.google.gwt.uibinder.client.UiField;
-import com.google.gwt.user.client.Timer;
-import com.google.gwt.user.client.Window;
-import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.google.gwt.user.client.ui.Label;
-import com.google.gwt.user.client.ui.Widget;
-
 public class ServicesUi extends AbstractServicesUi {
 
     private static final ServicesUiUiBinder uiBinder = GWT.create(ServicesUiUiBinder.class);
 
-    interface ServicesUiUiBinder extends UiBinder<Widget, ServicesUi> {
-    }
+    interface ServicesUiUiBinder extends UiBinder<Widget, ServicesUi> {}
 
     private final GwtSecurityTokenServiceAsync gwtXSRFService = GWT.create(GwtSecurityTokenService.class);
 
@@ -90,34 +87,46 @@ public class ServicesUi extends AbstractServicesUi {
 
     @UiField
     Label serviceDescription;
+
     @UiField
     Button apply;
+
     @UiField
     Button reset;
+
     @UiField
     Button delete;
+
     @UiField
     FieldSet fields;
+
     @UiField
     Form form;
+
     @UiField
     Button deleteButton;
+
     @UiField
     Button cancelButton;
 
     @UiField
     Modal incompleteFieldsModal;
+
     @UiField
     Alert incompleteFields;
+
     @UiField
     Text incompleteFieldsText;
 
     @UiField
     Modal deleteModal;
+
     @UiField
     ModalHeader deleteModalHeader;
+
     @UiField
     ModalBody deleteModalBody;
+
     @UiField
     AlertDialog alertDialog;
 
@@ -127,7 +136,9 @@ public class ServicesUi extends AbstractServicesUi {
     //
     // Public methods
     //
-    public ServicesUi(final GwtConfigComponent addedItem, final Optional<Listener> listener,
+    public ServicesUi(
+            final GwtConfigComponent addedItem,
+            final Optional<Listener> listener,
             final Optional<Validator> validator) {
         initWidget(uiBinder.createAndBindUi(this));
         this.validator = validator;
@@ -268,8 +279,8 @@ public class ServicesUi extends AbstractServicesUi {
 
                 @Override
                 public void onSuccess(GwtXSRFToken token) {
-                    ServicesUi.this.backend.deleteFactoryConfiguration(token,
-                            ServicesUi.this.configurableComponent.getComponentId(), new AsyncCallback<Void>() {
+                    ServicesUi.this.backend.deleteFactoryConfiguration(
+                            token, ServicesUi.this.configurableComponent.getComponentId(), new AsyncCallback<Void>() {
 
                                 @Override
                                 public void onFailure(Throwable caught) {
@@ -344,30 +355,39 @@ public class ServicesUi extends AbstractServicesUi {
                     messages = result.stream().map(ValidationResult::getMessage).collect(Collectors.toList());
 
                     if (result.stream().anyMatch(r -> r instanceof ServicesUi.Error)) {
-                        this.alertDialog.show(MSGS.error(), MSGS.formWithErrorsOrIncomplete(),
-                                AlertDialog.Severity.ERROR, null, messages.toArray(new String[messages.size()]));
+                        this.alertDialog.show(
+                                MSGS.error(),
+                                MSGS.formWithErrorsOrIncomplete(),
+                                AlertDialog.Severity.ERROR,
+                                null,
+                                messages.toArray(new String[messages.size()]));
                         return;
                     }
                 } else {
                     messages = Collections.emptyList();
                 }
 
-                this.alertDialog.show(MSGS.confirm(),
+                this.alertDialog.show(
+                        MSGS.confirm(),
                         MSGS.deviceConfigConfirmation(this.configurableComponent.getComponentName()),
-                        AlertDialog.Severity.INFO, ok -> {
+                        AlertDialog.Severity.INFO,
+                        ok -> {
                             if (ok) {
                                 RequestQueue.submit(context -> ServicesUi.this.gwtXSRFService.generateSecurityToken(
                                         context.callback(token -> ServicesUi.this.backend.updateComponentConfiguration(
-                                                token, ServicesUi.this.configurableComponent,
+                                                token,
+                                                ServicesUi.this.configurableComponent,
                                                 context.callback(new AsyncCallback<Void>() {
 
                                                     @Override
                                                     public void onFailure(Throwable caught) {
                                                         FailureHandler.handle(caught);
-                                                        errorLogger.log(Level.SEVERE,
+                                                        errorLogger.log(
+                                                                Level.SEVERE,
                                                                 caught.getLocalizedMessage() != null
                                                                         ? caught.getLocalizedMessage()
-                                                                        : caught.getClass().getName(),
+                                                                        : caught.getClass()
+                                                                                .getName(),
                                                                 caught);
                                                         ServicesUi.this.onApply.ifPresent(
                                                                 action -> action.accept(Optional.of(caught)));
@@ -379,21 +399,26 @@ public class ServicesUi extends AbstractServicesUi {
                                                         ServicesUi.this.apply.setEnabled(false);
                                                         ServicesUi.this.reset.setEnabled(false);
                                                         setDirty(false);
-                                                        ServicesUi.this.originalConfig = ServicesUi.this.configurableComponent;
-                                                        context.defer(2000, () -> ServicesUi.this.listener
-                                                                .ifPresent(Listener::onConfigurationChanged));
-                                                        ServicesUi.this.onApply
-                                                                .ifPresent(action -> action.accept(Optional.empty()));
+                                                        ServicesUi.this.originalConfig =
+                                                                ServicesUi.this.configurableComponent;
+                                                        context.defer(
+                                                                2000,
+                                                                () -> ServicesUi.this.listener.ifPresent(
+                                                                        Listener::onConfigurationChanged));
+                                                        ServicesUi.this.onApply.ifPresent(
+                                                                action -> action.accept(Optional.empty()));
                                                     }
                                                 })))));
                             }
-                        }, messages.toArray(new String[messages.size()]));
+                        },
+                        messages.toArray(new String[messages.size()]));
             }
 
         } else {
             errorLogger.log(Level.SEVERE, "Device configuration error!");
-            this.alertDialog.show(MSGS.warning(), MSGS.formWithErrorsOrIncomplete(), AlertDialog.Severity.ERROR,
-                    (ConfirmListener) null);
+            this.alertDialog.show(
+                    MSGS.warning(), MSGS.formWithErrorsOrIncomplete(), AlertDialog.Severity.ERROR, (ConfirmListener)
+                            null);
         }
     }
 
@@ -420,7 +445,6 @@ public class ServicesUi extends AbstractServicesUi {
     public interface Listener {
 
         public void onConfigurationChanged();
-
     }
 
     public interface ValidationResult {
@@ -471,8 +495,8 @@ public class ServicesUi extends AbstractServicesUi {
 
     public interface Backend {
 
-        void updateComponentConfiguration(GwtXSRFToken token, GwtConfigComponent component,
-                AsyncCallback<Void> callback);
+        void updateComponentConfiguration(
+                GwtXSRFToken token, GwtConfigComponent component, AsyncCallback<Void> callback);
 
         void deleteFactoryConfiguration(GwtXSRFToken token, String pid, AsyncCallback<Void> callback);
     }
@@ -482,10 +506,9 @@ public class ServicesUi extends AbstractServicesUi {
         private final GwtComponentServiceAsync gwtComponentService = GWT.create(GwtComponentService.class);
 
         @Override
-        public void updateComponentConfiguration(GwtXSRFToken token, GwtConfigComponent component,
-                AsyncCallback<Void> callback) {
+        public void updateComponentConfiguration(
+                GwtXSRFToken token, GwtConfigComponent component, AsyncCallback<Void> callback) {
             this.gwtComponentService.updateComponentConfiguration(token, component, callback);
-
         }
 
         @Override

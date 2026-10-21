@@ -1,19 +1,20 @@
 /*******************************************************************************
- * Copyright (c) 2017, 2025 Eurotech and/or its affiliates and others
- * 
+ * Copyright (c) 2017, 2026 Eurotech and/or its affiliates and others
+ *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
  * which is available at https://www.eclipse.org/legal/epl-2.0/
- * 
+ *
  * SPDX-License-Identifier: EPL-2.0
- * 
+ *
  * Contributors:
  *  Eurotech
  *******************************************************************************/
 package org.eclipse.kura.web.client.ui.wires;
 
+import com.google.gwt.core.client.GWT;
+import com.google.gwt.user.client.rpc.AsyncCallback;
 import java.util.List;
-
 import org.eclipse.kura.web.client.ui.EntryClassUi;
 import org.eclipse.kura.web.client.util.FailureHandler;
 import org.eclipse.kura.web.shared.model.GwtConfigComponent;
@@ -28,17 +29,13 @@ import org.eclipse.kura.web.shared.service.GwtSecurityTokenServiceAsync;
 import org.eclipse.kura.web.shared.service.GwtWireGraphService;
 import org.eclipse.kura.web.shared.service.GwtWireGraphServiceAsync;
 
-import com.google.gwt.core.client.GWT;
-import com.google.gwt.user.client.rpc.AsyncCallback;
-
 public final class WiresRPC {
 
     private static final GwtWireGraphServiceAsync gwtWireGraphService = GWT.create(GwtWireGraphService.class);
     private static final GwtDriverAndAssetServiceAsync gwtAssetService = GWT.create(GwtDriverAndAssetService.class);
     private static final GwtSecurityTokenServiceAsync gwtXSRFService = GWT.create(GwtSecurityTokenService.class);
 
-    private WiresRPC() {
-    }
+    private WiresRPC() {}
 
     public static void loadStaticInfo(final Callback<GwtWireComposerStaticInfo> callback) {
         EntryClassUi.showWaitModal();
@@ -130,8 +127,10 @@ public final class WiresRPC {
         });
     }
 
-    public static void updateWiresConfiguration(final GwtWireGraphConfiguration wireGraph,
-            final List<GwtConfigComponent> additionalConfigs, final Callback<Void> callback) {
+    public static void updateWiresConfiguration(
+            final GwtWireGraphConfiguration wireGraph,
+            final List<GwtConfigComponent> additionalConfigs,
+            final Callback<Void> callback) {
         EntryClassUi.showWaitModal();
         gwtXSRFService.generateSecurityToken(new AsyncCallback<GwtXSRFToken>() {
 
@@ -143,8 +142,8 @@ public final class WiresRPC {
 
             @Override
             public void onSuccess(GwtXSRFToken result) {
-                gwtWireGraphService.updateWireConfiguration(result, wireGraph, additionalConfigs,
-                        new AsyncCallback<Void>() {
+                gwtWireGraphService.updateWireConfiguration(
+                        result, wireGraph, additionalConfigs, new AsyncCallback<Void>() {
 
                             @Override
                             public void onFailure(Throwable ex) {
@@ -162,8 +161,8 @@ public final class WiresRPC {
         });
     }
 
-    public static void createNewDriver(final String factoryPid, final String pid,
-            final Callback<GwtConfigComponent> callback) {
+    public static void createNewDriver(
+            final String factoryPid, final String pid, final Callback<GwtConfigComponent> callback) {
         EntryClassUi.showWaitModal();
         gwtXSRFService.generateSecurityToken(new AsyncCallback<GwtXSRFToken>() {
 
@@ -195,8 +194,8 @@ public final class WiresRPC {
 
                             @Override
                             public void onSuccess(GwtXSRFToken result) {
-                                gwtWireGraphService.getGwtChannelDescriptor(result, pid,
-                                        new AsyncCallback<GwtConfigComponent>() {
+                                gwtWireGraphService.getGwtChannelDescriptor(
+                                        result, pid, new AsyncCallback<GwtConfigComponent>() {
 
                                             @Override
                                             public void onFailure(Throwable ex) {
@@ -222,5 +221,4 @@ public final class WiresRPC {
 
         public void onSuccess(T result);
     }
-
 }

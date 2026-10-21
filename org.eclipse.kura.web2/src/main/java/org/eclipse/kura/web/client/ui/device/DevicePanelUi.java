@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2011, 2025 Eurotech and/or its affiliates and others
+ * Copyright (c) 2011, 2026 Eurotech and/or its affiliates and others
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -12,6 +12,13 @@
  *******************************************************************************/
 package org.eclipse.kura.web.client.ui.device;
 
+import com.google.gwt.core.client.GWT;
+import com.google.gwt.uibinder.client.UiBinder;
+import com.google.gwt.uibinder.client.UiField;
+import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.google.gwt.user.client.ui.Composite;
+import com.google.gwt.user.client.ui.HTMLPanel;
+import com.google.gwt.user.client.ui.Widget;
 import org.eclipse.kura.web.client.messages.Messages;
 import org.eclipse.kura.web.client.ui.EntryClassUi;
 import org.eclipse.kura.web.client.ui.Tab;
@@ -26,22 +33,13 @@ import org.eclipse.kura.web.shared.service.GwtSecurityTokenServiceAsync;
 import org.gwtbootstrap3.client.ui.TabListItem;
 import org.gwtbootstrap3.client.ui.html.Span;
 
-import com.google.gwt.core.client.GWT;
-import com.google.gwt.uibinder.client.UiBinder;
-import com.google.gwt.uibinder.client.UiField;
-import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.google.gwt.user.client.ui.Composite;
-import com.google.gwt.user.client.ui.HTMLPanel;
-import com.google.gwt.user.client.ui.Widget;
-
 public class DevicePanelUi extends Composite {
 
     private static DevicePanelUiUiBinder uiBinder = GWT.create(DevicePanelUiUiBinder.class);
 
     private GwtSession session;
 
-    interface DevicePanelUiUiBinder extends UiBinder<Widget, DevicePanelUi> {
-    }
+    interface DevicePanelUiUiBinder extends UiBinder<Widget, DevicePanelUi> {}
 
     private static final Messages MSGS = GWT.create(Messages.class);
 
@@ -50,33 +48,46 @@ public class DevicePanelUi extends Composite {
 
     @UiField
     TabListItem profile;
+
     @UiField
     TabListItem bundles;
+
     @UiField
     TabListItem threads;
+
     @UiField
     TabListItem packages;
+
     @UiField
     TabListItem systemProperties;
+
     @UiField
     TabListItem containers;
+
     @UiField
     TabListItem command;
 
     @UiField
     ProfileTabUi profilePanel;
+
     @UiField
     BundlesTabUi bundlesPanel;
+
     @UiField
     ThreadsTabUi threadsPanel;
+
     @UiField
     SystemPackagesTabUi packagesPanel;
+
     @UiField
     SystemPropertiesTabUi systemPropertiesPanel;
+
     @UiField
     CommandTabUi commandPanel;
+
     @UiField
     LogTabUi logPanel;
+
     @UiField
     DockerContainersTabUi dockerContainersPanel;
 
@@ -95,7 +106,6 @@ public class DevicePanelUi extends Composite {
 
         this.command.setVisible(supportedFeatures.isCommandServiceAvailable());
         this.commandPanel.setVisible(supportedFeatures.isCommandServiceAvailable());
-
     }
 
     public void initDevicePanel() {

@@ -1,22 +1,35 @@
 /*******************************************************************************
  * Copyright (c) 2025, 2026 Eurotech and/or its affiliates and others
- * 
+ *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
  * which is available at https://www.eclipse.org/legal/epl-2.0/
- * 
+ *
  * SPDX-License-Identifier: EPL-2.0
- * 
+ *
  * Contributors:
  *  Eurotech
  *******************************************************************************/
 package org.eclipse.kura.web.client.ui.settings;
 
+import com.google.gwt.core.client.GWT;
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.dom.client.KeyUpEvent;
+import com.google.gwt.event.shared.HandlerRegistration;
+import com.google.gwt.uibinder.client.UiBinder;
+import com.google.gwt.uibinder.client.UiField;
+import com.google.gwt.user.client.ui.Composite;
+import com.google.gwt.user.client.ui.Hidden;
+import com.google.gwt.user.client.ui.HorizontalPanel;
+import com.google.gwt.user.client.ui.Label;
+import com.google.gwt.user.client.ui.ScrollPanel;
+import com.google.gwt.user.client.ui.VerticalPanel;
+import com.google.gwt.user.client.ui.Widget;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.stream.Collectors;
-
 import org.eclipse.kura.web.client.messages.Messages;
 import org.eclipse.kura.web.client.ui.AlertDialog;
 import org.eclipse.kura.web.client.ui.AlertDialog.DismissListener;
@@ -35,21 +48,6 @@ import org.gwtbootstrap3.client.ui.TextBox;
 import org.gwtbootstrap3.client.ui.base.form.AbstractForm.SubmitCompleteHandler;
 import org.gwtbootstrap3.client.ui.html.Paragraph;
 
-import com.google.gwt.core.client.GWT;
-import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.event.dom.client.KeyUpEvent;
-import com.google.gwt.event.shared.HandlerRegistration;
-import com.google.gwt.uibinder.client.UiBinder;
-import com.google.gwt.uibinder.client.UiField;
-import com.google.gwt.user.client.ui.Composite;
-import com.google.gwt.user.client.ui.Hidden;
-import com.google.gwt.user.client.ui.HorizontalPanel;
-import com.google.gwt.user.client.ui.Label;
-import com.google.gwt.user.client.ui.ScrollPanel;
-import com.google.gwt.user.client.ui.VerticalPanel;
-import com.google.gwt.user.client.ui.Widget;
-
 public abstract class SnapshotSelectorModal extends Composite {
 
     private static final String XSRF_TOKEN_REQUEST_FIELD = "xsrfToken";
@@ -59,38 +57,50 @@ public abstract class SnapshotSelectorModal extends Composite {
 
     private final GwtSecurityTokenServiceAsync gwtXSRFService = GWT.create(GwtSecurityTokenService.class);
 
-    interface SnapshotSelectorModalUiBinder extends UiBinder<Widget, SnapshotSelectorModal> {
-    }
+    interface SnapshotSelectorModalUiBinder extends UiBinder<Widget, SnapshotSelectorModal> {}
 
     @UiField
     Modal snapshotModal;
+
     @UiField
     Form snapshotForm;
+
     @UiField
     HorizontalPanel advancedModePanel;
+
     @UiField
     CheckBox advancedModeCheckbox;
+
     @UiField
     Paragraph snapshotModalDescription;
+
     @UiField
     Paragraph snapshotModalHint;
+
     @UiField
     TextBox pidSearch;
+
     @UiField
     ScrollPanel pidSelectionScrollPanel;
+
     @UiField
     Anchor selectOrRemoveAllAnchor;
+
     @UiField
     FormLabel noPidSelectedError;
+
     @UiField
     Label selectedPidCounter;
 
     @UiField
     Paragraph advancedModeDescription;
+
     @UiField
     Label advancedModeDescriptionSeparator;
+
     @UiField
     ModalFooter snapshotFooter;
+
     @UiField
     AlertDialog advancedConfirmationAlert;
 
@@ -185,8 +195,8 @@ public abstract class SnapshotSelectorModal extends Composite {
      * modal when done.
      */
 
-    public void hideMainAndShowAdvancedModal(String title, String message, String applyButton, String cancelButton,
-            DismissListener listener) {
+    public void hideMainAndShowAdvancedModal(
+            String title, String message, String applyButton, String cancelButton, DismissListener listener) {
         this.snapshotModal.hide();
         this.advancedConfirmationAlert.show(title, message, applyButton, cancelButton, Severity.ALERT, listener);
     }
@@ -334,7 +344,8 @@ public abstract class SnapshotSelectorModal extends Composite {
         if (searchedPid == null || searchedPid.isEmpty() || searchedPid.equals("")) {
             this.pidPanel.iterator().forEachRemaining(widget -> widget.setVisible(true));
         } else {
-            this.pidPanel.iterator()
+            this.pidPanel
+                    .iterator()
                     .forEachRemaining(widget -> widget.setVisible(isMatchingSearch(widget, searchedPid)));
         }
 
@@ -352,30 +363,29 @@ public abstract class SnapshotSelectorModal extends Composite {
 
         updateSelectOrRemoveAllText(checkPidsCheckboxStates());
         updateSelectedPidsCounter();
-
     }
 
     private void onSelectOrRemoveAllSelection(ClickEvent handler) {
         PartialSnapshotCheckboxStatus state = checkPidsCheckboxStates();
         switch (state) {
-        case ALL_VISIBLE_ALL_SELECTED:
-        case PARTIAL_VISIBLE_ALL_SELECTED: {
-            pidPanel.iterator().forEachRemaining(widget -> {
-                if (widget.isVisible()) {
-                    ((CheckBox) widget).setValue(false);
-                }
-            });
-            break;
-        }
+            case ALL_VISIBLE_ALL_SELECTED:
+            case PARTIAL_VISIBLE_ALL_SELECTED: {
+                pidPanel.iterator().forEachRemaining(widget -> {
+                    if (widget.isVisible()) {
+                        ((CheckBox) widget).setValue(false);
+                    }
+                });
+                break;
+            }
 
-        case ALL_VISIBLE_PARTIAL_SELECTED:
-        case PARTIAL_VISIBLE_PARTIAL_SELECTED:
-            pidPanel.iterator().forEachRemaining(widget -> {
-                if (widget.isVisible()) {
-                    ((CheckBox) widget).setValue(true);
-                }
-            });
-            break;
+            case ALL_VISIBLE_PARTIAL_SELECTED:
+            case PARTIAL_VISIBLE_PARTIAL_SELECTED:
+                pidPanel.iterator().forEachRemaining(widget -> {
+                    if (widget.isVisible()) {
+                        ((CheckBox) widget).setValue(true);
+                    }
+                });
+                break;
         }
 
         updateSelectOrRemoveAllText(checkPidsCheckboxStates());
@@ -451,21 +461,21 @@ public abstract class SnapshotSelectorModal extends Composite {
     private void updateSelectOrRemoveAllText(PartialSnapshotCheckboxStatus state) {
 
         switch (state) {
-        case ALL_VISIBLE_ALL_SELECTED:
-            this.selectOrRemoveAllAnchor.setText(MSGS.removeAllAnchorText());
-            break;
+            case ALL_VISIBLE_ALL_SELECTED:
+                this.selectOrRemoveAllAnchor.setText(MSGS.removeAllAnchorText());
+                break;
 
-        case ALL_VISIBLE_PARTIAL_SELECTED:
-            this.selectOrRemoveAllAnchor.setText(MSGS.selectAllAnchorText());
-            break;
+            case ALL_VISIBLE_PARTIAL_SELECTED:
+                this.selectOrRemoveAllAnchor.setText(MSGS.selectAllAnchorText());
+                break;
 
-        case PARTIAL_VISIBLE_ALL_SELECTED:
-            this.selectOrRemoveAllAnchor.setText(MSGS.removeAllVisibleAnchorText());
-            break;
+            case PARTIAL_VISIBLE_ALL_SELECTED:
+                this.selectOrRemoveAllAnchor.setText(MSGS.removeAllVisibleAnchorText());
+                break;
 
-        case PARTIAL_VISIBLE_PARTIAL_SELECTED:
-            this.selectOrRemoveAllAnchor.setText(MSGS.selectAllVisibleAnchorText());
-            break;
+            case PARTIAL_VISIBLE_PARTIAL_SELECTED:
+                this.selectOrRemoveAllAnchor.setText(MSGS.selectAllVisibleAnchorText());
+                break;
         }
     }
 
@@ -484,7 +494,9 @@ public abstract class SnapshotSelectorModal extends Composite {
             }
         }
 
-        StringBuilder counterTextBuilder = new StringBuilder("PIDs Selected ").append(selectedPids).append("/")
+        StringBuilder counterTextBuilder = new StringBuilder("PIDs Selected ")
+                .append(selectedPids)
+                .append("/")
                 .append(this.pidPanel.getWidgetCount());
 
         this.selectedPidCounter.setText(counterTextBuilder.toString());

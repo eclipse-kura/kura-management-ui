@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2020, 2025 Eurotech and/or its affiliates and others
+ * Copyright (c) 2020, 2026 Eurotech and/or its affiliates and others
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -12,10 +12,9 @@
  *******************************************************************************/
 package org.eclipse.kura.web.shared.model;
 
+import com.google.gwt.user.client.rpc.IsSerializable;
 import java.io.Serializable;
 import java.util.Set;
-
-import com.google.gwt.user.client.rpc.IsSerializable;
 
 public class GwtLoginInfo implements IsSerializable, Serializable {
 
@@ -25,11 +24,10 @@ public class GwtLoginInfo implements IsSerializable, Serializable {
     private Set<String> enabledAuthMethods;
     private Integer certAuthPort;
 
-    public GwtLoginInfo() {
-    }
+    public GwtLoginInfo() {}
 
-    public GwtLoginInfo(final String preLoginbannerContent, final Set<String> enabledAuthMethods,
-            final Integer clientAuthPort) {
+    public GwtLoginInfo(
+            final String preLoginbannerContent, final Set<String> enabledAuthMethods, final Integer clientAuthPort) {
         this.preLoginbannerContent = preLoginbannerContent;
         this.enabledAuthMethods = enabledAuthMethods;
         this.certAuthPort = clientAuthPort;

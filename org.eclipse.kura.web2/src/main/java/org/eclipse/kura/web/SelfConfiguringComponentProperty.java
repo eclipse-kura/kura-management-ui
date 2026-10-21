@@ -18,7 +18,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
-
 import org.eclipse.kura.KuraException;
 import org.eclipse.kura.configuration.Password;
 import org.eclipse.kura.configuration.metatype.AD;
@@ -43,8 +42,8 @@ public class SelfConfiguringComponentProperty<T> {
         this(ad, classz, Optional.empty());
     }
 
-    private SelfConfiguringComponentProperty(final Tad ad, final Class<T> classz,
-            final Optional<CryptoService> cryptoService) {
+    private SelfConfiguringComponentProperty(
+            final Tad ad, final Class<T> classz, final Optional<CryptoService> cryptoService) {
         this.ad = ad;
         this.cryptoService = cryptoService;
         this.valueType = classz;
@@ -59,7 +58,9 @@ public class SelfConfiguringComponentProperty<T> {
     public void fillValue(final Map<String, Object> properties) {
         if (this.value.isPresent() && !properties.containsKey(this.ad.getId())) {
             if (this.ad.getType() == Scalar.PASSWORD) {
-                properties.put(this.ad.getId(), new Password(this.value.get().toString().toCharArray()));
+                properties.put(
+                        this.ad.getId(),
+                        new Password(this.value.get().toString().toCharArray()));
             } else {
                 properties.put(this.ad.getId(), this.value.get());
             }
@@ -125,7 +126,6 @@ public class SelfConfiguringComponentProperty<T> {
         } else if (clazz != expected) {
             throw new IllegalArgumentException("AD type mismatch");
         }
-
     }
 
     private Object extractScalar(final Scalar scalar, final String value) {
@@ -205,11 +205,13 @@ public class SelfConfiguringComponentProperty<T> {
         if (cardinality == 0) {
             return Optional.of((T) extractScalar(scalar, defaultValue));
         } else {
-            final List<?> result = COMMA.splitAsStream(defaultValue).map(String::trim).filter(s -> !s.isEmpty())
-                    .map(s -> extractScalar(scalar, s)).collect(Collectors.toList());
+            final List<?> result = COMMA.splitAsStream(defaultValue)
+                    .map(String::trim)
+                    .filter(s -> !s.isEmpty())
+                    .map(s -> extractScalar(scalar, s))
+                    .collect(Collectors.toList());
 
             return Optional.of((T) result.toArray((T[]) createScalarArray(scalar)));
         }
-
     }
 }

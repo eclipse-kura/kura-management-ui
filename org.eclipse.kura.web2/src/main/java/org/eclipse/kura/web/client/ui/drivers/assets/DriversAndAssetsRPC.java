@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2017, 2025 Eurotech and/or its affiliates and others
+ * Copyright (c) 2017, 2026 Eurotech and/or its affiliates and others
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -12,8 +12,9 @@
  *******************************************************************************/
 package org.eclipse.kura.web.client.ui.drivers.assets;
 
+import com.google.gwt.core.client.GWT;
+import com.google.gwt.user.client.rpc.AsyncCallback;
 import java.util.List;
-
 import org.eclipse.kura.web.client.ui.EntryClassUi;
 import org.eclipse.kura.web.client.util.FailureHandler;
 import org.eclipse.kura.web.shared.model.GwtChannelOperationResult;
@@ -26,16 +27,12 @@ import org.eclipse.kura.web.shared.service.GwtDriverAndAssetServiceAsync;
 import org.eclipse.kura.web.shared.service.GwtSecurityTokenService;
 import org.eclipse.kura.web.shared.service.GwtSecurityTokenServiceAsync;
 
-import com.google.gwt.core.client.GWT;
-import com.google.gwt.user.client.rpc.AsyncCallback;
-
 public final class DriversAndAssetsRPC {
 
-    private DriversAndAssetsRPC() {
-    }
+    private DriversAndAssetsRPC() {}
 
-    private static final GwtDriverAndAssetServiceAsync gwtDriverAssetService = GWT
-            .create(GwtDriverAndAssetService.class);
+    private static final GwtDriverAndAssetServiceAsync gwtDriverAssetService =
+            GWT.create(GwtDriverAndAssetService.class);
     private static final GwtSecurityTokenServiceAsync gwtXSRFService = GWT.create(GwtSecurityTokenService.class);
 
     public static void loadDriverAndAssetInfo(final Callback<GwtDriversAndAssetsInfo> callback) {
@@ -98,8 +95,11 @@ public final class DriversAndAssetsRPC {
         });
     }
 
-    public static void createFactoryConfiguration(final String pid, final String factoryPid,
-            final GwtConfigComponent configuration, final Callback<Void> callback) {
+    public static void createFactoryConfiguration(
+            final String pid,
+            final String factoryPid,
+            final GwtConfigComponent configuration,
+            final Callback<Void> callback) {
         EntryClassUi.showWaitModal();
         gwtXSRFService.generateSecurityToken(new AsyncCallback<GwtXSRFToken>() {
 
@@ -111,8 +111,8 @@ public final class DriversAndAssetsRPC {
 
             @Override
             public void onSuccess(GwtXSRFToken result) {
-                gwtDriverAssetService.createDriverOrAssetConfiguration(result, factoryPid, pid, configuration,
-                        new AsyncCallback<Void>() {
+                gwtDriverAssetService.createDriverOrAssetConfiguration(
+                        result, factoryPid, pid, configuration, new AsyncCallback<Void>() {
 
                             @Override
                             public void onFailure(Throwable ex) {
@@ -190,8 +190,8 @@ public final class DriversAndAssetsRPC {
         });
     }
 
-    public static void createNewDriver(final String factoryPid, final String pid,
-            final Callback<GwtConfigComponent> callback) {
+    public static void createNewDriver(
+            final String factoryPid, final String pid, final Callback<GwtConfigComponent> callback) {
         EntryClassUi.showWaitModal();
         gwtXSRFService.generateSecurityToken(new AsyncCallback<GwtXSRFToken>() {
 
@@ -203,8 +203,8 @@ public final class DriversAndAssetsRPC {
 
             @Override
             public void onSuccess(GwtXSRFToken result) {
-                gwtDriverAssetService.createDriverOrAssetConfiguration(result, factoryPid, pid,
-                        new AsyncCallback<Void>() {
+                gwtDriverAssetService.createDriverOrAssetConfiguration(
+                        result, factoryPid, pid, new AsyncCallback<Void>() {
 
                             @Override
                             public void onFailure(Throwable ex) {
@@ -224,8 +224,8 @@ public final class DriversAndAssetsRPC {
 
                                     @Override
                                     public void onSuccess(GwtXSRFToken result) {
-                                        gwtDriverAssetService.getChannelDescriptor(result, pid,
-                                                new AsyncCallback<GwtConfigComponent>() {
+                                        gwtDriverAssetService.getChannelDescriptor(
+                                                result, pid, new AsyncCallback<GwtConfigComponent>() {
 
                                                     @Override
                                                     public void onFailure(Throwable ex) {
@@ -247,7 +247,9 @@ public final class DriversAndAssetsRPC {
         });
     }
 
-    public static void write(final String assetPid, final List<GwtChannelRecord> records,
+    public static void write(
+            final String assetPid,
+            final List<GwtChannelRecord> records,
             final Callback<GwtChannelOperationResult> callback) {
         EntryClassUi.showWaitModal();
         gwtXSRFService.generateSecurityToken(new AsyncCallback<GwtXSRFToken>() {

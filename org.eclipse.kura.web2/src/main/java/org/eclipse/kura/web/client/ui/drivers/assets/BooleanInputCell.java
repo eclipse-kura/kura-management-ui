@@ -1,20 +1,16 @@
 /*******************************************************************************
- * Copyright (c) 2018, 2020 Eurotech and/or its affiliates and others
- * 
+ * Copyright (c) 2018, 2026 Eurotech and/or its affiliates and others
+ *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
  * which is available at https://www.eclipse.org/legal/epl-2.0/
- * 
+ *
  * SPDX-License-Identifier: EPL-2.0
- * 
+ *
  * Contributors:
  *  Eurotech
  *******************************************************************************/
-
 package org.eclipse.kura.web.client.ui.drivers.assets;
-
-import java.util.HashSet;
-import java.util.Set;
 
 import com.google.gwt.cell.client.AbstractCell;
 import com.google.gwt.cell.client.CheckboxCell;
@@ -24,6 +20,8 @@ import com.google.gwt.dom.client.Document;
 import com.google.gwt.dom.client.Element;
 import com.google.gwt.dom.client.NativeEvent;
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
+import java.util.HashSet;
+import java.util.Set;
 
 public class BooleanInputCell extends AbstractCell<String> {
 
@@ -35,8 +33,8 @@ public class BooleanInputCell extends AbstractCell<String> {
     }
 
     @Override
-    public void onBrowserEvent(Context context, Element parent, String value, NativeEvent event,
-            ValueUpdater<String> valueUpdater) {
+    public void onBrowserEvent(
+            Context context, Element parent, String value, NativeEvent event, ValueUpdater<String> valueUpdater) {
         final NativeEvent forwarded;
 
         if (BrowserEvents.CLICK.contentEquals(event.getType())) {

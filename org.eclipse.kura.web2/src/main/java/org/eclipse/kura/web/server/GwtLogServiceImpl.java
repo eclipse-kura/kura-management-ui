@@ -18,7 +18,6 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
-
 import org.eclipse.kura.configuration.ConfigurationService;
 import org.eclipse.kura.log.LogEntry;
 import org.eclipse.kura.log.LogProvider;
@@ -60,12 +59,13 @@ public class GwtLogServiceImpl extends OsgiRemoteServiceServlet implements GwtLo
             List<String> availableLogProviders = new ArrayList<>();
 
             final String matchEverything = "(objectClass=*)";
-            List<ServiceReference<LogProvider>> logProviderRefs = (List<ServiceReference<LogProvider>>) ServiceLocator
-                    .getInstance().getServiceReferences(LogProvider.class, matchEverything);
+            List<ServiceReference<LogProvider>> logProviderRefs = (List<ServiceReference<LogProvider>>)
+                    ServiceLocator.getInstance().getServiceReferences(LogProvider.class, matchEverything);
 
             for (ServiceReference<LogProvider> logProviderRef : logProviderRefs) {
                 String pid = (String) logProviderRef.getProperty(ConfigurationService.KURA_SERVICE_PID);
-                LogProvider service = FrameworkUtil.getBundle(LogProvider.class).getBundleContext()
+                LogProvider service = FrameworkUtil.getBundle(LogProvider.class)
+                        .getBundleContext()
                         .getService(logProviderRef);
 
                 availableLogProviders.add(pid);
@@ -94,7 +94,8 @@ public class GwtLogServiceImpl extends OsgiRemoteServiceServlet implements GwtLo
             }
 
             Optional<String> defaultLogManager = getDefaultLogManager();
-            if (defaultLogManager.isPresent() && !REGISTERED_LOG_PROVIDERS.isEmpty()
+            if (defaultLogManager.isPresent()
+                    && !REGISTERED_LOG_PROVIDERS.isEmpty()
                     && !REGISTERED_LOG_PROVIDERS.get(0).equals(defaultLogManager.get())) {
                 String logManager = defaultLogManager.get();
                 if (REGISTERED_LOG_PROVIDERS.contains(logManager)) {
@@ -110,7 +111,9 @@ public class GwtLogServiceImpl extends OsgiRemoteServiceServlet implements GwtLo
     private String getFormattedTimestamp(LogEntry entry) {
         String time = "UNDEFINED";
         try {
-            return Instant.ofEpochSecond(entry.getTimestamp()).atZone(ZoneId.systemDefault()).toLocalDateTime()
+            return Instant.ofEpochSecond(entry.getTimestamp())
+                    .atZone(ZoneId.systemDefault())
+                    .toLocalDateTime()
                     .toString();
         } catch (Exception ex) {
             return time;

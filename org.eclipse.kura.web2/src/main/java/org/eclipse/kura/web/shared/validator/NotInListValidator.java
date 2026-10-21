@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2021 Eurotech and/or its affiliates and others
+ * Copyright (c) 2021, 2026 Eurotech and/or its affiliates and others
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -31,5 +31,4 @@ public class NotInListValidator<T> implements Validator<T> {
             errorMessageConsumer.accept(this.message);
         }
     }
-
 }

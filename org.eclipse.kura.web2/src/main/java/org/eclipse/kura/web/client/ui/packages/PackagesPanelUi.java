@@ -1,21 +1,35 @@
 /*******************************************************************************
- * Copyright (c) 2011, 2021 Eurotech and/or its affiliates and others
- * 
+ * Copyright (c) 2011, 2026 Eurotech and/or its affiliates and others
+ *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
  * which is available at https://www.eclipse.org/legal/epl-2.0/
- * 
+ *
  * SPDX-License-Identifier: EPL-2.0
- * 
+ *
  * Contributors:
  *  Eurotech
  *******************************************************************************/
 package org.eclipse.kura.web.client.ui.packages;
 
+import com.google.gwt.core.client.GWT;
+import com.google.gwt.regexp.shared.RegExp;
+import com.google.gwt.uibinder.client.UiBinder;
+import com.google.gwt.uibinder.client.UiField;
+import com.google.gwt.user.cellview.client.TextColumn;
+import com.google.gwt.user.client.Timer;
+import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.google.gwt.user.client.ui.Composite;
+import com.google.gwt.user.client.ui.FileUpload;
+import com.google.gwt.user.client.ui.FormPanel;
+import com.google.gwt.user.client.ui.HTMLPanel;
+import com.google.gwt.user.client.ui.Hidden;
+import com.google.gwt.user.client.ui.Widget;
+import com.google.gwt.view.client.ListDataProvider;
+import com.google.gwt.view.client.SingleSelectionModel;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
 import org.eclipse.kura.web.Console;
 import org.eclipse.kura.web.client.messages.Messages;
 import org.eclipse.kura.web.client.messages.ValidationMessages;
@@ -53,30 +67,14 @@ import org.gwtbootstrap3.client.ui.html.Paragraph;
 import org.gwtbootstrap3.client.ui.html.Span;
 import org.gwtbootstrap3.client.ui.html.Text;
 
-import com.google.gwt.core.client.GWT;
-import com.google.gwt.regexp.shared.RegExp;
-import com.google.gwt.uibinder.client.UiBinder;
-import com.google.gwt.uibinder.client.UiField;
-import com.google.gwt.user.cellview.client.TextColumn;
-import com.google.gwt.user.client.Timer;
-import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.google.gwt.user.client.ui.Composite;
-import com.google.gwt.user.client.ui.FileUpload;
-import com.google.gwt.user.client.ui.FormPanel;
-import com.google.gwt.user.client.ui.HTMLPanel;
-import com.google.gwt.user.client.ui.Hidden;
-import com.google.gwt.user.client.ui.Widget;
-import com.google.gwt.view.client.ListDataProvider;
-import com.google.gwt.view.client.SingleSelectionModel;
-
 public class PackagesPanelUi extends Composite {
 
     private static final String STYLE_STATUS_TABLE_ROW = "status-table-row";
     private static final String UPLOADED_FILE = "uploadedFile";
     private static final String XSRF_TOKEN = "xsrfToken";
     private static final String DROPZONE_ACTIVE_STYLE_NAME = "active";
-    private static RegExp marketplaceUrlRegexp = RegExp
-            .compile("http[s]?:\\/\\/marketplace.eclipse.org/marketplace-client-intro\\?mpc_install=.*");
+    private static RegExp marketplaceUrlRegexp =
+            RegExp.compile("http[s]?:\\/\\/marketplace.eclipse.org/marketplace-client-intro\\?mpc_install=.*");
 
     private static PackagesPanelUiUiBinder uiBinder = GWT.create(PackagesPanelUiUiBinder.class);
     private static final Logger logger = Logger.getLogger(PackagesPanelUi.class.getSimpleName());
@@ -99,32 +97,38 @@ public class PackagesPanelUi extends Composite {
     private GwtSession gwtSession;
     private GwtDeploymentPackage selected;
 
-    interface PackagesPanelUiUiBinder extends UiBinder<Widget, PackagesPanelUi> {
-    }
+    interface PackagesPanelUiUiBinder extends UiBinder<Widget, PackagesPanelUi> {}
 
     @UiField
     Modal uploadModal;
 
     @UiField
     FormPanel packagesFormFile;
+
     @UiField
     FormPanel packagesFormUrl;
 
     @UiField
     FormGroup packagesGroupUrl;
+
     @UiField
     FormGroup packagesGroupFile;
 
     @UiField
     Button fileCancel;
+
     @UiField
     Button fileSubmit;
+
     @UiField
     Button urlCancel;
+
     @UiField
     Button urlSubmit;
+
     @UiField
     Button packagesInstall;
+
     @UiField
     Button packagesUninstall;
 
@@ -154,6 +158,7 @@ public class PackagesPanelUi extends Composite {
 
     @UiField
     Hidden xsrfTokenFieldFile;
+
     @UiField
     Hidden xsrfTokenFieldUrl;
 
@@ -165,15 +170,19 @@ public class PackagesPanelUi extends Composite {
 
     @UiField
     Paragraph versionMismatchErrorText;
+
     @UiField
     Paragraph maxKuraVersionLabel;
+
     @UiField
     Paragraph minKuraVersionLabel;
+
     @UiField
     Paragraph currentKuraVersionLabel;
 
     @UiField
     Button btnCancelMarketplaceInstall;
+
     @UiField
     Button btnConfirmMarketplaceInstall;
 
@@ -198,8 +207,8 @@ public class PackagesPanelUi extends Composite {
         this.packagesIntro.add(description);
 
         this.packagesGrid.setSelectionModel(this.selectionModel);
-        this.selectionModel.addSelectionChangeHandler(event -> PackagesPanelUi.this.packagesUninstall
-                .setEnabled(PackagesPanelUi.this.selectionModel.getSelectedObject() != null));
+        this.selectionModel.addSelectionChangeHandler(event -> PackagesPanelUi.this.packagesUninstall.setEnabled(
+                PackagesPanelUi.this.selectionModel.getSelectedObject() != null));
         initTable();
 
         initTabButtons();
@@ -281,8 +290,8 @@ public class PackagesPanelUi extends Composite {
     private void initModalHandlers() {
         this.filePath.getElement().setAttribute("accept", ".dp");
 
-        this.fileSubmit.addClickHandler(
-                event -> PackagesPanelUi.this.gwtXSRFService.generateSecurityToken(new AsyncCallback<GwtXSRFToken>() {
+        this.fileSubmit.addClickHandler(event ->
+                PackagesPanelUi.this.gwtXSRFService.generateSecurityToken(new AsyncCallback<GwtXSRFToken>() {
 
                     @Override
                     public void onFailure(Throwable ex) {
@@ -302,8 +311,8 @@ public class PackagesPanelUi extends Composite {
 
         this.fileCancel.addClickHandler(event -> PackagesPanelUi.this.uploadModal.hide());
 
-        this.urlSubmit.addClickHandler(
-                event -> PackagesPanelUi.this.gwtXSRFService.generateSecurityToken(new AsyncCallback<GwtXSRFToken>() {
+        this.urlSubmit.addClickHandler(event ->
+                PackagesPanelUi.this.gwtXSRFService.generateSecurityToken(new AsyncCallback<GwtXSRFToken>() {
 
                     @Override
                     public void onFailure(Throwable ex) {
@@ -416,8 +425,8 @@ public class PackagesPanelUi extends Composite {
 
             @Override
             public void onSuccess(GwtXSRFToken token) {
-                PackagesPanelUi.this.gwtPackageService.uninstallDeploymentPackage(token, selected.getName(),
-                        new AsyncCallback<Void>() {
+                PackagesPanelUi.this.gwtPackageService.uninstallDeploymentPackage(
+                        token, selected.getName(), new AsyncCallback<Void>() {
 
                             @Override
                             public void onFailure(Throwable caught) {
@@ -431,7 +440,6 @@ public class PackagesPanelUi extends Composite {
                             }
                         });
             }
-
         });
     }
 
@@ -456,7 +464,7 @@ public class PackagesPanelUi extends Composite {
         };
         col2.setCellStyleNames(STYLE_STATUS_TABLE_ROW);
         this.packagesGrid.addColumn(col2, MSGS.deviceBndVersion());
-        
+
         TextColumn<GwtDeploymentPackage> col3 = new TextColumn<GwtDeploymentPackage>() {
 
             @Override
@@ -488,8 +496,8 @@ public class PackagesPanelUi extends Composite {
 
             @Override
             public void onSuccess(GwtXSRFToken token) {
-                PackagesPanelUi.this.gwtPackageService.findDeviceDeploymentPackages(token,
-                        new AsyncCallback<List<GwtDeploymentPackage>>() {
+                PackagesPanelUi.this.gwtPackageService.findDeviceDeploymentPackages(
+                        token, new AsyncCallback<List<GwtDeploymentPackage>>() {
 
                             @Override
                             public void onFailure(Throwable caught) {
@@ -498,8 +506,10 @@ public class PackagesPanelUi extends Composite {
                                 GwtDeploymentPackage pkg = new GwtDeploymentPackage();
                                 pkg.setName("Unavailable! Please click refresh");
                                 pkg.setVersion(caught.getLocalizedMessage());
-                                PackagesPanelUi.this.packagesDataProvider.getList().add(pkg);
-
+                                PackagesPanelUi.this
+                                        .packagesDataProvider
+                                        .getList()
+                                        .add(pkg);
                             }
 
                             @Override
@@ -507,13 +517,22 @@ public class PackagesPanelUi extends Composite {
                                 PackagesPanelUi.this.isRefreshPending = false;
                                 EntryClassUi.hideWaitModal();
                                 for (GwtDeploymentPackage pair : result) {
-                                    PackagesPanelUi.this.packagesDataProvider.getList().add(pair);
+                                    PackagesPanelUi.this
+                                            .packagesDataProvider
+                                            .getList()
+                                            .add(pair);
                                 }
-                                int size = PackagesPanelUi.this.packagesDataProvider.getList().size();
+                                int size = PackagesPanelUi.this
+                                        .packagesDataProvider
+                                        .getList()
+                                        .size();
                                 PackagesPanelUi.this.packagesGrid.setVisibleRange(0, size);
                                 PackagesPanelUi.this.packagesDataProvider.flush();
 
-                                if (PackagesPanelUi.this.packagesDataProvider.getList().isEmpty()) {
+                                if (PackagesPanelUi.this
+                                        .packagesDataProvider
+                                        .getList()
+                                        .isEmpty()) {
                                     PackagesPanelUi.this.packagesGrid.setVisible(false);
                                     PackagesPanelUi.this.notification.setVisible(true);
                                     PackagesPanelUi.this.notification.setText(MSGS.devicePackagesNone());
@@ -564,8 +583,8 @@ public class PackagesPanelUi extends Composite {
             @Override
             public void onSuccess(GwtXSRFToken token) {
                 // Retrieve the URL of the DP via the Eclipse Marketplace API
-                PackagesPanelUi.this.gwtPackageService.getMarketplacePackageDescriptor(token, nodeId,
-                        new AsyncCallback<GwtMarketplacePackageDescriptor>() {
+                PackagesPanelUi.this.gwtPackageService.getMarketplacePackageDescriptor(
+                        token, nodeId, new AsyncCallback<GwtMarketplacePackageDescriptor>() {
 
                             @Override
                             public void onFailure(Throwable ex) {
@@ -584,7 +603,6 @@ public class PackagesPanelUi extends Composite {
                                 }
                             }
                         });
-
             }
         });
     }
@@ -592,8 +610,8 @@ public class PackagesPanelUi extends Composite {
     private void installFromUrl(DropEvent event) {
         final String url = event.getAsText();
         if (isEclipseMarketplaceUrl(url)) {
-            PackagesPanelUi.this.confirmDialog.show(MSGS.packagesMarketplaceInstallConfirmMessage(),
-                    () -> eclipseMarketplaceInstall(url));
+            PackagesPanelUi.this.confirmDialog.show(
+                    MSGS.packagesMarketplaceInstallConfirmMessage(), () -> eclipseMarketplaceInstall(url));
         } else {
             PackagesPanelUi.this.uploadErrorText.setText(MSGS.packagesMarketplaceInstallDpNotValid());
             PackagesPanelUi.this.uploadErrorModal.show();
@@ -612,8 +630,8 @@ public class PackagesPanelUi extends Composite {
 
             @Override
             public void onSuccess(GwtXSRFToken token) {
-                PackagesPanelUi.this.gwtPackageService.installPackageFromMarketplace(token, descriptor,
-                        new AsyncCallback<Void>() {
+                PackagesPanelUi.this.gwtPackageService.installPackageFromMarketplace(
+                        token, descriptor, new AsyncCallback<Void>() {
 
                             @Override
                             public void onSuccess(Void result) {
@@ -659,7 +677,6 @@ public class PackagesPanelUi extends Composite {
             formData.append(UPLOADED_FILE, file);
             formData.submit(DP_UPLOAD_URI, c.callback());
         })));
-
     }
 
     private void initDragDrop() {
@@ -715,11 +732,10 @@ public class PackagesPanelUi extends Composite {
             maxKuraVersion = "unspecified";
         }
 
-        this.currentKuraVersionLabel
-                .setText(VMSGS.marketplaceInstallCurrentKuraVersion() + " " + descriptor.getCurrentKuraVersion());
+        this.currentKuraVersionLabel.setText(
+                VMSGS.marketplaceInstallCurrentKuraVersion() + " " + descriptor.getCurrentKuraVersion());
         this.minKuraVersionLabel.setText(VMSGS.marketplaceInstallMinKuraVersion() + " " + minKuraVersion);
         this.maxKuraVersionLabel.setText(VMSGS.marketplaceInstallMaxKuraVersion() + " " + maxKuraVersion);
         this.versionCheckModal.show();
-
     }
 }

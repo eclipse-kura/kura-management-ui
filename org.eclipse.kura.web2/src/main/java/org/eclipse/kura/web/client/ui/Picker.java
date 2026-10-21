@@ -14,22 +14,6 @@ package org.eclipse.kura.web.client.ui;
 
 import static java.util.Objects.requireNonNull;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
-import java.util.function.Consumer;
-import java.util.function.Function;
-
-import org.gwtbootstrap3.client.ui.Button;
-import org.gwtbootstrap3.client.ui.FormLabel;
-import org.gwtbootstrap3.client.ui.Input;
-import org.gwtbootstrap3.client.ui.Modal;
-import org.gwtbootstrap3.client.ui.Panel;
-import org.gwtbootstrap3.client.ui.base.HasId;
-import org.gwtbootstrap3.client.ui.form.error.BasicEditorError;
-import org.gwtbootstrap3.client.ui.form.validator.Validator;
-
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.editor.client.Editor;
 import com.google.gwt.editor.client.EditorError;
@@ -39,22 +23,39 @@ import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FormPanel;
 import com.google.gwt.user.client.ui.Widget;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
+import java.util.function.Consumer;
+import java.util.function.Function;
+import org.gwtbootstrap3.client.ui.Button;
+import org.gwtbootstrap3.client.ui.FormLabel;
+import org.gwtbootstrap3.client.ui.Input;
+import org.gwtbootstrap3.client.ui.Modal;
+import org.gwtbootstrap3.client.ui.Panel;
+import org.gwtbootstrap3.client.ui.base.HasId;
+import org.gwtbootstrap3.client.ui.form.error.BasicEditorError;
+import org.gwtbootstrap3.client.ui.form.validator.Validator;
 
 public class Picker extends Composite implements HasId {
 
     private static PickerUiBinder uiBinder = GWT.create(PickerUiBinder.class);
 
-    interface PickerUiBinder extends UiBinder<Widget, Picker> {
-    }
+    interface PickerUiBinder extends UiBinder<Widget, Picker> {}
 
     @UiField
     FormLabel label;
+
     @UiField
     FormPanel form;
+
     @UiField
     Button yes;
+
     @UiField
     Button no;
+
     @UiField
     Panel inputPanel;
 
@@ -201,8 +202,8 @@ public class Picker extends Composite implements HasId {
             } else if (inputType == Input.class) {
                 pickInput();
             } else {
-                throw new IllegalArgumentException("Supported input types are Input and NewPasswordInputForm, but was "
-                        + inputType.getName());
+                throw new IllegalArgumentException(
+                        "Supported input types are Input and NewPasswordInputForm, but was " + inputType.getName());
             }
 
             Picker.this.modal.show();
@@ -211,9 +212,8 @@ public class Picker extends Composite implements HasId {
         private void pickInput() {
             final Input input = initInput();
 
-            final State<U> localState = new State<>(input, this.provider, this.validators, this.consumer,
-                    this.onCancel.orElse(() -> {
-                    }));
+            final State<U> localState =
+                    new State<>(input, this.provider, this.validators, this.consumer, this.onCancel.orElse(() -> {}));
 
             Picker.this.state = Optional.of(localState);
             Picker.this.dismissAction = Optional.of(State::onCancel);
@@ -226,9 +226,8 @@ public class Picker extends Composite implements HasId {
         private void pickNewPasswordInput() {
             final NewPasswordInputForm inputForm = initNewPasswordInput();
 
-            final State<U> localState = new State<>(inputForm, this.provider, this.validators, this.consumer,
-                    this.onCancel.orElse(() -> {
-                    }));
+            final State<U> localState = new State<>(
+                    inputForm, this.provider, this.validators, this.consumer, this.onCancel.orElse(() -> {}));
 
             Picker.this.state = Optional.of(localState);
             Picker.this.dismissAction = Optional.of(State::onCancel);
@@ -253,7 +252,10 @@ public class Picker extends Composite implements HasId {
         private Optional<U> currentValue = Optional.empty();
 
         @SuppressWarnings("unchecked")
-        public State(Input value, Function<String, U> provider, List<Validator<String>> validators,
+        public State(
+                Input value,
+                Function<String, U> provider,
+                List<Validator<String>> validators,
                 Consumer<U> consumer,
                 final Runnable onCancel) {
             this.value = value;
@@ -273,7 +275,10 @@ public class Picker extends Composite implements HasId {
             this.shownHandler = Picker.this.modal.addShownHandler(e -> value.setFocus(true));
         }
 
-        public State(NewPasswordInputForm value, Function<String, U> provider, List<Validator<String>> validators,
+        public State(
+                NewPasswordInputForm value,
+                Function<String, U> provider,
+                List<Validator<String>> validators,
                 Consumer<U> consumer,
                 final Runnable onCancel) {
             this.value = null;
