@@ -23,6 +23,7 @@ Import-Package: \
     org.eclipse.kura.internal.wire.asset;resolution:=optional,\
     org.eclipse.kura.net.admin;resolution:=optional,\
     org.eclipse.kura.net.admin.ipv6;resolution:=optional,\
+    org.eclipse.kura.watchdog;version="[2.0,3.0)";resolution:=optional,\
     !android.*,\
     !com.gargoylesoftware.*,\
     !com.google.appengine.*,\

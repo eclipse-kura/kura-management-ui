@@ -81,7 +81,8 @@ public class StatusPanelUi extends Composite {
                     || "Wireless Settings".equals(row.getName())
                     || "Cellular Settings".equals(row.getName())
                     || "Position Status".equals(row.getName())
-                    || "Tamper Detection Status".equals(row.getName())) {
+                    || "Tamper Detection Status".equals(row.getName())
+                    || "Watchdog Status".equals(row.getName())) {
                 return "rowHeader";
             } else {
                 return " ";
