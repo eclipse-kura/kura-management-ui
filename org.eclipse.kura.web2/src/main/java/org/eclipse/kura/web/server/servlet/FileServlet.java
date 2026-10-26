@@ -37,10 +37,15 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 import java.util.stream.Collectors;
 import org.apache.commons.fileupload2.core.DiskFileItem;
 import org.apache.commons.fileupload2.core.DiskFileItemFactory;
+import org.apache.commons.fileupload2.core.FileItem;
+import org.apache.commons.fileupload2.core.FileUploadByteCountLimitException;
 import org.apache.commons.fileupload2.core.FileUploadException;
+import org.apache.commons.fileupload2.core.FileUploadFileCountLimitException;
+import org.apache.commons.fileupload2.core.FileUploadSizeException;
 import org.apache.commons.fileupload2.jakarta.servlet5.JakartaFileCleaner;
 import org.apache.commons.fileupload2.jakarta.servlet5.JakartaServletFileUpload;
 import org.apache.commons.io.FileCleaningTracker;
@@ -99,6 +104,11 @@ public class FileServlet extends AuditServlet {
 
     protected static Logger logger = LoggerFactory.getLogger(FileServlet.class);
 
+    static final String FILE_TRANSFER_SIZE_MAX_PROPNAME = "file.transfer.size.max";
+    // deprecated for removal, still honored when set to preserve existing configurations
+    static final String FILE_UPLOAD_SIZE_MAX_PROPNAME = "file.upload.size.max";
+    static final long FILE_TRANSFER_SIZE_MAX_DEFAULT = 1_048_576L * 25; // 25MB
+
     protected static final String JAVA_IO_TMPDIR = "java.io.tmpdir";
     protected static final String EXPECTED_1_FILE_PATTERN = "expected 1 file item but found {}";
 
@@ -110,8 +120,11 @@ public class FileServlet extends AuditServlet {
     protected DiskFileItemFactory diskFileItemFactory;
     private FileCleaningTracker fileCleaningTracker;
 
-    private final BundleContext bundleContext;
+    protected final BundleContext bundleContext;
     private final GwtSupportedFeatures supportedFeatures;
+
+    // Only one file upload or package installation at a time is accepted from the web UI
+    protected final UploadGuard uploadGuard = new UploadGuard();
 
     public FileServlet(final GwtSupportedFeatures supportedFeatures) {
         super("UI FileServlet", "Handle upload request");
@@ -187,13 +200,13 @@ public class FileServlet extends AuditServlet {
 
         if (reqPathInfo.equals("/configuration/snapshot")) {
             KuraRemoteServiceServlet.requirePermissions(req, Mode.ALL, new String[] {KuraPermission.ADMIN});
-            doPostConfigurationSnapshot(req);
+            this.uploadGuard.handle(req, resp, () -> doPostConfigurationSnapshot(req));
         } else if (reqPathInfo.equals("/command") && supportedFeatures.isCommandServiceAvailable()) {
             KuraRemoteServiceServlet.requirePermissions(req, Mode.ALL, new String[] {KuraPermission.DEVICE});
-            doPostCommand(req, resp);
+            this.uploadGuard.handle(req, resp, () -> doPostCommand(req, resp));
         } else if (reqPathInfo.equals("/asset")) {
             KuraRemoteServiceServlet.requirePermissions(req, Mode.ALL, new String[] {KuraPermission.WIRES_ADMIN});
-            doPostAsset(req, resp);
+            this.uploadGuard.handle(req, resp, () -> doPostAsset(req, resp));
         } else {
             logger.error("Unknown request path info: {}", reqPathInfo);
             throw new ServletException("Unknown request path info: " + reqPathInfo);
@@ -302,28 +315,31 @@ public class FileServlet extends AuditServlet {
             throw new ServletException(ERROR_PARSING_THE_FILE_UPLOAD_REQUEST);
         }
 
-        // BEGIN XSRF - Servlet dependent code
-        Map<String, String> formFields = upload.getFormFields();
-
         try {
-            GwtXSRFToken token = new GwtXSRFToken(formFields.get(XSRF_TOKEN));
-            KuraRemoteServiceServlet.checkXSRFToken(req, token);
-        } catch (Exception e) {
-            throw new ServletException("Security error: please retry this operation correctly.");
-        }
-        // END XSRF security check
+            // BEGIN XSRF - Servlet dependent code
+            Map<String, String> formFields = upload.getFormFields();
 
-        List<DiskFileItem> fileItems = upload.getFileItems();
-
-        try {
-            // The command form always sends the file field, with an empty file name when no file is selected
-            if (!fileItems.isEmpty() && isFileSelected(fileItems.get(0))) {
-                unZipInCommandWorkingDirectory(fileItems.get(0));
+            try {
+                GwtXSRFToken token = new GwtXSRFToken(formFields.get(XSRF_TOKEN));
+                KuraRemoteServiceServlet.checkXSRFToken(req, token);
+            } catch (Exception e) {
+                throw new ServletException("Security error: please retry this operation correctly.");
             }
-        } catch (IOException | ServletException | IllegalStateException e) {
-            reportExtractionFailure(resp, e);
+            // END XSRF security check
+
+            List<FileItem> fileItems = upload.getFileItems();
+
+            try {
+                // The command form always sends the file field, with an empty file name when no file is selected
+                if (!fileItems.isEmpty() && isFileSelected(fileItems.get(0))) {
+                    unZipInCommandWorkingDirectory(fileItems.get(0));
+                }
+            } catch (IOException | ServletException | IllegalStateException e) {
+                reportExtractionFailure(resp, e);
+            }
         } finally {
-            for (DiskFileItem fileItem : fileItems) {
+            // Also when the XSRF check fails, do not wait for the FileCleaningTracker to remove the temporary files
+            for (FileItem fileItem : upload.getFileItems()) {
                 fileItem.delete();
             }
         }
@@ -438,10 +454,14 @@ public class FileServlet extends AuditServlet {
             logger.warn("Security error: please retry this operation correctly.", ex2);
             resp.getWriter().write("Security error: please retry this operation.");
             throw ex2;
+        } finally {
+            for (DiskFileItem fileItem : upload.getFileItems()) {
+                fileItem.delete();
+            }
         }
     }
 
-    private void doPostConfigurationSnapshot(HttpServletRequest req) throws ServletException {
+    private void doPostConfigurationSnapshot(HttpServletRequest req) throws ServletException, IOException {
 
         UploadRequest upload = new UploadRequest(this.diskFileItemFactory);
 
@@ -452,36 +472,45 @@ public class FileServlet extends AuditServlet {
             throw new ServletException(ERROR_PARSING_THE_FILE_UPLOAD_REQUEST);
         }
 
-        // BEGIN XSRF - Servlet dependent code
-        Map<String, String> formFields = upload.getFormFields();
+        String fileName;
+        String fileItemString;
 
         try {
-            GwtXSRFToken token = new GwtXSRFToken(formFields.get(XSRF_TOKEN));
-            KuraRemoteServiceServlet.checkXSRFToken(req, token);
-        } catch (Exception e) {
-            throw new ServletException("Security error: please retry this operation correctly.", e);
-        }
-        // END XSRF security check
+            // BEGIN XSRF - Servlet dependent code
+            Map<String, String> formFields = upload.getFormFields();
 
-        List<DiskFileItem> fileItems = upload.getFileItems();
-        int fileItemsSize = fileItems.size();
-        if (fileItemsSize != 1) {
-            logger.error(EXPECTED_1_FILE_PATTERN, fileItemsSize);
-            throw new ServletException("Wrong number of file items");
-        }
+            try {
+                GwtXSRFToken token = new GwtXSRFToken(formFields.get(XSRF_TOKEN));
+                KuraRemoteServiceServlet.checkXSRFToken(req, token);
+            } catch (Exception e) {
+                throw new ServletException("Security error: please retry this operation correctly.", e);
+            }
+            // END XSRF security check
 
-        DiskFileItem fileItem = fileItems.get(0);
-        byte[] data;
-        try {
-            data = fileItem.get();
-        } catch (IOException e) {
-            throw new ServletException(e.getMessage());
+            List<DiskFileItem> fileItems = upload.getFileItems();
+            int fileItemsSize = fileItems.size();
+            if (fileItemsSize != 1) {
+                logger.error(EXPECTED_1_FILE_PATTERN, fileItemsSize);
+                throw new ServletException("Wrong number of file items");
+            }
+
+            DiskFileItem fileItem = fileItems.get(0);
+            byte[] data;
+            try {
+                data = fileItem.get();
+            } catch (IOException e) {
+                throw new ServletException(e.getMessage());
+            }
+            fileName = fileItem.getName();
+            fileItemString = new String(data, StandardCharsets.UTF_8);
+        } finally {
+            // The content has been read, do not wait for the FileCleaningTracker to remove the temporary files
+            for (DiskFileItem fileItem : upload.getFileItems()) {
+                fileItem.delete();
+            }
         }
-        String fileItemString = new String(data, StandardCharsets.UTF_8);
 
         final List<ComponentConfiguration> configImpls;
-
-        String fileName = fileItem.getName();
 
         if (fileName != null) {
             fileName = fileName.toLowerCase();
@@ -547,15 +576,29 @@ public class FileServlet extends AuditServlet {
     static long getFileUploadSizeMax() {
         ServiceLocator locator = ServiceLocator.getInstance();
 
-        long sizeMax = -1;
+        long sizeMax = FILE_TRANSFER_SIZE_MAX_DEFAULT;
+        String propName = FILE_TRANSFER_SIZE_MAX_PROPNAME;
         try {
             SystemService systemService = locator.getService(SystemService.class);
-            sizeMax = Long.parseLong(systemService.getProperties().getProperty("file.upload.size.max", "-1"));
+            Properties properties = systemService.getProperties();
+
+            if (properties.getProperty(FILE_UPLOAD_SIZE_MAX_PROPNAME) != null) {
+                logger.warn(
+                        "{} is deprecated for removal, use {} instead",
+                        FILE_UPLOAD_SIZE_MAX_PROPNAME,
+                        FILE_TRANSFER_SIZE_MAX_PROPNAME);
+                propName = FILE_UPLOAD_SIZE_MAX_PROPNAME;
+            }
+
+            sizeMax = Long.parseLong(properties.getProperty(propName, String.valueOf(FILE_TRANSFER_SIZE_MAX_DEFAULT)));
         } catch (GwtKuraException e) {
             logger.error(SYSTEM_SERVICE_ERROR_MESSAGE, e);
+        } catch (NumberFormatException e) {
+            logger.warn("Error parsing {}, using default of {}", propName, FILE_TRANSFER_SIZE_MAX_DEFAULT, e);
         }
 
-        return sizeMax;
+        // a negative value disables the limit (ServletFileUpload expects -1 for no limit), 0 rejects any upload
+        return sizeMax >= 0 ? sizeMax : -1;
     }
 
     private static int getFileUploadInMemorySizeThreshold() {
@@ -628,14 +671,20 @@ class UploadRequest extends JakartaServletFileUpload<DiskFileItem, DiskFileItemF
         this.fileItems = new ArrayList<>();
     }
 
-    public void parse(HttpServletRequest req) throws FileUploadException {
+    public void parse(HttpServletRequest req) throws FileUploadException, UploadSizeLimitExceededException {
 
         logger.debug("upload.getFileSizeMax(): {}", getFileSizeMax());
         logger.debug("upload.getSizeMax(): {}", getSizeMax());
 
         // Parse the request
         List<DiskFileItem> items = null;
-        items = parseRequest(req);
+        try {
+            items = parseRequest(req);
+        } catch (FileUploadByteCountLimitException | FileUploadFileCountLimitException e) {
+            throw e;
+        } catch (FileUploadSizeException e) {
+            throw new UploadSizeLimitExceededException(e.getPermitted(), e);
+        }
 
         // Process the uploaded items
         Iterator<DiskFileItem> iter = items.iterator();
@@ -650,6 +699,9 @@ class UploadRequest extends JakartaServletFileUpload<DiskFileItem, DiskFileItemF
                     logger.debug("Form field item name: {}, value: {}", name, value);
 
                     this.formFields.put(name, value);
+
+                    // Form fields larger than the in-memory threshold are written to disk as well
+                    item.delete();
                 } catch (IOException e) {
                     throw new FileUploadException(e.getMessage(), e);
                 }

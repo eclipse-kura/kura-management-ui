@@ -311,8 +311,10 @@ public class AssetConfigurationUi extends AbstractServicesUi implements HasConfi
 
                         } else {
                             EntryClassUi.hideWaitModal();
-                            logger.log(Level.SEVERE, MSGS.information() + ": " + MSGS.fileUploadFailure());
-                            FailureHandler.handle(new Exception(htmlResponse));
+                            if (!FailureHandler.handleUploadRejected(htmlResponse)) {
+                                logger.log(Level.SEVERE, MSGS.information() + ": " + MSGS.fileUploadFailure());
+                                FailureHandler.handle(new Exception(htmlResponse));
+                            }
                         }
                     });
                 }))));
