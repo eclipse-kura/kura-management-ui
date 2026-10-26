@@ -17,18 +17,16 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSession;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.util.HashMap;
 import java.util.Map;
-
 import org.eclipse.kura.audit.AuditConstants;
 import org.eclipse.kura.audit.AuditContext;
 import org.eclipse.kura.web.session.Attributes;
 import org.junit.Test;
-
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpSession;
 
 public class ConsoleTest {
 
@@ -124,13 +122,16 @@ public class ConsoleTest {
 
     private void thenForwardedForFieldIsAbsent() {
         assertNotNull(this.result);
-        assertFalse("forwarded.for must not be present when X-Forwarded-For header is absent",
+        assertFalse(
+                "forwarded.for must not be present when X-Forwarded-For header is absent",
                 this.result.getProperties().containsKey("forwarded.for"));
     }
 
     private HttpServletRequest newHttpServletRequest() {
-        return (HttpServletRequest) Proxy.newProxyInstance(HttpServletRequest.class.getClassLoader(),
-                new Class<?>[] { HttpServletRequest.class }, (proxy, method, args) -> {
+        return (HttpServletRequest) Proxy.newProxyInstance(
+                HttpServletRequest.class.getClassLoader(),
+                new Class<?>[] {HttpServletRequest.class},
+                (proxy, method, args) -> {
                     final String methodName = method.getName();
 
                     if ("getRemoteAddr".equals(methodName)) {
@@ -148,8 +149,8 @@ public class ConsoleTest {
     }
 
     private HttpSession newHttpSession(final String attributeName, final Object attributeValue) {
-        return (HttpSession) Proxy.newProxyInstance(HttpSession.class.getClassLoader(),
-                new Class<?>[] { HttpSession.class }, (proxy, method, args) -> {
+        return (HttpSession) Proxy.newProxyInstance(
+                HttpSession.class.getClassLoader(), new Class<?>[] {HttpSession.class}, (proxy, method, args) -> {
                     if ("getAttribute".equals(method.getName()) && attributeName.equals(args[0])) {
                         return attributeValue;
                     }

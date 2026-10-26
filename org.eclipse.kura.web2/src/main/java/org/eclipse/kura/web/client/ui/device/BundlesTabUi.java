@@ -1,19 +1,28 @@
 /*******************************************************************************
- * Copyright (c) 2011, 2021 Eurotech and/or its affiliates and others
- * 
+ * Copyright (c) 2011, 2026 Eurotech and/or its affiliates and others
+ *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
  * which is available at https://www.eclipse.org/legal/epl-2.0/
- * 
+ *
  * SPDX-License-Identifier: EPL-2.0
- * 
+ *
  * Contributors:
  *  Eurotech
  *******************************************************************************/
 package org.eclipse.kura.web.client.ui.device;
 
+import com.google.gwt.core.client.GWT;
+import com.google.gwt.uibinder.client.UiBinder;
+import com.google.gwt.uibinder.client.UiField;
+import com.google.gwt.user.cellview.client.TextColumn;
+import com.google.gwt.user.cellview.client.TextHeader;
+import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.google.gwt.user.client.ui.Composite;
+import com.google.gwt.user.client.ui.Widget;
+import com.google.gwt.view.client.ListDataProvider;
+import com.google.gwt.view.client.SingleSelectionModel;
 import java.util.List;
-
 import org.eclipse.kura.web.client.messages.Messages;
 import org.eclipse.kura.web.client.messages.ValidationMessages;
 import org.eclipse.kura.web.client.ui.EntryClassUi;
@@ -30,23 +39,11 @@ import org.eclipse.kura.web.shared.service.GwtSecurityTokenServiceAsync;
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.gwt.CellTable;
 
-import com.google.gwt.core.client.GWT;
-import com.google.gwt.uibinder.client.UiBinder;
-import com.google.gwt.uibinder.client.UiField;
-import com.google.gwt.user.cellview.client.TextColumn;
-import com.google.gwt.user.cellview.client.TextHeader;
-import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.google.gwt.user.client.ui.Composite;
-import com.google.gwt.user.client.ui.Widget;
-import com.google.gwt.view.client.ListDataProvider;
-import com.google.gwt.view.client.SingleSelectionModel;
-
 public class BundlesTabUi extends Composite implements Tab {
 
     private static BundlesTabUiUiBinder uiBinder = GWT.create(BundlesTabUiUiBinder.class);
 
-    interface BundlesTabUiUiBinder extends UiBinder<Widget, BundlesTabUi> {
-    }
+    interface BundlesTabUiUiBinder extends UiBinder<Widget, BundlesTabUi> {}
 
     private static final Messages MSGS = GWT.create(Messages.class);
     private static final ValidationMessages validationMessages = GWT.create(ValidationMessages.class);
@@ -60,13 +57,16 @@ public class BundlesTabUi extends Composite implements Tab {
 
     @UiField
     Button bundlesRefresh;
+
     @UiField
     Button bundleStart;
+
     @UiField
     Button bundleStop;
 
     @UiField
     CellTable<GwtGroupedNVPair> bundlesGrid = new CellTable<>();
+
     private final ListDataProvider<GwtGroupedNVPair> bundlesDataProvider = new ListDataProvider<>();
     private final SingleSelectionModel<GwtGroupedNVPair> selectionModel = new SingleSelectionModel<>();
 
@@ -129,14 +129,15 @@ public class BundlesTabUi extends Composite implements Tab {
 
             @Override
             public void onSuccess(GwtXSRFToken token) {
-                BundlesTabUi.this.deviceService.startBundle(token,
-                        BundlesTabUi.this.selectionModel.getSelectedObject().getId(), new AsyncCallback<Void>() {
+                BundlesTabUi.this.deviceService.startBundle(
+                        token,
+                        BundlesTabUi.this.selectionModel.getSelectedObject().getId(),
+                        new AsyncCallback<Void>() {
 
                             @Override
                             public void onFailure(Throwable caught) {
                                 EntryClassUi.hideWaitModal();
                                 FailureHandler.handle(caught);
-
                             }
 
                             @Override
@@ -144,7 +145,6 @@ public class BundlesTabUi extends Composite implements Tab {
                                 EntryClassUi.hideWaitModal();
                             }
                         });
-
             }
 
             @Override
@@ -167,14 +167,15 @@ public class BundlesTabUi extends Composite implements Tab {
 
             @Override
             public void onSuccess(GwtXSRFToken token) {
-                BundlesTabUi.this.deviceService.stopBundle(token,
-                        BundlesTabUi.this.selectionModel.getSelectedObject().getId(), new AsyncCallback<Void>() {
+                BundlesTabUi.this.deviceService.stopBundle(
+                        token,
+                        BundlesTabUi.this.selectionModel.getSelectedObject().getId(),
+                        new AsyncCallback<Void>() {
 
                             @Override
                             public void onFailure(Throwable caught) {
                                 EntryClassUi.hideWaitModal();
                                 FailureHandler.handle(caught);
-
                             }
 
                             @Override
@@ -187,8 +188,8 @@ public class BundlesTabUi extends Composite implements Tab {
         });
     }
 
-    private void loadBundlesTable(CellTable<GwtGroupedNVPair> bundlesGrid2,
-            ListDataProvider<GwtGroupedNVPair> dataProvider) {
+    private void loadBundlesTable(
+            CellTable<GwtGroupedNVPair> bundlesGrid2, ListDataProvider<GwtGroupedNVPair> dataProvider) {
 
         TextColumn<GwtGroupedNVPair> col1 = new TextColumn<GwtGroupedNVPair>() {
 
@@ -237,7 +238,7 @@ public class BundlesTabUi extends Composite implements Tab {
         TextHeader version = new TextHeader(MSGS.deviceBndVersion());
         version.setHeaderStyleNames(ROW_HEADER_STYLE);
         bundlesGrid2.addColumn(col4, version);
-        
+
         TextColumn<GwtGroupedNVPair> col5 = new TextColumn<GwtGroupedNVPair>() {
 
             @Override
@@ -306,7 +307,8 @@ public class BundlesTabUi extends Composite implements Tab {
                         for (GwtGroupedNVPair resultPair : result) {
                             BundlesTabUi.this.bundlesDataProvider.getList().add(resultPair);
                         }
-                        int size = BundlesTabUi.this.bundlesDataProvider.getList().size();
+                        int size =
+                                BundlesTabUi.this.bundlesDataProvider.getList().size();
                         BundlesTabUi.this.bundlesGrid.setVisibleRange(0, size);
                         BundlesTabUi.this.bundlesDataProvider.flush();
                         BundlesTabUi.this.selectionModel.clear();
@@ -314,7 +316,6 @@ public class BundlesTabUi extends Composite implements Tab {
                     }
                 });
             }
-
         });
     }
 
@@ -322,5 +323,4 @@ public class BundlesTabUi extends Composite implements Tab {
     public void clear() {
         // Not needed
     }
-
 }

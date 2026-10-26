@@ -1,35 +1,30 @@
 /*******************************************************************************
- * Copyright (c) 2018, 2020 Eurotech and/or its affiliates and others
- * 
+ * Copyright (c) 2018, 2026 Eurotech and/or its affiliates and others
+ *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
  * which is available at https://www.eclipse.org/legal/epl-2.0/
- * 
+ *
  * SPDX-License-Identifier: EPL-2.0
- * 
+ *
  * Contributors:
  *  Eurotech
  *******************************************************************************/
-
 package org.eclipse.kura.web.client.ui.wires.composer;
 
+import com.google.gwt.core.client.JavaScriptObject;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import com.google.gwt.core.client.JavaScriptObject;
-
 public final class PortNames extends JavaScriptObject {
 
-    protected PortNames() {
-    }
+    protected PortNames() {}
 
-    public native String getPortName(int index)
-    /*-{
+    public native String getPortName(int index) /*-{
         return this["" + index]
     }-*/;
 
-    public native void setPortName(String name, int index)
-    /*-{
+    public native void setPortName(String name, int index) /*-{
         if (name) {
             this["" + index] = name
         } else {
@@ -37,8 +32,7 @@ public final class PortNames extends JavaScriptObject {
         }
     }-*/;
 
-    public static native PortNames create()
-    /*-{
+    public static native PortNames create() /*-{
         return {}
     }-*/;
 

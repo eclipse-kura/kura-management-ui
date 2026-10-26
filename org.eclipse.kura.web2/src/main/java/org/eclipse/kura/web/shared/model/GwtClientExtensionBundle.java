@@ -1,12 +1,12 @@
 /*******************************************************************************
- * Copyright (c) 2018, 2020 Eurotech and/or its affiliates and others
- * 
+ * Copyright (c) 2018, 2026 Eurotech and/or its affiliates and others
+ *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
  * which is available at https://www.eclipse.org/legal/epl-2.0/
- * 
+ *
  * SPDX-License-Identifier: EPL-2.0
- * 
+ *
  * Contributors:
  *  Eurotech
  *******************************************************************************/
@@ -23,8 +23,7 @@ public class GwtClientExtensionBundle extends KuraBaseModel implements Serializa
      */
     private static final long serialVersionUID = 7106592629491998207L;
 
-    public GwtClientExtensionBundle() {
-    }
+    public GwtClientExtensionBundle() {}
 
     public GwtClientExtensionBundle(Map<String, String> properties, String entryPointUrl) {
         setExtensionBundleProperties(new HashMap<>(properties));
@@ -46,5 +45,4 @@ public class GwtClientExtensionBundle extends KuraBaseModel implements Serializa
     public String getEntryPointUrl() {
         return get("entryPointUrl");
     }
-
 }

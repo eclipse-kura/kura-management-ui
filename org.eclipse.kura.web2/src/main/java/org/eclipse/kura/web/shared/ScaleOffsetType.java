@@ -16,14 +16,12 @@ package org.eclipse.kura.web.shared;
 /**
  * This contains all the required type constants for representing
  * Scale and Offset.
- * 
+ *
  * This is a copy of {@code org.eclipse.kura.channel.ScaleOffsetType}
  *
  * @since 2.8
  */
-
 public enum ScaleOffsetType {
-
     DEFINED_BY_VALUE_TYPE,
 
     /**
@@ -70,5 +68,4 @@ public enum ScaleOffsetType {
 
         throw new IllegalArgumentException("Cannot convert \"" + stringScaleOffsetType + "\" to ScaleOffsetType");
     }
-
 }

@@ -12,18 +12,6 @@
  *******************************************************************************/
 package org.eclipse.kura.web.client.ui;
 
-import java.util.List;
-import java.util.Optional;
-
-import org.eclipse.kura.web.shared.model.GwtPasswordStrenghtRequirements;
-import org.gwtbootstrap3.client.ui.Button;
-import org.gwtbootstrap3.client.ui.InputGroup;
-import org.gwtbootstrap3.client.ui.InputGroupButton;
-import org.gwtbootstrap3.client.ui.base.mixin.ErrorHandlerMixin;
-import org.gwtbootstrap3.client.ui.constants.IconType;
-import org.gwtbootstrap3.client.ui.constants.InputType;
-import org.gwtbootstrap3.client.ui.form.validator.Validator;
-
 import com.google.gwt.dom.client.Style.Unit;
 import com.google.gwt.editor.client.EditorError;
 import com.google.gwt.editor.client.HasEditorErrors;
@@ -35,6 +23,16 @@ import com.google.gwt.event.dom.client.KeyUpHandler;
 import com.google.gwt.event.dom.client.MouseOutHandler;
 import com.google.gwt.event.dom.client.MouseOverHandler;
 import com.google.gwt.event.shared.HandlerRegistration;
+import java.util.List;
+import java.util.Optional;
+import org.eclipse.kura.web.shared.model.GwtPasswordStrenghtRequirements;
+import org.gwtbootstrap3.client.ui.Button;
+import org.gwtbootstrap3.client.ui.InputGroup;
+import org.gwtbootstrap3.client.ui.InputGroupButton;
+import org.gwtbootstrap3.client.ui.base.mixin.ErrorHandlerMixin;
+import org.gwtbootstrap3.client.ui.constants.IconType;
+import org.gwtbootstrap3.client.ui.constants.InputType;
+import org.gwtbootstrap3.client.ui.form.validator.Validator;
 
 public class NewPasswordInputForm extends InputGroup implements HasEditorErrors<String> {
 
@@ -176,8 +174,8 @@ public class NewPasswordInputForm extends InputGroup implements HasEditorErrors<
         this.newPasswordInput.setValidators(validators);
     }
 
-    public final void setInputPasswordValidatorsFrom(Optional<String> identityName,
-            GwtPasswordStrenghtRequirements userOptions) {
+    public final void setInputPasswordValidatorsFrom(
+            Optional<String> identityName, GwtPasswordStrenghtRequirements userOptions) {
         this.newPasswordInput.setValidatorsFrom(identityName, userOptions);
     }
 

@@ -17,7 +17,6 @@ package org.eclipse.kura.web.server.net2.configuration;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
-
 import org.eclipse.kura.KuraException;
 import org.eclipse.kura.net.wifi.WifiMode;
 import org.eclipse.kura.web.server.net2.utils.EnumsParser;
@@ -45,8 +44,7 @@ public class NetworkConfigurationServicePropertiesBuilder {
     private final NetworkConfigurationServiceProperties properties;
     private final String ifname;
 
-    private static final Logger logger = LoggerFactory
-            .getLogger(NetworkConfigurationServicePropertiesBuilder.class);
+    private static final Logger logger = LoggerFactory.getLogger(NetworkConfigurationServicePropertiesBuilder.class);
 
     private final GwtNetInterfaceConfig oldGwtNetInterfaceConfig;
 
@@ -59,8 +57,8 @@ public class NetworkConfigurationServicePropertiesBuilder {
         this.oldGwtNetInterfaceConfig = getConfigsAndStatuses(this.gwtConfig.getName());
     }
 
-    NetworkConfigurationServicePropertiesBuilder(GwtNetInterfaceConfig gwtConfig,
-            GwtNetInterfaceConfig oldGwtNetInterfaceConfig) {
+    NetworkConfigurationServicePropertiesBuilder(
+            GwtNetInterfaceConfig gwtConfig, GwtNetInterfaceConfig oldGwtNetInterfaceConfig) {
         this.gwtConfig = gwtConfig;
         this.gwtConfig.setUnescaped(true);
         this.properties = new NetworkConfigurationServiceProperties();
@@ -103,15 +101,14 @@ public class NetworkConfigurationServicePropertiesBuilder {
         this.properties.setType(this.ifname, this.gwtConfig.getHwType());
 
         if (this.gwtConfig instanceof GwtWifiNetInterfaceConfig config) {
-            String wifiMode = EnumsParser
-                    .getWifiMode(Optional.ofNullable(config.getWirelessMode()));
+            String wifiMode = EnumsParser.getWifiMode(Optional.ofNullable(config.getWirelessMode()));
             this.properties.setWifiMode(this.ifname, wifiMode);
         }
     }
 
     private void setIpv4Properties() {
-        this.properties.setIp4Status(this.ifname,
-                EnumsParser.getNetInterfaceStatus(Optional.ofNullable(this.gwtConfig.getStatus())));
+        this.properties.setIp4Status(
+                this.ifname, EnumsParser.getNetInterfaceStatus(Optional.ofNullable(this.gwtConfig.getStatus())));
 
         boolean isManual = this.gwtConfig.getConfigMode().equals(GwtNetIfConfigMode.netIPv4ConfigModeManual.name());
         boolean isWan = this.gwtConfig.getStatus().equals(GwtNetIfStatus.netIPv4StatusEnabledWAN.name());
@@ -134,7 +131,6 @@ public class NetworkConfigurationServicePropertiesBuilder {
         if (isManual && isWan) {
             this.properties.setIp4Gateway(this.ifname, this.gwtConfig.getGateway());
         }
-
     }
 
     private void setIpv6Properties() {
@@ -178,23 +174,25 @@ public class NetworkConfigurationServicePropertiesBuilder {
 
     private void setIpv4DhcpClientProperties() {
         switch (this.gwtConfig.getConfigModeEnum()) {
-        case netIPv4ConfigModeDHCP:
-            this.properties.setDhcpClient4Enabled(this.ifname, true);
-            break;
-        case netIPv4ConfigModeManual:
-            this.properties.setDhcpClient4Enabled(this.ifname, false);
-            break;
-        default:
-            break;
+            case netIPv4ConfigModeDHCP:
+                this.properties.setDhcpClient4Enabled(this.ifname, true);
+                break;
+            case netIPv4ConfigModeManual:
+                this.properties.setDhcpClient4Enabled(this.ifname, false);
+                break;
+            default:
+                break;
         }
     }
 
     private void setIpv4DhcpServerProperties() {
         boolean isManualAddress = this.gwtConfig.getConfigModeEnum() == GwtNetIfConfigMode.netIPv4ConfigModeManual;
-        boolean isDhcpServer = isManualAddress && this.gwtConfig.getRouterModeEnum() != GwtNetRouterMode.netRouterOff
+        boolean isDhcpServer = isManualAddress
+                && this.gwtConfig.getRouterModeEnum() != GwtNetRouterMode.netRouterOff
                 && this.gwtConfig.getRouterModeEnum() != GwtNetRouterMode.netRouterNat;
-        boolean isNatEnabled = isManualAddress && (this.gwtConfig.getRouterModeEnum() == GwtNetRouterMode.netRouterNat
-                || this.gwtConfig.getRouterModeEnum() == GwtNetRouterMode.netRouterDchpNat);
+        boolean isNatEnabled = isManualAddress
+                && (this.gwtConfig.getRouterModeEnum() == GwtNetRouterMode.netRouterNat
+                        || this.gwtConfig.getRouterModeEnum() == GwtNetRouterMode.netRouterDchpNat);
 
         this.properties.setDhcpServer4Enabled(this.ifname, isDhcpServer);
         this.properties.setNatEnabled(this.ifname, isNatEnabled);
@@ -211,8 +209,7 @@ public class NetworkConfigurationServicePropertiesBuilder {
 
     private void setWifiProperties() throws GwtKuraException {
         if (this.gwtConfig instanceof GwtWifiNetInterfaceConfig config) {
-            String wifiMode = EnumsParser
-                    .getWifiMode(Optional.ofNullable(config.getWirelessMode()));
+            String wifiMode = EnumsParser.getWifiMode(Optional.ofNullable(config.getWirelessMode()));
 
             this.properties.setWifiMode(this.ifname, wifiMode);
 
@@ -245,7 +242,7 @@ public class NetworkConfigurationServicePropertiesBuilder {
 
                 this.properties.setWifiMasterPassphrase(this.ifname, gwtApConfig.getPassword());
             } else {
-                if (!gwtWifiConfig.getSecurity().equals(GwtWifiSecurity.netWifiSecurityNONE.name()) 
+                if (!gwtWifiConfig.getSecurity().equals(GwtWifiSecurity.netWifiSecurityNONE.name())
                         && !gwtWifiConfig.getSecurity().equals(GwtWifiSecurity.netWifiSecurityWEP.name())) {
                     GwtServerUtil.validateUserPassword(Optional.empty(), gwtWifiConfig.getPassword());
                 }
@@ -255,19 +252,18 @@ public class NetworkConfigurationServicePropertiesBuilder {
 
         this.properties.setWifiMasterChannel(this.ifname, gwtWifiConfig.getChannels());
 
-        this.properties.setWifiMasterMode(this.ifname,
-                EnumsParser.getWifiMode(Optional.ofNullable(gwtWifiConfig.getWirelessMode())));
-        this.properties.setWifiMasterSecurityType(this.ifname,
-                EnumsParser.getWifiSecurity(Optional.ofNullable(gwtWifiConfig.getSecurity())));
-        this.properties.setWifiMasterPairwiseCiphers(this.ifname,
-                EnumsParser.getWifiCiphers(Optional.ofNullable(gwtWifiConfig.getPairwiseCiphers())));
-        this.properties.setWifiMasterGroupCiphers(this.ifname,
-                EnumsParser.getWifiCiphers(Optional.ofNullable(gwtWifiConfig.getGroupCiphers())));
+        this.properties.setWifiMasterMode(
+                this.ifname, EnumsParser.getWifiMode(Optional.ofNullable(gwtWifiConfig.getWirelessMode())));
+        this.properties.setWifiMasterSecurityType(
+                this.ifname, EnumsParser.getWifiSecurity(Optional.ofNullable(gwtWifiConfig.getSecurity())));
+        this.properties.setWifiMasterPairwiseCiphers(
+                this.ifname, EnumsParser.getWifiCiphers(Optional.ofNullable(gwtWifiConfig.getPairwiseCiphers())));
+        this.properties.setWifiMasterGroupCiphers(
+                this.ifname, EnumsParser.getWifiCiphers(Optional.ofNullable(gwtWifiConfig.getGroupCiphers())));
 
         // wifi master specific properties
-        this.properties.setWifiMasterRadioMode(this.ifname,
-                EnumsParser.getWifiRadioMode(Optional.ofNullable(gwtWifiConfig.getRadioMode())));
-
+        this.properties.setWifiMasterRadioMode(
+                this.ifname, EnumsParser.getWifiRadioMode(Optional.ofNullable(gwtWifiConfig.getRadioMode())));
     }
 
     private void set8021xConfig() throws GwtKuraException {
@@ -277,16 +273,20 @@ public class NetworkConfigurationServicePropertiesBuilder {
 
         logger.info("setting 802-1x config");
 
-        if (this.gwtConfig.get8021xConfig().getEap() != null && !this.gwtConfig.get8021xConfig().getEap().isEmpty()) {
-            this.properties.set8021xEap(this.ifname, this.gwtConfig.get8021xConfig().getEap());
+        if (this.gwtConfig.get8021xConfig().getEap() != null
+                && !this.gwtConfig.get8021xConfig().getEap().isEmpty()) {
+            this.properties.set8021xEap(
+                    this.ifname, this.gwtConfig.get8021xConfig().getEap());
         }
 
         if (isValidStringProperty(this.gwtConfig.get8021xConfig().getInnerAuth())) {
-            this.properties.set8021xInnerAuth(this.ifname, this.gwtConfig.get8021xConfig().getInnerAuth());
+            this.properties.set8021xInnerAuth(
+                    this.ifname, this.gwtConfig.get8021xConfig().getInnerAuth());
         }
 
         if (isValidStringProperty(this.gwtConfig.get8021xConfig().getUsername())) {
-            this.properties.set8021xIdentity(this.ifname, this.gwtConfig.get8021xConfig().getUsername());
+            this.properties.set8021xIdentity(
+                    this.ifname, this.gwtConfig.get8021xConfig().getUsername());
         }
 
         if (isValidStringProperty(this.gwtConfig.get8021xConfig().getPassword())) {
@@ -313,18 +313,20 @@ public class NetworkConfigurationServicePropertiesBuilder {
 
     private void set8021xCertificatesAndPublicPrivateKeyPairs() {
         if (this.gwtConfig.get8021xConfig().getKeystorePid() != null) {
-            this.properties.set8021xKeystorePid(this.ifname, this.gwtConfig.get8021xConfig().getKeystorePid());
+            this.properties.set8021xKeystorePid(
+                    this.ifname, this.gwtConfig.get8021xConfig().getKeystorePid());
         }
 
         if (this.gwtConfig.get8021xConfig().getCaCertName() != null) {
-            this.properties.set8021xCaCertName(this.ifname, this.gwtConfig.get8021xConfig().getCaCertName());
+            this.properties.set8021xCaCertName(
+                    this.ifname, this.gwtConfig.get8021xConfig().getCaCertName());
         }
 
         if (this.gwtConfig.get8021xConfig().getPublicPrivateKeyPairName() != null) {
-            this.properties.set8021xPublicPrivateKeyPairName(this.ifname,
-                    this.gwtConfig.get8021xConfig().getPublicPrivateKeyPairName());
-            this.properties.set8021xClientCertName(this.ifname,
-                    this.gwtConfig.get8021xConfig().getPublicPrivateKeyPairName());
+            this.properties.set8021xPublicPrivateKeyPairName(
+                    this.ifname, this.gwtConfig.get8021xConfig().getPublicPrivateKeyPairName());
+            this.properties.set8021xClientCertName(
+                    this.ifname, this.gwtConfig.get8021xConfig().getPublicPrivateKeyPairName());
         }
     }
 
@@ -353,16 +355,16 @@ public class NetworkConfigurationServicePropertiesBuilder {
 
         this.properties.setWifiInfraChannel(this.ifname, gwtWifiConfig.getChannels());
 
-        this.properties.setWifiInfraMode(this.ifname,
-                EnumsParser.getWifiMode(Optional.ofNullable(gwtWifiConfig.getWirelessMode())));
-        this.properties.setWifiInfraSecurityType(this.ifname,
-                EnumsParser.getWifiSecurity(Optional.ofNullable(gwtWifiConfig.getSecurity())));
-        this.properties.setWifiInfraPairwiseCiphers(this.ifname,
-                EnumsParser.getWifiCiphers(Optional.ofNullable(gwtWifiConfig.getPairwiseCiphers())));
-        this.properties.setWifiInfraGroupCiphers(this.ifname,
-                EnumsParser.getWifiCiphers(Optional.ofNullable(gwtWifiConfig.getGroupCiphers())));
-        this.properties.setWifiInfraRadioMode(this.ifname,
-                EnumsParser.getWifiRadioMode(Optional.ofNullable(gwtWifiConfig.getRadioMode())));
+        this.properties.setWifiInfraMode(
+                this.ifname, EnumsParser.getWifiMode(Optional.ofNullable(gwtWifiConfig.getWirelessMode())));
+        this.properties.setWifiInfraSecurityType(
+                this.ifname, EnumsParser.getWifiSecurity(Optional.ofNullable(gwtWifiConfig.getSecurity())));
+        this.properties.setWifiInfraPairwiseCiphers(
+                this.ifname, EnumsParser.getWifiCiphers(Optional.ofNullable(gwtWifiConfig.getPairwiseCiphers())));
+        this.properties.setWifiInfraGroupCiphers(
+                this.ifname, EnumsParser.getWifiCiphers(Optional.ofNullable(gwtWifiConfig.getGroupCiphers())));
+        this.properties.setWifiInfraRadioMode(
+                this.ifname, EnumsParser.getWifiRadioMode(Optional.ofNullable(gwtWifiConfig.getRadioMode())));
 
         // wifi infra specific properties
 
@@ -389,8 +391,8 @@ public class NetworkConfigurationServicePropertiesBuilder {
     private void setModemProperties() {
         if (this.gwtConfig instanceof GwtModemInterfaceConfig gwtModemConfig) {
 
-            this.properties.setModemAuthType(this.ifname,
-                    EnumsParser.getAuthType(Optional.ofNullable(gwtModemConfig.getAuthType())));
+            this.properties.setModemAuthType(
+                    this.ifname, EnumsParser.getAuthType(Optional.ofNullable(gwtModemConfig.getAuthType())));
             this.properties.setModemDialString(this.ifname, gwtModemConfig.getDialString());
             this.properties.setModemUsername(this.ifname, gwtModemConfig.getUsername());
 
@@ -430,11 +432,12 @@ public class NetworkConfigurationServicePropertiesBuilder {
     }
 
     private void setAdvancedProperties() {
-        this.properties.setIp4Mtu(this.ifname,
-                Objects.nonNull(this.gwtConfig.getMtu()) ? this.gwtConfig.getMtu() : DEFAULT_MTU);
-        this.properties.setIp6Mtu(this.ifname,
-                Objects.nonNull(this.gwtConfig.getIpv6Mtu()) ? this.gwtConfig.getIpv6Mtu() : DEFAULT_MTU);
-        this.properties.setPromisc(this.ifname,
+        this.properties.setIp4Mtu(
+                this.ifname, Objects.nonNull(this.gwtConfig.getMtu()) ? this.gwtConfig.getMtu() : DEFAULT_MTU);
+        this.properties.setIp6Mtu(
+                this.ifname, Objects.nonNull(this.gwtConfig.getIpv6Mtu()) ? this.gwtConfig.getIpv6Mtu() : DEFAULT_MTU);
+        this.properties.setPromisc(
+                this.ifname,
                 Objects.nonNull(this.gwtConfig.getPromisc()) ? this.gwtConfig.getPromisc() : DEFAULT_PROMISC);
     }
 
@@ -442,5 +445,4 @@ public class NetworkConfigurationServicePropertiesBuilder {
         NetworkConfigurationServiceAdapter configuration = new NetworkConfigurationServiceAdapter();
         return configuration.getGwtNetInterfaceConfig(ifName);
     }
-
 }

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2023, 2024 Eurotech and/or its affiliates and others
+ * Copyright (c) 2023, 2026 Eurotech and/or its affiliates and others
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -13,7 +13,6 @@
 package org.eclipse.kura.web.server.net2.utils;
 
 import java.util.Optional;
-
 import org.eclipse.kura.net.NetInterfaceStatus;
 import org.eclipse.kura.net.modem.ModemConfig.AuthType;
 import org.eclipse.kura.net.wifi.WifiCiphers;
@@ -33,13 +32,11 @@ import org.eclipse.kura.web.shared.model.GwtWifiWirelessMode;
  */
 public class EnumsParser {
 
-    private EnumsParser() {
-
-    }
+    private EnumsParser() {}
 
     /**
      * Converts values of {@link WifiMode} to {@link GwtWifiWirelessMode} values
-     * 
+     *
      */
     public static String getGwtWifiWirelessMode(Optional<String> wifiMode) {
         if (wifiMode.isPresent()) {
@@ -61,7 +58,7 @@ public class EnumsParser {
 
     /**
      * Converts values of {@link GwtWifiWirelessMode} to {@link WifiMode} values
-     * 
+     *
      */
     public static String getWifiMode(Optional<String> gwtWifiWirelessMode) {
         if (gwtWifiWirelessMode.isPresent()) {
@@ -84,7 +81,7 @@ public class EnumsParser {
     /**
      * Converts values of {@link NetInterfaceStatus} to {@link GwtNetIfStatus}
      * values
-     * 
+     *
      */
     public static String getGwtNetIfStatus(Optional<String> netInterfaceStatus) {
         if (netInterfaceStatus.isPresent()) {
@@ -111,7 +108,7 @@ public class EnumsParser {
     /**
      * Converts values of {@link GwtNetIfStatus} to {@link NetInterfaceStatus}
      * values
-     * 
+     *
      */
     public static String getNetInterfaceStatus(Optional<String> gwtNetIfStatus) {
         if (gwtNetIfStatus.isPresent()) {
@@ -141,7 +138,7 @@ public class EnumsParser {
 
     /**
      * Converts values of {@link WifiSecurity} to {@link GwtWifiSecurity} values
-     * 
+     *
      */
     public static String getGwtWifiSecurity(Optional<String> wifiSecurity) {
         if (wifiSecurity.isPresent()) {
@@ -183,7 +180,7 @@ public class EnumsParser {
 
     /**
      * Converts values of {@link GwtWifiSecurity} to {@link WifiSecurity} values
-     * 
+     *
      */
     public static String getWifiSecurity(Optional<String> gwtWifiSecurity) {
         if (gwtWifiSecurity.isPresent()) {
@@ -214,7 +211,6 @@ public class EnumsParser {
             if (gwtWifiSecurity.get().equals(GwtWifiSecurity.netWifiSecurityWPA2WPA3Enterprise.name())) {
                 return WifiSecurity.SECURITY_WPA2_WPA3_ENTERPRISE.name();
             }
-
         }
 
         return WifiSecurity.NONE.name();
@@ -222,7 +218,7 @@ public class EnumsParser {
 
     /**
      * Converts values of {@link WifiCiphers} to {@link GwtWifiCiphers} values
-     * 
+     *
      */
     public static String getGwtWifiCiphers(Optional<String> wifiCiphers) {
         if (wifiCiphers.isPresent()) {
@@ -244,7 +240,7 @@ public class EnumsParser {
 
     /**
      * Converts values of {@link GwtWifiCiphers} to {@link WifiCiphers} values
-     * 
+     *
      */
     public static Optional<String> getWifiCiphers(Optional<String> gwtWifiCiphers) {
         if (gwtWifiCiphers.isPresent()) {
@@ -266,7 +262,7 @@ public class EnumsParser {
 
     /**
      * Converts values of {@link WifiRadioMode} to {@link GwtWifiRadioMode} values
-     * 
+     *
      */
     public static Optional<String> getGwtWifiRadioMode(Optional<String> wifiRadioMode) {
         if (wifiRadioMode.isPresent()) {
@@ -294,12 +290,11 @@ public class EnumsParser {
         }
 
         return Optional.of(GwtWifiRadioMode.netWifiRadioModeBGN.name());
-
     }
 
     /**
      * Converts values of {@link GwtWifiRadioMode} to {@link WifiRadioMode} values
-     * 
+     *
      */
     public static Optional<String> getWifiRadioMode(Optional<String> gwtWifiRadioMode) {
         if (gwtWifiRadioMode.isPresent()) {
@@ -329,7 +324,7 @@ public class EnumsParser {
 
     /**
      * Converts values of {@link AuthType} to {@link GwtModemAuthType}
-     * 
+     *
      */
     public static GwtModemAuthType getGwtModemAuthType(Optional<String> authType) {
         if (authType.isPresent()) {
@@ -351,25 +346,24 @@ public class EnumsParser {
 
     /**
      * Converts values of {@link GwtModemAuthType} to {@link AuthType.name()}
-     * 
+     *
      */
     public static String getAuthType(Optional<GwtModemAuthType> gwtModemAuthType) {
         if (gwtModemAuthType.isPresent()) {
             switch (gwtModemAuthType.get()) {
-            case netModemAuthAUTO:
-                return AuthType.AUTO.name();
-            case netModemAuthCHAP:
-                return AuthType.CHAP.name();
+                case netModemAuthAUTO:
+                    return AuthType.AUTO.name();
+                case netModemAuthCHAP:
+                    return AuthType.CHAP.name();
 
-            case netModemAuthPAP:
-                return AuthType.PAP.name();
-            case netModemAuthNONE:
-            default:
-                break;
+                case netModemAuthPAP:
+                    return AuthType.PAP.name();
+                case netModemAuthNONE:
+                default:
+                    break;
             }
         }
 
         return AuthType.NONE.name();
     }
-
 }

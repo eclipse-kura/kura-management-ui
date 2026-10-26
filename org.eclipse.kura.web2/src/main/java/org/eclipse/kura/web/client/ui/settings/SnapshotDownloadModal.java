@@ -1,28 +1,26 @@
 /*******************************************************************************
- * Copyright (c) 2024, 2025 Eurotech and/or its affiliates and others
- * 
+ * Copyright (c) 2024, 2026 Eurotech and/or its affiliates and others
+ *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
  * which is available at https://www.eclipse.org/legal/epl-2.0/
- * 
+ *
  * SPDX-License-Identifier: EPL-2.0
- * 
+ *
  * Contributors:
  *  Eurotech
  *******************************************************************************/
 package org.eclipse.kura.web.client.ui.settings;
 
+import com.google.gwt.core.client.GWT;
+import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.google.gwt.user.client.ui.Hidden;
 import java.util.Arrays;
 import java.util.List;
-
 import org.eclipse.kura.web.Console;
 import org.gwtbootstrap3.client.ui.CheckBox;
 import org.gwtbootstrap3.client.ui.base.form.AbstractForm.SubmitCompleteEvent;
 import org.gwtbootstrap3.client.ui.constants.ButtonType;
-
-import com.google.gwt.core.client.GWT;
-import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.google.gwt.user.client.ui.Hidden;
 
 public class SnapshotDownloadModal extends SnapshotSelectorModal {
 
@@ -48,32 +46,41 @@ public class SnapshotDownloadModal extends SnapshotSelectorModal {
         clearClickHandlers();
         removeRequestParameters();
 
-        this.cancelButton = new SnapshotSelectorActionButton(MSGS.cancelButton(), FONT_AWESOME_STYLE_NAME,
-                ButtonType.PRIMARY, e -> hideAndReset());
+        this.cancelButton = new SnapshotSelectorActionButton(
+                MSGS.cancelButton(), FONT_AWESOME_STYLE_NAME, ButtonType.PRIMARY, e -> hideAndReset());
 
-        this.jsonDownloadButton = new SnapshotSelectorActionButton(MSGS.downloadSnapshotJsonButton(),
-                FONT_AWESOME_STYLE_NAME, ButtonType.PRIMARY, e -> onSnapshotDownloadButtonClick(JSON_DOWNLOAD_FORMAT));
+        this.jsonDownloadButton = new SnapshotSelectorActionButton(
+                MSGS.downloadSnapshotJsonButton(),
+                FONT_AWESOME_STYLE_NAME,
+                ButtonType.PRIMARY,
+                e -> onSnapshotDownloadButtonClick(JSON_DOWNLOAD_FORMAT));
 
-        this.xmlDownloadButton = new SnapshotSelectorActionButton(MSGS.downloadSnapshotXmlButton(),
-                FONT_AWESOME_STYLE_NAME, ButtonType.PRIMARY, e -> onSnapshotDownloadButtonClick(XML_DOWNLOAD_FORMAT));
+        this.xmlDownloadButton = new SnapshotSelectorActionButton(
+                MSGS.downloadSnapshotXmlButton(),
+                FONT_AWESOME_STYLE_NAME,
+                ButtonType.PRIMARY,
+                e -> onSnapshotDownloadButtonClick(XML_DOWNLOAD_FORMAT));
 
         addFooterButton(this.cancelButton);
         addFooterButton(this.jsonDownloadButton);
         addFooterButton(this.xmlDownloadButton);
 
         this.pidsListField = createRequestParameter(PIDS_LIST_REQUEST_FIELD, PIDS_LIST_REQUEST_FIELD, "");
-        this.snapshotDownloadFormatField = createRequestParameter(DOWNLOAD_FORMAT_REQUEST_FIELD,
-                DOWNLOAD_FORMAT_REQUEST_FIELD, "");
+        this.snapshotDownloadFormatField =
+                createRequestParameter(DOWNLOAD_FORMAT_REQUEST_FIELD, DOWNLOAD_FORMAT_REQUEST_FIELD, "");
         this.snapshotIdField = createRequestParameter(SNAPSHOT_ID_REQUEST_FIELD, SNAPSHOT_ID_REQUEST_FIELD, "");
 
         addRequestParameter(this.pidsListField);
         addRequestParameter(this.snapshotDownloadFormatField);
         addRequestParameter(this.snapshotIdField);
 
-        setModalTitleDescriptionAndHints(MSGS.deviceSnapshotDownloadModalTitle(),
-                MSGS.deviceSnapshotDownloadModalDescription(), MSGS.deviceSnapshotDownloadFormatHint());
+        setModalTitleDescriptionAndHints(
+                MSGS.deviceSnapshotDownloadModalTitle(),
+                MSGS.deviceSnapshotDownloadModalDescription(),
+                MSGS.deviceSnapshotDownloadFormatHint());
 
-        setFormRequestType(com.google.gwt.user.client.ui.FormPanel.ENCODING_URLENCODED,
+        setFormRequestType(
+                com.google.gwt.user.client.ui.FormPanel.ENCODING_URLENCODED,
                 com.google.gwt.user.client.ui.FormPanel.METHOD_POST,
                 Console.ADMIN_ROOT + '/' + GWT.getModuleName() + "/device_snapshots");
 
@@ -154,5 +161,4 @@ public class SnapshotDownloadModal extends SnapshotSelectorModal {
             removeRequestParameter(this.snapshotIdField);
         }
     }
-
 }

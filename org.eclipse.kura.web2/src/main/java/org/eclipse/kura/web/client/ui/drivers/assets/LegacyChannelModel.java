@@ -17,7 +17,6 @@ package org.eclipse.kura.web.client.ui.drivers.assets;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
-
 import org.eclipse.kura.web.client.util.ValidationUtil;
 import org.eclipse.kura.web.shared.AssetConstants;
 import org.eclipse.kura.web.shared.DataType;
@@ -94,7 +93,9 @@ public class LegacyChannelModel implements AssetModel.ChannelModel {
     }
 
     private boolean isScalarType(DataType valueType) {
-        return valueType != null && valueType != DataType.BOOLEAN && valueType != DataType.STRING
+        return valueType != null
+                && valueType != DataType.BOOLEAN
+                && valueType != DataType.STRING
                 && valueType != DataType.BYTE_ARRAY;
     }
 
@@ -187,5 +188,4 @@ public class LegacyChannelModel implements AssetModel.ChannelModel {
             return new LegacyChannelModel(this.channelName, this.parameters);
         }
     }
-
 }

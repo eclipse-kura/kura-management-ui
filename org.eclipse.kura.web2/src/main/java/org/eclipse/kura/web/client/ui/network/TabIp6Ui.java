@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2023, 2025 Eurotech and/or its affiliates and others
+ * Copyright (c) 2023, 2026 Eurotech and/or its affiliates and others
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -13,10 +13,15 @@
  *******************************************************************************/
 package org.eclipse.kura.web.client.ui.network;
 
+import com.google.gwt.core.client.GWT;
+import com.google.gwt.uibinder.client.UiBinder;
+import com.google.gwt.uibinder.client.UiField;
+import com.google.gwt.user.client.ui.Composite;
+import com.google.gwt.user.client.ui.ScrollPanel;
+import com.google.gwt.user.client.ui.Widget;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.logging.Logger;
-
 import org.eclipse.kura.web.client.messages.Messages;
 import org.eclipse.kura.web.client.util.HelpButton;
 import org.eclipse.kura.web.client.util.MessageUtils;
@@ -36,13 +41,6 @@ import org.gwtbootstrap3.client.ui.TextBox;
 import org.gwtbootstrap3.client.ui.constants.ValidationState;
 import org.gwtbootstrap3.client.ui.html.Span;
 
-import com.google.gwt.core.client.GWT;
-import com.google.gwt.uibinder.client.UiBinder;
-import com.google.gwt.uibinder.client.UiField;
-import com.google.gwt.user.client.ui.Composite;
-import com.google.gwt.user.client.ui.ScrollPanel;
-import com.google.gwt.user.client.ui.Widget;
-
 public class TabIp6Ui extends Composite implements NetworkTab {
 
     private static final String STATUS_UNMANAGED = "netIPv6StatusUnmanaged";
@@ -57,101 +55,138 @@ public class TabIp6Ui extends Composite implements NetworkTab {
     private static final String PRIVACY_PREFER_PUB = "netIPv6PrivacyEnabledPubAdd";
     private static final String PRIVACY_PREFER_TEMP = "netIPv6PrivacyEnabledTempAdd";
 
-    private static final String IPV6_ADDRESS_REGEX = "(([0-9a-fA-F]{1,4}:){7,7}[0-9a-fA-F]{1,4}|([0-9a-fA-F]{1,4}:){1,7}:|([0-9a-fA-F]{1,4}:){1,6}:[0-9a-fA-F]{1,4}|([0-9a-fA-F]{1,4}:){1,5}(:[0-9a-fA-F]{1,4}){1,2}|([0-9a-fA-F]{1,4}:){1,4}(:[0-9a-fA-F]{1,4}){1,3}|([0-9a-fA-F]{1,4}:){1,3}(:[0-9a-fA-F]{1,4}){1,4}|([0-9a-fA-F]{1,4}:){1,2}(:[0-9a-fA-F]{1,4}){1,5}|[0-9a-fA-F]{1,4}:((:[0-9a-fA-F]{1,4}){1,6})|:((:[0-9a-fA-F]{1,4}){1,7}|:)|fe80:(:[0-9a-fA-F]{0,4}){0,4}%[0-9a-zA-Z]{1,}|::(ffff(:0{1,4}){0,1}:){0,1}((25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])\\.){3,3}(25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])|([0-9a-fA-F]{1,4}:){1,4}:((25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])\\.){3,3}(25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9]))";
+    private static final String IPV6_ADDRESS_REGEX =
+            "(([0-9a-fA-F]{1,4}:){7,7}[0-9a-fA-F]{1,4}|([0-9a-fA-F]{1,4}:){1,7}:|([0-9a-fA-F]{1,4}:){1,6}:[0-9a-fA-F]{1,4}|([0-9a-fA-F]{1,4}:){1,5}(:[0-9a-fA-F]{1,4}){1,2}|([0-9a-fA-F]{1,4}:){1,4}(:[0-9a-fA-F]{1,4}){1,3}|([0-9a-fA-F]{1,4}:){1,3}(:[0-9a-fA-F]{1,4}){1,4}|([0-9a-fA-F]{1,4}:){1,2}(:[0-9a-fA-F]{1,4}){1,5}|[0-9a-fA-F]{1,4}:((:[0-9a-fA-F]{1,4}){1,6})|:((:[0-9a-fA-F]{1,4}){1,7}|:)|fe80:(:[0-9a-fA-F]{0,4}){0,4}%[0-9a-zA-Z]{1,}|::(ffff(:0{1,4}){0,1}:){0,1}((25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])\\.){3,3}(25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])|([0-9a-fA-F]{1,4}:){1,4}:((25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9])\\.){3,3}(25[0-5]|(2[0-4]|1{0,1}[0-9]){0,1}[0-9]))";
     private static final String DNS_REGEX = "[\\s,;\\n\\t]+";
 
-    interface TabIp6UiUiBinder extends UiBinder<Widget, TabIp6Ui> {
-    }
+    interface TabIp6UiUiBinder extends UiBinder<Widget, TabIp6Ui> {}
 
     @UiField
     FormGroup groupStatus;
+
     @UiField
     FormGroup groupPriority;
+
     @UiField
     FormGroup groupConfigure;
+
     @UiField
     FormGroup groupAutoconfigurationMode;
+
     @UiField
     FormGroup groupIp;
+
     @UiField
     FormGroup groupSubnet;
+
     @UiField
     FormGroup groupGateway;
+
     @UiField
     FormGroup groupDns;
+
     @UiField
     FormGroup groupPrivacy;
 
     @UiField
     FormLabel labelStatus;
+
     @UiField
     FormLabel labelPriority;
+
     @UiField
     FormLabel labelConfigure;
+
     @UiField
     FormLabel labelAutoconfiguration;
+
     @UiField
     FormLabel labelIp;
+
     @UiField
     FormLabel labelSubnet;
+
     @UiField
     FormLabel labelGateway;
+
     @UiField
     FormLabel labelDns;
+
     @UiField
     FormLabel labelPrivacy;
 
     @UiField
     HelpBlock wrongInputPriority;
+
     @UiField
     HelpBlock wrongInputIp;
+
     @UiField
     HelpBlock wrongInputSubnet;
+
     @UiField
     HelpBlock wrongInputGateway;
+
     @UiField
     HelpBlock wrongInputDns;
 
     @UiField
     HelpButton helpButtonStatus;
+
     @UiField
     HelpButton helpButtonPriority;
+
     @UiField
     HelpButton helpButtonConfigure;
+
     @UiField
     HelpButton helpButtonAutoconfiguration;
+
     @UiField
     HelpButton helpButtonIp;
+
     @UiField
     HelpButton helpButtonSubnet;
+
     @UiField
     HelpButton helpButtonGateway;
+
     @UiField
     HelpButton helpButtonDns;
+
     @UiField
     HelpButton helpButtonPrivacy;
 
     @UiField
     ListBox status;
+
     @UiField
     IntegerBox priority;
+
     @UiField
     ListBox configure;
+
     @UiField
     ListBox autoconfiguration;
+
     @UiField
     TextBox ip;
+
     @UiField
     IntegerBox subnet;
+
     @UiField
     TextBox gateway;
+
     @UiField
     TextArea dns;
+
     @UiField
     ListBox privacy;
 
     @UiField
     PanelHeader helpTitle;
+
     @UiField
     ScrollPanel helpText;
 
@@ -367,7 +402,8 @@ public class TabIp6Ui extends Composite implements NetworkTab {
             setDirty(true);
 
             String address = this.ip.getText();
-            boolean isValid = address != null && address.trim().length() > 0
+            boolean isValid = address != null
+                    && address.trim().length() > 0
                     && address.trim().matches(IPV6_ADDRESS_REGEX);
 
             if (isValid) {
@@ -412,7 +448,8 @@ public class TabIp6Ui extends Composite implements NetworkTab {
             setDirty(true);
 
             String address = this.gateway.getText();
-            boolean isValid = address != null && address.trim().length() > 0
+            boolean isValid = address != null
+                    && address.trim().length() > 0
                     && address.trim().matches(IPV6_ADDRESS_REGEX);
 
             if (!isValid) {
@@ -501,31 +538,30 @@ public class TabIp6Ui extends Composite implements NetworkTab {
 
     private void refreshFieldsBasedOnInterface(GwtNetInterfaceConfig config) {
         switch (config.getHwTypeEnum()) {
-        case ETHERNET:
-            break;
-        case LOOPBACK:
-            this.status.setEnabled(false);
-            this.priority.setEnabled(false);
-            this.configure.setEnabled(false);
-            this.autoconfiguration.setEnabled(false);
-            this.ip.setEnabled(false);
-            this.subnet.setEnabled(false);
-            this.gateway.setEnabled(false);
-            this.dns.setEnabled(false);
-            this.privacy.setEnabled(false);
-            break;
-        case MODEM:
-            this.configure.setEnabled(false);
-            this.configure.setSelectedIndex(0);
-            this.ip.setEnabled(false);
-            this.subnet.setEnabled(false);
-            this.gateway.setEnabled(false);
-            break;
-        case WIFI:
-            break;
-        default:
-            break;
-
+            case ETHERNET:
+                break;
+            case LOOPBACK:
+                this.status.setEnabled(false);
+                this.priority.setEnabled(false);
+                this.configure.setEnabled(false);
+                this.autoconfiguration.setEnabled(false);
+                this.ip.setEnabled(false);
+                this.subnet.setEnabled(false);
+                this.gateway.setEnabled(false);
+                this.dns.setEnabled(false);
+                this.privacy.setEnabled(false);
+                break;
+            case MODEM:
+                this.configure.setEnabled(false);
+                this.configure.setSelectedIndex(0);
+                this.ip.setEnabled(false);
+                this.subnet.setEnabled(false);
+                this.gateway.setEnabled(false);
+                break;
+            case WIFI:
+                break;
+            default:
+                break;
         }
     }
 
@@ -570,7 +606,8 @@ public class TabIp6Ui extends Composite implements NetworkTab {
         }
 
         // Show read-only dns field when there are no custom DNS entries
-        this.dnsRead.setVisible(this.dns.getValue() == null || this.dns.getValue().isEmpty());
+        this.dnsRead.setVisible(
+                this.dns.getValue() == null || this.dns.getValue().isEmpty());
     }
 
     @Override
@@ -731,7 +768,8 @@ public class TabIp6Ui extends Composite implements NetworkTab {
         }
 
         for (int i = 0; i < this.autoconfiguration.getItemCount(); i++) {
-            if (this.autoconfiguration.getValue(i)
+            if (this.autoconfiguration
+                    .getValue(i)
                     .equals(this.selectedNetIfConfig.get().getIpv6AutoconfigurationMode())) {
                 this.autoconfiguration.setSelectedIndex(i);
                 break;
@@ -751,7 +789,8 @@ public class TabIp6Ui extends Composite implements NetworkTab {
         }
 
         if (this.selectedNetIfConfig.get().getIpv6DnsServers() != null) {
-            String dnsServersUi = this.selectedNetIfConfig.get().getIpv6DnsServers().replace(" ", "\n");
+            String dnsServersUi =
+                    this.selectedNetIfConfig.get().getIpv6DnsServers().replace(" ", "\n");
             this.dns.setValue(dnsServersUi);
         }
 
@@ -770,5 +809,4 @@ public class TabIp6Ui extends Composite implements NetworkTab {
     public void clear() {
         // Not needed
     }
-
 }

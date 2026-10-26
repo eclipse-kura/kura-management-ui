@@ -1,12 +1,12 @@
 /*******************************************************************************
- * Copyright (c) 2016, 2020 Eurotech and/or its affiliates and others
- * 
+ * Copyright (c) 2016, 2026 Eurotech and/or its affiliates and others
+ *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
  * which is available at https://www.eclipse.org/legal/epl-2.0/
- * 
+ *
  * SPDX-License-Identifier: EPL-2.0
- * 
+ *
  * Contributors:
  *  Eurotech
  *******************************************************************************/
@@ -14,11 +14,12 @@ package org.eclipse.kura.web.server.util;
 
 import static org.eclipse.kura.configuration.ConfigurationService.KURA_SERVICE_PID;
 
+import com.eclipsesource.json.Json;
+import com.eclipsesource.json.JsonObject;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 import org.eclipse.kura.KuraErrorCode;
 import org.eclipse.kura.KuraRuntimeException;
 import org.eclipse.kura.web.shared.GwtKuraException;
@@ -32,9 +33,6 @@ import org.osgi.framework.FrameworkUtil;
 import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.framework.ServiceReference;
 import org.osgi.service.cm.ConfigurationAdmin;
-
-import com.eclipsesource.json.Json;
-import com.eclipsesource.json.JsonObject;
 
 /**
  * The Class GwtWireGraphServiceUtil.
@@ -56,7 +54,8 @@ public final class GwtWireGraphServiceUtil {
      * @return the driver by PID
      */
     public static String getDriverByPid(final String pid) {
-        final BundleContext context = FrameworkUtil.getBundle(GwtWireGraphServiceUtil.class).getBundleContext();
+        final BundleContext context =
+                FrameworkUtil.getBundle(GwtWireGraphServiceUtil.class).getBundleContext();
         final ServiceReference<?>[] refs = getServiceReferences(context, WireComponent.class.getName(), null);
         for (final ServiceReference<?> ref : refs) {
             if (ref.getProperty(KURA_SERVICE_PID).equals(pid)) {
@@ -76,7 +75,8 @@ public final class GwtWireGraphServiceUtil {
      * @return the factory PID
      */
     public static String getFactoryPid(final String pid) {
-        final BundleContext context = FrameworkUtil.getBundle(GwtWireGraphServiceUtil.class).getBundleContext();
+        final BundleContext context =
+                FrameworkUtil.getBundle(GwtWireGraphServiceUtil.class).getBundleContext();
         final ServiceReference<?>[] refs = getServiceReferences(context, WireComponent.class.getName(), null);
         for (final ServiceReference<?> ref : refs) {
             if (ref.getProperty(KURA_SERVICE_PID).equals(pid)) {
@@ -98,8 +98,8 @@ public final class GwtWireGraphServiceUtil {
      *            valid OSGi filter (can be <code>null</code>)
      * @return non-<code>null</code> array of references to matching services
      */
-    public static ServiceReference<?>[] getServiceReferences(final BundleContext bundleContext, final String clazz,
-            final String filter) {
+    public static ServiceReference<?>[] getServiceReferences(
+            final BundleContext bundleContext, final String clazz, final String filter) {
         try {
             final ServiceReference<?>[] refs = bundleContext.getServiceReferences(clazz, filter);
             return refs == null ? new ServiceReference[0] : refs;
@@ -116,7 +116,8 @@ public final class GwtWireGraphServiceUtil {
      * @return the type
      */
     public static String getType(final String pid) {
-        final BundleContext context = FrameworkUtil.getBundle(GwtWireGraphServiceUtil.class).getBundleContext();
+        final BundleContext context =
+                FrameworkUtil.getBundle(GwtWireGraphServiceUtil.class).getBundleContext();
         final ServiceReference<?>[] refs = getServiceReferences(context, WireComponent.class.getName(), null);
         for (final ServiceReference<?> ref : refs) {
             WireComponent wc;
@@ -157,7 +158,8 @@ public final class GwtWireGraphServiceUtil {
     public static List<String> getWireComponents() throws GwtKuraException {
         final WireHelperService helperService = ServiceLocator.getInstance().getService(WireHelperService.class);
         final List<String> list = new ArrayList<>();
-        final BundleContext context = FrameworkUtil.getBundle(GwtWireGraphServiceUtil.class).getBundleContext();
+        final BundleContext context =
+                FrameworkUtil.getBundle(GwtWireGraphServiceUtil.class).getBundleContext();
         final ServiceReference<?>[] refs = getServiceReferences(context, WireComponent.class.getName(), null);
         for (final ServiceReference<?> ref : refs) {
             final WireComponent wc = (WireComponent) context.getService(ref);
@@ -252,5 +254,4 @@ public final class GwtWireGraphServiceUtil {
             return this.driverPid;
         }
     }
-
 }

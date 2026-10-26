@@ -16,6 +16,10 @@ package org.eclipse.kura.web;
 import static java.util.Objects.isNull;
 import static org.eclipse.kura.web.session.SecurityHandler.chain;
 
+import jakarta.servlet.Servlet;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSession;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -27,7 +31,6 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.concurrent.atomic.AtomicReference;
-
 import org.eclipse.kura.KuraException;
 import org.eclipse.kura.audit.AuditConstants;
 import org.eclipse.kura.audit.AuditContext;
@@ -100,15 +103,16 @@ import org.osgi.service.servlet.whiteboard.HttpWhiteboardConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import jakarta.servlet.Servlet;
-import jakarta.servlet.http.HttpServlet;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpSession;
-
-@Component(name = "org.eclipse.kura.web.Console", immediate = true, service = SelfConfiguringComponent.class,
-        configurationPolicy = ConfigurationPolicy.OPTIONAL, property = {
-                "service.pid=org.eclipse.kura.web.Console", "kura.service.pid=org.eclipse.kura.web.Console",
-                "kura.ui.service.hide:Boolean=true" })
+@Component(
+        name = "org.eclipse.kura.web.Console",
+        immediate = true,
+        service = SelfConfiguringComponent.class,
+        configurationPolicy = ConfigurationPolicy.OPTIONAL,
+        property = {
+            "service.pid=org.eclipse.kura.web.Console",
+            "kura.service.pid=org.eclipse.kura.web.Console",
+            "kura.ui.service.hide:Boolean=true"
+        })
 public class Console implements SelfConfiguringComponent {
 
     private static final String SESSION_CONTEXT_NAME_PREFIX = "sessionContext-";
@@ -140,8 +144,8 @@ public class Console implements SelfConfiguringComponent {
     private ComponentContext componentContext;
 
     private SystemService systemService;
-    private final AtomicReference<Optional<SslManagerService>> sslManagerService = new AtomicReference<>(
-            Optional.empty());
+    private final AtomicReference<Optional<SslManagerService>> sslManagerService =
+            new AtomicReference<>(Optional.empty());
 
     private IdentityService identityService;
 
@@ -154,8 +158,8 @@ public class Console implements SelfConfiguringComponent {
     private final Set<ServiceRegistration<ResourcesService>> resources = new CopyOnWriteArraySet<>();
     private final Set<ServiceRegistration<Servlet>> servlets = new CopyOnWriteArraySet<>();
 
-    private final Set<String> authenticationPaths = new HashSet<>(
-            Arrays.asList(AUTH_PATH, PASSWORD_AUTH_PATH, CERT_AUTH_PATH));
+    private final Set<String> authenticationPaths =
+            new HashSet<>(Arrays.asList(AUTH_PATH, PASSWORD_AUTH_PATH, CERT_AUTH_PATH));
 
     private BundleContext bundleContext;
 
@@ -169,8 +173,11 @@ public class Console implements SelfConfiguringComponent {
     //
     // ----------------------------------------------------------------
 
-    @Reference(name = "SslManagerService", cardinality = ReferenceCardinality.OPTIONAL,
-            policy = ReferencePolicy.DYNAMIC, unbind = "unsetSslManagerService")
+    @Reference(
+            name = "SslManagerService",
+            cardinality = ReferenceCardinality.OPTIONAL,
+            policy = ReferencePolicy.DYNAMIC,
+            unbind = "unsetSslManagerService")
     public void setSslManagerService(SslManagerService sslManagerService) {
         this.sslManagerService.set(Optional.of(sslManagerService));
     }
@@ -216,8 +223,10 @@ public class Console implements SelfConfiguringComponent {
 
         setInstance(this);
         try {
-            setConsoleOptions(properties == null ? ConsoleOptions.defaultConfiguration()
-                    : ConsoleOptions.fromProperties(properties));
+            setConsoleOptions(
+                    properties == null
+                            ? ConsoleOptions.defaultConfiguration()
+                            : ConsoleOptions.fromProperties(properties));
         } catch (final Exception e) {
             logger.warn("failed to build console options", e);
             return;
@@ -268,7 +277,8 @@ public class Console implements SelfConfiguringComponent {
 
         ConsoleOptions newOptions;
         try {
-            newOptions = properties == null ? ConsoleOptions.defaultConfiguration()
+            newOptions = properties == null
+                    ? ConsoleOptions.defaultConfiguration()
                     : ConsoleOptions.fromProperties(properties);
         } catch (final Exception e) {
             logger.warn("failed to build console options", e);
@@ -295,7 +305,6 @@ public class Console implements SelfConfiguringComponent {
         setSessionMaxInactiveInterval(options.getSessionMaxInactivityInterval());
 
         initResourcesAndServlets();
-
     }
 
     @Deactivate
@@ -323,7 +332,6 @@ public class Console implements SelfConfiguringComponent {
         this.contexts.clear();
         this.resources.clear();
         this.servlets.clear();
-
     }
 
     public String setAuthenticated(final HttpSession session, final String user, final AuditContext context) {
@@ -346,8 +354,8 @@ public class Console implements SelfConfiguringComponent {
         final String requestIp = req.getRemoteAddr();
         final String xForwardedFor = req.getHeader("X-FORWARDED-FOR");
 
-        final Object rawAuditContext = session != null ? session.getAttribute(Attributes.AUDIT_CONTEXT.getValue())
-                : null;
+        final Object rawAuditContext =
+                session != null ? session.getAttribute(Attributes.AUDIT_CONTEXT.getValue()) : null;
 
         final AuditContext auditContext;
 
@@ -435,7 +443,6 @@ public class Console implements SelfConfiguringComponent {
         if (sessionAuditContext instanceof AuditContext auditContext) {
             auditContext.getProperties().put("session.id", id);
         }
-
     }
 
     private SecurityHandler createSessionHandlerChain() {
@@ -450,21 +457,21 @@ public class Console implements SelfConfiguringComponent {
         // default session handler requires an authenticated session and handles session
         // expiration, handles session
         // lock
-        final SecurityHandler defaultHandler = chain(baseHandler, sessionAuthHandler, sessionLockedSecurityHandler,
-                sessionExpirationHandler);
+        final SecurityHandler defaultHandler =
+                chain(baseHandler, sessionAuthHandler, sessionLockedSecurityHandler, sessionExpirationHandler);
 
-        final RoutingSecurityHandler routingHandler = new RoutingSecurityHandler(
-                defaultHandler.sendErrorOnFailure(401));
+        final RoutingSecurityHandler routingHandler =
+                new RoutingSecurityHandler(defaultHandler.sendErrorOnFailure(401));
 
         // exception on authentication paths, allow access without authentication but
         // create a session
-        routingHandler.addRouteHandler(this.authenticationPaths::contains,
-                chain(baseHandler, new CreateSessionSecurityHandler()));
+        routingHandler.addRouteHandler(
+                this.authenticationPaths::contains, chain(baseHandler, new CreateSessionSecurityHandler()));
 
         // exception on event paths, activity on these paths does not count towards
         // session expiration
-        routingHandler.addRouteHandler(eventPaths::contains,
-                chain(baseHandler, sessionAuthHandler).sendErrorOnFailure(401));
+        routingHandler.addRouteHandler(
+                eventPaths::contains, chain(baseHandler, sessionAuthHandler).sendErrorOnFailure(401));
 
         // exception on admin console path, redirect to login page on failure instead of
         // sending 401 status
@@ -500,83 +507,154 @@ public class Console implements SelfConfiguringComponent {
         registerResources(AUTH_PATH, "www/auth.html", new AuthorizationResources(), sessionContextName);
         registerResources(CONSOLE_PATH, "www/denali.html", new ConsoleResources(), sessionContextName);
 
-        registerServlet("gwtLoginInfoService", LOGIN_MODULE_PATH + "/loginInfo", new GwtLoginInfoServiceImpl(),
+        registerServlet(
+                "gwtLoginInfoService",
+                LOGIN_MODULE_PATH + "/loginInfo",
+                new GwtLoginInfoServiceImpl(),
                 resourceContextName);
 
         registerServlet("redirectServlet", "/", new RedirectServlet("/"::equals, this.appRoot), resourceContextName);
 
-        registerServlet("notFoundAuthResourceServlet", AUTH_RESOURCE_PATH, new SendStatusServlet(404),
+        registerServlet(
+                "notFoundAuthResourceServlet", AUTH_RESOURCE_PATH, new SendStatusServlet(404), resourceContextName);
+        registerServlet(
+                "notFoundConsoleResourceServlet",
+                CONSOLE_RESOURCE_PATH,
+                new SendStatusServlet(404),
                 resourceContextName);
-        registerServlet("notFoundConsoleResourceServlet", CONSOLE_RESOURCE_PATH, new SendStatusServlet(404),
-                resourceContextName);
 
-        registerServlet("gwtPasswordAuthenticationService", PASSWORD_AUTH_PATH,
-                new GwtPasswordAuthenticationServiceImpl(this.userManager, CONSOLE_PATH), sessionContextName);
-        registerServlet("sslAuthenticationServlet", CERT_AUTH_PATH,
-                new SslAuthenticationServlet(CONSOLE_PATH, this.userManager), sessionContextName);
+        registerServlet(
+                "gwtPasswordAuthenticationService",
+                PASSWORD_AUTH_PATH,
+                new GwtPasswordAuthenticationServiceImpl(this.userManager, CONSOLE_PATH),
+                sessionContextName);
+        registerServlet(
+                "sslAuthenticationServlet",
+                CERT_AUTH_PATH,
+                new SslAuthenticationServlet(CONSOLE_PATH, this.userManager),
+                sessionContextName);
 
-        registerServlet("gwtKeystoreServiceImpl", DENALI_MODULE_PATH + "/keystore", new GwtKeystoreServiceImpl(),
+        registerServlet(
+                "gwtKeystoreServiceImpl",
+                DENALI_MODULE_PATH + "/keystore",
+                new GwtKeystoreServiceImpl(),
                 sessionContextName);
-        registerServlet("gwtSslManagerServiceImpl", DENALI_MODULE_PATH + "/ssl", new GwtSslManagerServiceImpl(),
+        registerServlet(
+                "gwtSslManagerServiceImpl",
+                DENALI_MODULE_PATH + "/ssl",
+                new GwtSslManagerServiceImpl(),
                 sessionContextName);
 
-        registerServlet("denaliSessionService", DENALI_MODULE_PATH + SESSION,
-                new GwtSessionServiceImpl(this.userManager), sessionContextName);
+        registerServlet(
+                "denaliSessionService",
+                DENALI_MODULE_PATH + SESSION,
+                new GwtSessionServiceImpl(this.userManager),
+                sessionContextName);
 
-        registerServlet("loginSessionService", LOGIN_MODULE_PATH + SESSION, new GwtSessionServiceImpl(this.userManager),
+        registerServlet(
+                "loginSessionService",
+                LOGIN_MODULE_PATH + SESSION,
+                new GwtSessionServiceImpl(this.userManager),
                 sessionContextName);
-        registerServlet("xsrfLoginServlet", LOGIN_MODULE_PATH + XSRF_PATH, new GwtSecurityTokenServiceImpl(),
+        registerServlet(
+                "xsrfLoginServlet",
+                LOGIN_MODULE_PATH + XSRF_PATH,
+                new GwtSecurityTokenServiceImpl(),
                 sessionContextName);
-        registerServlet("xsrfDenaliServlet", DENALI_MODULE_PATH + XSRF_PATH, new GwtSecurityTokenServiceImpl(),
+        registerServlet(
+                "xsrfDenaliServlet",
+                DENALI_MODULE_PATH + XSRF_PATH,
+                new GwtSecurityTokenServiceImpl(),
                 sessionContextName);
-        registerServlet("statusService", DENALI_MODULE_PATH + "/status", new GwtStatusServiceImpl(),
-                sessionContextName);
-        registerServlet("deviceService", DENALI_MODULE_PATH + "/device", new GwtDeviceServiceImpl(supportedFeatures),
+        registerServlet(
+                "statusService", DENALI_MODULE_PATH + "/status", new GwtStatusServiceImpl(), sessionContextName);
+        registerServlet(
+                "deviceService",
+                DENALI_MODULE_PATH + "/device",
+                new GwtDeviceServiceImpl(supportedFeatures),
                 sessionContextName);
         registerServlet("logService", DENALI_MODULE_PATH + "/logservice", new GwtLogServiceImpl(), sessionContextName);
-        registerServlet("networkService", DENALI_MODULE_PATH + "/network", new GwtNetworkServiceImpl(),
-                sessionContextName);
-        registerServlet("componentService", DENALI_MODULE_PATH + "/component", new GwtComponentServiceImpl(),
-                sessionContextName);
-        if (supportedFeatures.isPackagesServiceAvailable()) {
-                registerServlet("packageService", DENALI_MODULE_PATH + "/package",
-                    new GwtPackageServiceImpl(this.sslManagerService::get), sessionContextName);
-        }
-        registerServlet("snapshotServiceImpl", DENALI_MODULE_PATH + "/snapshot", new GwtSnapshotServiceImpl(),
-                sessionContextName);
-        registerServlet("certificateService", DENALI_MODULE_PATH + "/certificate", new GwtCertificatesServiceImpl(),
-                sessionContextName);
-        registerServlet("securityService", DENALI_MODULE_PATH + "/security", new GwtSecurityServiceImpl(),
-                sessionContextName);
-        registerServlet("usersService", DENALI_MODULE_PATH + "/users", new GwtUserServiceImpl(this.userManager),
+        registerServlet(
+                "networkService", DENALI_MODULE_PATH + "/network", new GwtNetworkServiceImpl(), sessionContextName);
+        registerServlet(
+                "componentService",
+                DENALI_MODULE_PATH + "/component",
+                new GwtComponentServiceImpl(),
                 sessionContextName);
         if (supportedFeatures.isPackagesServiceAvailable()) {
-                registerServlet("packagesExtendedFileServlet", DENALI_MODULE_PATH + "/file/*",
-                    new PackagesExtendedFileServlet(supportedFeatures),
-                        sessionContextName);
-        } else {
-                registerServlet("fileServlet", DENALI_MODULE_PATH + "/file/*", new FileServlet(supportedFeatures),
+            registerServlet(
+                    "packageService",
+                    DENALI_MODULE_PATH + "/package",
+                    new GwtPackageServiceImpl(this.sslManagerService::get),
                     sessionContextName);
         }
-        registerServlet("deviceSnapshotsServlet", DENALI_MODULE_PATH + "/device_snapshots",
-                new DeviceSnapshotsServlet(), sessionContextName);
+        registerServlet(
+                "snapshotServiceImpl",
+                DENALI_MODULE_PATH + "/snapshot",
+                new GwtSnapshotServiceImpl(),
+                sessionContextName);
+        registerServlet(
+                "certificateService",
+                DENALI_MODULE_PATH + "/certificate",
+                new GwtCertificatesServiceImpl(),
+                sessionContextName);
+        registerServlet(
+                "securityService", DENALI_MODULE_PATH + "/security", new GwtSecurityServiceImpl(), sessionContextName);
+        registerServlet(
+                "usersService",
+                DENALI_MODULE_PATH + "/users",
+                new GwtUserServiceImpl(this.userManager),
+                sessionContextName);
+        if (supportedFeatures.isPackagesServiceAvailable()) {
+            registerServlet(
+                    "packagesExtendedFileServlet",
+                    DENALI_MODULE_PATH + "/file/*",
+                    new PackagesExtendedFileServlet(supportedFeatures),
+                    sessionContextName);
+        } else {
+            registerServlet(
+                    "fileServlet",
+                    DENALI_MODULE_PATH + "/file/*",
+                    new FileServlet(supportedFeatures),
+                    sessionContextName);
+        }
+        registerServlet(
+                "deviceSnapshotsServlet",
+                DENALI_MODULE_PATH + "/device_snapshots",
+                new DeviceSnapshotsServlet(),
+                sessionContextName);
         if (supportedFeatures.isAssetAvailable()) {
-            registerServlet("channelServlet", DENALI_MODULE_PATH + "/assetsUpDownload", new ChannelServlet(),
+            registerServlet(
+                    "channelServlet",
+                    DENALI_MODULE_PATH + "/assetsUpDownload",
+                    new ChannelServlet(),
                     sessionContextName);
         }
         registerServlet("logServlet", DENALI_MODULE_PATH + "/log", new LogServlet(), sessionContextName);
         registerServlet("skinServlet", DENALI_MODULE_PATH + "/skin/*", new SkinServlet(), resourceContextName);
-        registerServlet("cloudServices", DENALI_MODULE_PATH + "/cloudservices", new GwtCloudConnectionServiceImpl(),
+        registerServlet(
+                "cloudServices",
+                DENALI_MODULE_PATH + "/cloudservices",
+                new GwtCloudConnectionServiceImpl(),
                 sessionContextName);
         if (supportedFeatures.areWiresServicesAvailable()) {
-            registerServlet("wireGraphService", DENALI_MODULE_PATH + "/wires",
-                    new GwtWireGraphServiceImpl(supportedFeatures), sessionContextName);
-            registerServlet("wiresSnapshotServlet", DENALI_MODULE_PATH + "/wiresSnapshot", new WiresSnapshotServlet(),
+            registerServlet(
+                    "wireGraphService",
+                    DENALI_MODULE_PATH + "/wires",
+                    new GwtWireGraphServiceImpl(supportedFeatures),
+                    sessionContextName);
+            registerServlet(
+                    "wiresSnapshotServlet",
+                    DENALI_MODULE_PATH + "/wiresSnapshot",
+                    new WiresSnapshotServlet(),
                     sessionContextName);
         }
         if (supportedFeatures.areDriverServicesAvailable()) {
-            registerServlet("driverAndAssetService", DENALI_MODULE_PATH + "/assetservices",
-                    new GwtDriverAndAssetServiceImpl(supportedFeatures), sessionContextName);
+            registerServlet(
+                    "driverAndAssetService",
+                    DENALI_MODULE_PATH + "/assetservices",
+                    new GwtDriverAndAssetServiceImpl(supportedFeatures),
+                    sessionContextName);
         }
         registerServlet("wiresBlinkService", ADMIN_ROOT + "/sse", this.wiresBlinkService, sessionContextName);
         registerServlet("eventService", DENALI_MODULE_PATH + EVENT_PATH, this.eventService, sessionContextName);
@@ -584,76 +662,82 @@ public class Console implements SelfConfiguringComponent {
         this.eventService.start();
     }
 
-    private void registerContextHelper(String contextName, String contextPath, ServletContextHelper contextHelper,
-            int ranking) {
+    private void registerContextHelper(
+            String contextName, String contextPath, ServletContextHelper contextHelper, int ranking) {
         Map<String, Object> props = new HashMap<>();
 
         props.put(HttpWhiteboardConstants.HTTP_WHITEBOARD_CONTEXT_NAME, contextName);
         props.put(HttpWhiteboardConstants.HTTP_WHITEBOARD_CONTEXT_PATH, contextPath);
         props.put(Constants.SERVICE_RANKING, ranking);
 
-        ServiceRegistration<ServletContextHelper> contextService = this.bundleContext
-                .registerService(ServletContextHelper.class, contextHelper, new Hashtable<>(props));
+        ServiceRegistration<ServletContextHelper> contextService =
+                this.bundleContext.registerService(ServletContextHelper.class, contextHelper, new Hashtable<>(props));
 
         this.contexts.add(contextService);
 
-        logger.debug("registered context helper with id: {} , name: {} , path {}", //
-                contextService.getReference().getProperty(Constants.SERVICE_ID), contextName, contextPath);
+        logger.debug(
+                "registered context helper with id: {} , name: {} , path {}", //
+                contextService.getReference().getProperty(Constants.SERVICE_ID),
+                contextName,
+                contextPath);
     }
 
-    private void registerResources(String pattern, String prefix, ResourcesService resourcesService,
-            String contextHelperName) {
+    private void registerResources(
+            String pattern, String prefix, ResourcesService resourcesService, String contextHelperName) {
         Map<String, Object> props = new HashMap<>();
 
-        String contextHelperSelector = "(" + HttpWhiteboardConstants.HTTP_WHITEBOARD_CONTEXT_NAME + "="
-                + contextHelperName + ")";
+        String contextHelperSelector =
+                "(" + HttpWhiteboardConstants.HTTP_WHITEBOARD_CONTEXT_NAME + "=" + contextHelperName + ")";
 
         props.put(HttpWhiteboardConstants.HTTP_WHITEBOARD_RESOURCE_PATTERN, pattern);
         props.put(HttpWhiteboardConstants.HTTP_WHITEBOARD_RESOURCE_PREFIX, prefix);
         props.put(HttpWhiteboardConstants.HTTP_WHITEBOARD_CONTEXT_SELECT, contextHelperSelector);
 
-        ServiceRegistration<ResourcesService> resourcesS = this.bundleContext.registerService(ResourcesService.class,
-                resourcesService, new Hashtable<>(props));
+        ServiceRegistration<ResourcesService> resourcesS =
+                this.bundleContext.registerService(ResourcesService.class, resourcesService, new Hashtable<>(props));
 
         this.resources.add(resourcesS);
 
-        logger.debug("registered resource with id: {} , pattern: {} , prefix {} , contextHelper {}", //
-                resourcesS.getReference().getProperty(Constants.SERVICE_ID), pattern, prefix, contextHelperSelector);
+        logger.debug(
+                "registered resource with id: {} , pattern: {} , prefix {} , contextHelper {}", //
+                resourcesS.getReference().getProperty(Constants.SERVICE_ID),
+                pattern,
+                prefix,
+                contextHelperSelector);
     }
 
-    private void registerServlet(String servletName, String servletPattern, HttpServlet servlet,
-            String contextHelperName) {
+    private void registerServlet(
+            String servletName, String servletPattern, HttpServlet servlet, String contextHelperName) {
 
         Map<String, String> props = new HashMap<>();
 
-        String contextHelperSelector = "(" + HttpWhiteboardConstants.HTTP_WHITEBOARD_CONTEXT_NAME + "="
-                + contextHelperName + ")";
+        String contextHelperSelector =
+                "(" + HttpWhiteboardConstants.HTTP_WHITEBOARD_CONTEXT_NAME + "=" + contextHelperName + ")";
 
         props.put(HttpWhiteboardConstants.HTTP_WHITEBOARD_SERVLET_NAME, servletName);
         props.put(HttpWhiteboardConstants.HTTP_WHITEBOARD_SERVLET_PATTERN, servletPattern);
         props.put(HttpWhiteboardConstants.HTTP_WHITEBOARD_CONTEXT_SELECT, contextHelperSelector);
 
-        ServiceRegistration<Servlet> servletService = this.bundleContext.registerService(Servlet.class, servlet,
-                new Hashtable<>(props));
+        ServiceRegistration<Servlet> servletService =
+                this.bundleContext.registerService(Servlet.class, servlet, new Hashtable<>(props));
 
         this.servlets.add(servletService);
 
-        logger.debug("registered servlet with id: {} , name: {} , pattern {} , contextHelper {}", //
-                servletService.getReference().getProperty(Constants.SERVICE_ID), servletName, servletPattern,
+        logger.debug(
+                "registered servlet with id: {} , name: {} , pattern {} , contextHelper {}", //
+                servletService.getReference().getProperty(Constants.SERVICE_ID),
+                servletName,
+                servletPattern,
                 contextHelperSelector);
     }
 
-    public interface ResourcesService {
-    }
+    public interface ResourcesService {}
 
-    public class AdminResources implements ResourcesService {
-    }
+    public class AdminResources implements ResourcesService {}
 
-    public class AuthorizationResources implements ResourcesService {
-    }
+    public class AuthorizationResources implements ResourcesService {}
 
-    public class ConsoleResources implements ResourcesService {
-    }
+    public class ConsoleResources implements ResourcesService {}
 
     public Set<String> getBuiltinAuthenticationMethods() {
         return new HashSet<>(Arrays.asList("Certificate", "Password"));
@@ -671,5 +755,4 @@ public class Console implements SelfConfiguringComponent {
     public ComponentConfiguration getConfiguration() throws KuraException {
         return consoleOptions.getConfiguration();
     }
-
 }

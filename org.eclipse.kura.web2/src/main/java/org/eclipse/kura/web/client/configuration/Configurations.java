@@ -1,12 +1,12 @@
 /*******************************************************************************
- * Copyright (c) 2017, 2020 Eurotech and/or its affiliates and others
- * 
+ * Copyright (c) 2017, 2026 Eurotech and/or its affiliates and others
+ *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
  * which is available at https://www.eclipse.org/legal/epl-2.0/
- * 
+ *
  * SPDX-License-Identifier: EPL-2.0
- * 
+ *
  * Contributors:
  *  Eurotech
  *******************************************************************************/
@@ -20,7 +20,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
-
 import org.eclipse.kura.web.client.ui.drivers.assets.AssetModel;
 import org.eclipse.kura.web.client.ui.drivers.assets.AssetModelImpl;
 import org.eclipse.kura.web.client.util.ValidationUtil;
@@ -46,8 +45,8 @@ public class Configurations {
         return this.currentConfigurations.get(pid);
     }
 
-    private GwtConfigComponent createConfigurationFromDefinition(String pid, String factoryPid,
-            GwtConfigComponent definition) {
+    private GwtConfigComponent createConfigurationFromDefinition(
+            String pid, String factoryPid, GwtConfigComponent definition) {
         final GwtConfigComponent cloned = new GwtConfigComponent(definition);
         cloned.setComponentId(pid);
         cloned.setFactoryPid(factoryPid);
@@ -118,7 +117,8 @@ public class Configurations {
     public void deleteConfiguration(String pid) {
         this.allActivePids.remove(pid);
 
-        if (!WIRE_ASSET_PID.equals(this.currentConfigurations.get(pid).getConfiguration().getFactoryId())) {
+        if (!WIRE_ASSET_PID.equals(
+                this.currentConfigurations.get(pid).getConfiguration().getFactoryId())) {
             this.currentConfigurations.remove(pid);
         }
     }
@@ -222,8 +222,8 @@ public class Configurations {
     }
 
     public void invalidateConfiguration(String pid) {
-        this.currentConfigurations.computeIfPresent(pid,
-                (p, configuration) -> new InvalidConfigurationWrapper(configuration));
+        this.currentConfigurations.computeIfPresent(
+                pid, (p, configuration) -> new InvalidConfigurationWrapper(configuration));
     }
 
     private class ConfigurationWrapper implements HasConfiguration {
@@ -271,8 +271,8 @@ public class Configurations {
                 return false;
             }
 
-            final AssetModel assetModelImpl = new AssetModelImpl(configuration, driverDescriptor,
-                    baseChannelDescriptor);
+            final AssetModel assetModelImpl =
+                    new AssetModelImpl(configuration, driverDescriptor, baseChannelDescriptor);
 
             return assetModelImpl.isValid();
         }

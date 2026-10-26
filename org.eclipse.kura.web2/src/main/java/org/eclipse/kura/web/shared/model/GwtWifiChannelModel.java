@@ -1,12 +1,12 @@
 /*******************************************************************************
- * Copyright (c) 2011, 2021 Eurotech and/or its affiliates and others
- * 
+ * Copyright (c) 2011, 2026 Eurotech and/or its affiliates and others
+ *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
  * which is available at https://www.eclipse.org/legal/epl-2.0/
- * 
+ *
  * SPDX-License-Identifier: EPL-2.0
- * 
+ *
  * Contributors:
  *  Eurotech
  *******************************************************************************/
@@ -24,9 +24,7 @@ public class GwtWifiChannelModel extends GwtBaseModel {
 
     private static final int FIRST_5000MHZ_CHANNEL = 32;
 
-    public GwtWifiChannelModel() {
-
-    }
+    public GwtWifiChannelModel() {}
 
     public GwtWifiChannelModel(int channel, int frequency) {
 
@@ -36,10 +34,8 @@ public class GwtWifiChannelModel extends GwtBaseModel {
 
         String band = null;
 
-        if (channel >= FIRST_2400MHZ_CHANNEL && channel <= LAST_2400MHZ_CHANNEL)
-            band = BAND2400MHZ;
-        else if (channel >= FIRST_5000MHZ_CHANNEL)
-            band = BAND5000MHZ;
+        if (channel >= FIRST_2400MHZ_CHANNEL && channel <= LAST_2400MHZ_CHANNEL) band = BAND2400MHZ;
+        else if (channel >= FIRST_5000MHZ_CHANNEL) band = BAND5000MHZ;
 
         set("band", band);
     }
@@ -78,5 +74,4 @@ public class GwtWifiChannelModel extends GwtBaseModel {
         sb.append(channel);
         return sb.toString();
     }
-
 }

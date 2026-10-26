@@ -1,12 +1,12 @@
 /*******************************************************************************
  * Copyright (c) 2011, 2026 Eurotech and/or its affiliates and others
- * 
+ *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
  * which is available at https://www.eclipse.org/legal/epl-2.0/
- * 
+ *
  * SPDX-License-Identifier: EPL-2.0
- * 
+ *
  * Contributors:
  *  Eurotech
  *******************************************************************************/
@@ -16,7 +16,6 @@ package org.eclipse.kura.web.shared.model;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
-
 import org.eclipse.kura.web.shared.IdHelper;
 
 public class GwtConfigComponent extends KuraBaseModel implements Serializable {
@@ -24,7 +23,7 @@ public class GwtConfigComponent extends KuraBaseModel implements Serializable {
     private static final long serialVersionUID = -6388356998309026758L;
 
     private List<GwtConfigParameter> parameters;
-    
+
     public GwtConfigComponent() {
         this.parameters = new ArrayList<GwtConfigParameter>();
     }
@@ -141,15 +140,13 @@ public class GwtConfigComponent extends KuraBaseModel implements Serializable {
     }
 
     public String getOCDComponentHeader() {
-    	
-    	if (this.get("factoryPid") != null) {
-    		return IdHelper.getLastIdComponent(this.get("factoryPid") 
-    				+ " - " + this.get("componentName"));
-    	} else if (this.get("componentId") != null) {
-    		return IdHelper.getLastIdComponent(this.get("componentId")) 
-    				+ " - " + this.get("componentName");
-    	}
-    	
-    	return this.get("componentName");
+
+        if (this.get("factoryPid") != null) {
+            return IdHelper.getLastIdComponent(this.get("factoryPid") + " - " + this.get("componentName"));
+        } else if (this.get("componentId") != null) {
+            return IdHelper.getLastIdComponent(this.get("componentId")) + " - " + this.get("componentName");
+        }
+
+        return this.get("componentName");
     }
 }

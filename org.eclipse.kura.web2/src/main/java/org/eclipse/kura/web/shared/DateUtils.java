@@ -1,28 +1,25 @@
 /*******************************************************************************
- * Copyright (c) 2011, 2021 Eurotech and/or its affiliates and others
- * 
+ * Copyright (c) 2011, 2026 Eurotech and/or its affiliates and others
+ *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
  * which is available at https://www.eclipse.org/legal/epl-2.0/
- * 
+ *
  * SPDX-License-Identifier: EPL-2.0
- * 
+ *
  * Contributors:
  *  Eurotech
  *******************************************************************************/
 package org.eclipse.kura.web.shared;
 
-import java.util.Date;
-
 import com.google.gwt.i18n.client.DateTimeFormat;
+import java.util.Date;
 
 public class DateUtils {
 
     private static final String YYYY_MM_DD_HH_MM_SS_SSS = "yyyy.MM.dd.HH.mm.ss.SSS";
 
-    private DateUtils() {
-
-    }
+    private DateUtils() {}
 
     /**
      * formatDate takes a date an return its string representation
@@ -154,48 +151,48 @@ public class DateUtils {
         sb.append(dateString.substring(0, 8));
 
         switch (getMonth(date)) {
-        case 0: // Jan
-            sb.append("31");
-            break;
-        case 1: // Feb
-            if (isLeapYear(getYear(date))) {
-                sb.append("29");
-            } else {
-                sb.append("28");
-            }
-            break;
-        case 2: // Mar
-            sb.append("31");
-            break;
-        case 3: // Apr
-            sb.append("30");
-            break;
-        case 4: // May
-            sb.append("31");
-            break;
-        case 5: // June
-            sb.append("30");
-            break;
-        case 6: // July
-            sb.append("31");
-            break;
-        case 7: // August
-            sb.append("31");
-            break;
-        case 8: // Sept
-            sb.append("30");
-            break;
-        case 9: // Oct
-            sb.append("31");
-            break;
-        case 10: // Nov
-            sb.append("30");
-            break;
-        case 11: // Dec
-            sb.append("31");
-            break;
-        default:
-            break;
+            case 0: // Jan
+                sb.append("31");
+                break;
+            case 1: // Feb
+                if (isLeapYear(getYear(date))) {
+                    sb.append("29");
+                } else {
+                    sb.append("28");
+                }
+                break;
+            case 2: // Mar
+                sb.append("31");
+                break;
+            case 3: // Apr
+                sb.append("30");
+                break;
+            case 4: // May
+                sb.append("31");
+                break;
+            case 5: // June
+                sb.append("30");
+                break;
+            case 6: // July
+                sb.append("31");
+                break;
+            case 7: // August
+                sb.append("31");
+                break;
+            case 8: // Sept
+                sb.append("30");
+                break;
+            case 9: // Oct
+                sb.append("31");
+                break;
+            case 10: // Nov
+                sb.append("30");
+                break;
+            case 11: // Dec
+                sb.append("31");
+                break;
+            default:
+                break;
         }
 
         sb.append(dateString.substring(10));

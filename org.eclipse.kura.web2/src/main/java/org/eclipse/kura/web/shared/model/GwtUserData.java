@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2020, 2021 Eurotech and/or its affiliates and others
+ * Copyright (c) 2020, 2026 Eurotech and/or its affiliates and others
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -15,7 +15,6 @@ package org.eclipse.kura.web.shared.model;
 import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
-
 import org.eclipse.kura.web.shared.KuraPermission;
 
 public class GwtUserData extends GwtBaseModel implements Serializable {
@@ -26,8 +25,7 @@ public class GwtUserData extends GwtBaseModel implements Serializable {
     @SuppressWarnings("unused")
     private HashSet<String> unused;
 
-    public GwtUserData() {
-    }
+    public GwtUserData() {}
 
     public GwtUserData(final String userName, final Set<String> permissions) {
         setUserName(userName);
@@ -82,7 +80,8 @@ public class GwtUserData extends GwtBaseModel implements Serializable {
         final int prime = 31;
         int result = 1;
         result = prime * result + (isAdmin() ? 1231 : 1237);
-        result = prime * result + (getPermissions() == null ? 0 : getPermissions().hashCode());
+        result = prime * result
+                + (getPermissions() == null ? 0 : getPermissions().hashCode());
         result = prime * result + (getUserName() == null ? 0 : getUserName().hashCode());
         return result;
     }
@@ -118,5 +117,4 @@ public class GwtUserData extends GwtBaseModel implements Serializable {
         }
         return true;
     }
-
 }

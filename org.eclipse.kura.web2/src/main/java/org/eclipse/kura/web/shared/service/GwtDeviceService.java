@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2011, 2025 Eurotech and/or its affiliates and others
+ * Copyright (c) 2011, 2026 Eurotech and/or its affiliates and others
  *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
@@ -12,8 +12,9 @@
  *******************************************************************************/
 package org.eclipse.kura.web.shared.service;
 
+import com.google.gwt.user.client.rpc.RemoteService;
+import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
 import java.util.List;
-
 import org.eclipse.kura.web.server.Audit;
 import org.eclipse.kura.web.server.RequiredPermissions;
 import org.eclipse.kura.web.server.RequiredPermissions.Mode;
@@ -23,14 +24,13 @@ import org.eclipse.kura.web.shared.model.GwtGroupedNVPair;
 import org.eclipse.kura.web.shared.model.GwtSupportedFeatures;
 import org.eclipse.kura.web.shared.model.GwtXSRFToken;
 
-import com.google.gwt.user.client.rpc.RemoteService;
-import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
-
 @RemoteServiceRelativePath("device")
 @RequiredPermissions(KuraPermission.DEVICE)
 public interface GwtDeviceService extends RemoteService {
 
-    @RequiredPermissions(mode = Mode.ANY, value = { KuraPermission.DEVICE, KuraPermission.NETWORK_ADMIN })
+    @RequiredPermissions(
+            mode = Mode.ANY,
+            value = {KuraPermission.DEVICE, KuraPermission.NETWORK_ADMIN})
     public List<GwtGroupedNVPair> findDeviceConfiguration(GwtXSRFToken xsrfToken) throws GwtKuraException;
 
     public List<GwtGroupedNVPair> findBundles(GwtXSRFToken xsrfToken) throws GwtKuraException;
@@ -69,5 +69,4 @@ public interface GwtDeviceService extends RemoteService {
 
     @Audit(componentName = "UI Device", description = "Delete Container Image")
     public void deleteImage(GwtXSRFToken xsrfToken, String imageId) throws GwtKuraException;
-
 }

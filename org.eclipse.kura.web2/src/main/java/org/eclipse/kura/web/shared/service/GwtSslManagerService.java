@@ -1,25 +1,24 @@
 /*******************************************************************************
- * Copyright (c) 2021 Eurotech and/or its affiliates and others
- * 
+ * Copyright (c) 2021, 2026 Eurotech and/or its affiliates and others
+ *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
  * which is available at https://www.eclipse.org/legal/epl-2.0/
- * 
+ *
  * SPDX-License-Identifier: EPL-2.0
- * 
+ *
  * Contributors:
  *  Eurotech
  *******************************************************************************/
 package org.eclipse.kura.web.shared.service;
 
+import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
 import org.eclipse.kura.web.server.Audit;
 import org.eclipse.kura.web.server.RequiredPermissions;
 import org.eclipse.kura.web.shared.GwtKuraException;
 import org.eclipse.kura.web.shared.KuraPermission;
 import org.eclipse.kura.web.shared.model.GwtConfigComponent;
 import org.eclipse.kura.web.shared.model.GwtXSRFToken;
-
-import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
 
 @RequiredPermissions(KuraPermission.ADMIN)
 @RemoteServiceRelativePath("ssl")

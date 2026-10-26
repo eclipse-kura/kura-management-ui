@@ -132,7 +132,8 @@ public class ScaleOffsetTypeTest {
 
     private void thenThrownMessageContains(String expectedSubstring) {
         String message = this.thrown.getMessage();
-        assertTrue("exception message must name [" + expectedSubstring + "] but was: [" + message + "]",
+        assertTrue(
+                "exception message must name [" + expectedSubstring + "] but was: [" + message + "]",
                 message != null && message.contains(expectedSubstring));
     }
 }

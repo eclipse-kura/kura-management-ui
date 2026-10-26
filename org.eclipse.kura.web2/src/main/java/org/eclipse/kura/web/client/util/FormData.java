@@ -1,16 +1,15 @@
 /*******************************************************************************
- * Copyright (c) 2020 Eurotech and/or its affiliates and others
- * 
+ * Copyright (c) 2020, 2026 Eurotech and/or its affiliates and others
+ *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
  * which is available at https://www.eclipse.org/legal/epl-2.0/
- * 
+ *
  * SPDX-License-Identifier: EPL-2.0
- * 
+ *
  * Contributors:
  *  Eurotech
  *******************************************************************************/
-
 package org.eclipse.kura.web.client.util;
 
 import com.google.gwt.core.client.JavaScriptObject;
@@ -18,26 +17,21 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 
 public class FormData extends JavaScriptObject {
 
-    protected FormData() {
-    }
+    protected FormData() {}
 
-    public static native FormData create()
-    /*-{
+    public static native FormData create() /*-{
         return new FormData()
     }-*/;
 
-    public final native void append(String key, String value)
-    /*-{
+    public final native void append(String key, String value) /*-{
         this.append(key, value)
     }-*/;
 
-    public final native void append(String key, File file)
-    /*-{
+    public final native void append(String key, File file) /*-{
         this.append(key, file)
     }-*/;
 
-    public final native void submit(String relativePath, AsyncCallback<Void> callback)
-    /*-{
+    public final native void submit(String relativePath, AsyncCallback<Void> callback) /*-{
         var request = new XMLHttpRequest()
         request.open("POST", relativePath, true)
         request.onload = function(event) {
@@ -48,7 +42,7 @@ public class FormData extends JavaScriptObject {
               callback.@com.google.gwt.user.client.rpc.AsyncCallback::onFailure(Ljava/lang/Throwable;)(exception)
             }
         }
-    
+
         request.send(this)
     }-*/;
 }

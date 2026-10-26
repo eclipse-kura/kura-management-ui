@@ -1,12 +1,12 @@
 /*******************************************************************************
  * Copyright (c) 2018, 2026 Eurotech and/or its affiliates and others
- * 
+ *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
  * which is available at https://www.eclipse.org/legal/epl-2.0/
- * 
+ *
  * SPDX-License-Identifier: EPL-2.0
- * 
+ *
  * Contributors:
  *  Eurotech
  *******************************************************************************/
@@ -16,6 +16,7 @@ package org.eclipse.kura.web.server.util;
 import static java.lang.String.format;
 import static org.eclipse.kura.configuration.ConfigurationService.KURA_SERVICE_PID;
 
+import jakarta.servlet.ServletException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -28,9 +29,6 @@ import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
-
-import jakarta.servlet.ServletException;
-
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
@@ -64,7 +62,8 @@ public class AssetConfigValidator {
             properties.add(element.getId());
         });
 
-        withDriver(driverPid,
+        withDriver(
+                driverPid,
                 descriptor -> ((List<Tad>) descriptor.getChannelDescriptor().getDescriptor()).forEach(element -> {
                     metatypes.add(element);
                     properties.add(element.getId());
@@ -89,8 +88,9 @@ public class AssetConfigValidator {
         private final List<Tad> adsByIndex;
         private final List<GwtConfigParameter> defaultValues;
 
-        public LineScanner(final List<Tad> fullChannelMetatype, final List<String> columnHeaders,
-                Boolean nullValueAsEmptyString) throws ValidationException {
+        public LineScanner(
+                final List<Tad> fullChannelMetatype, final List<String> columnHeaders, Boolean nullValueAsEmptyString)
+                throws ValidationException {
             this.adsByIndex = probeAdsByIndex(fullChannelMetatype, columnHeaders);
             this.defaultValues = probeDefaultValues(fullChannelMetatype, this.adsByIndex, nullValueAsEmptyString);
         }
@@ -146,7 +146,8 @@ public class AssetConfigValidator {
                 if (header.totalOccurrenceCount == 1) {
                     // we have a single column with the given name, try to associate it with the last matching Driver or
                     // Asset AD
-                    boundAd = findLast(fullChannelMetatype,
+                    boundAd = findLast(
+                            fullChannelMetatype,
                             ad -> ad.getId().equals(header.name) || ad.getId().equals("+" + header.name));
                 } else if (header.totalOccurrenceCount == 2 && header.occurrenceIndex == 0) {
                     // we have two columns with the given name in CSV file, associate the first CSV column with the
@@ -170,8 +171,8 @@ public class AssetConfigValidator {
             return result;
         }
 
-        private List<GwtConfigParameter> probeDefaultValues(final List<Tad> fullChannelMetatype,
-                final List<Tad> boundAds, Boolean nullValueAsEmptyString) {
+        private List<GwtConfigParameter> probeDefaultValues(
+                final List<Tad> fullChannelMetatype, final List<Tad> boundAds, Boolean nullValueAsEmptyString) {
             final List<Tad> missing = fullChannelMetatype.stream()
                     .filter(c -> boundAds.stream().noneMatch(b -> b.getId().equals(c.getId())))
                     .collect(Collectors.toList());
@@ -197,8 +198,11 @@ public class AssetConfigValidator {
             return result;
         }
 
-        public String scan(final CSVRecord line, final Consumer<GwtConfigParameter> parameterConsumer,
-                List<String> errors, Boolean nullValueAsEmptyString) {
+        public String scan(
+                final CSVRecord line,
+                final Consumer<GwtConfigParameter> parameterConsumer,
+                List<String> errors,
+                Boolean nullValueAsEmptyString) {
             String channelName = "";
             boolean errorInChannel = false;
             if (line.size() != adsByIndex.size()) {
@@ -234,8 +238,8 @@ public class AssetConfigValidator {
         }
     }
 
-    public List<GwtConfigParameter> validateCsv(String csv, String driverPid, List<String> errors,
-            Boolean nullValueAsEmptyString) throws ServletException {
+    public List<GwtConfigParameter> validateCsv(
+            String csv, String driverPid, List<String> errors, Boolean nullValueAsEmptyString) throws ServletException {
 
         try (CSVParser parser = CSVParser.parse(csv, CSVFormat.RFC4180)) {
             errors.clear();
@@ -250,8 +254,8 @@ public class AssetConfigValidator {
                 throw new ValidationException();
             }
             this.lineNumber = 1;
-            final List<String> header = StreamSupport.stream(lines.remove(0).spliterator(), false)
-                    .collect(Collectors.toList());
+            final List<String> header =
+                    StreamSupport.stream(lines.remove(0).spliterator(), false).collect(Collectors.toList());
 
             final LineScanner scanner = new LineScanner(fullChannelMetatype, header, nullValueAsEmptyString);
 
@@ -277,7 +281,6 @@ public class AssetConfigValidator {
             errors.add("Validation exception on CSV file.");
             throw new ServletException("Validation exception on CSV file.");
         }
-
     }
 
     private void withDriver(final String kuraServicePid, final ServiceConsumer<Driver> consumer) throws Exception {
@@ -300,13 +303,21 @@ public class AssetConfigValidator {
     }
 
     private String errorString(int lineNumber, Tad field, String value) {
-        return new StringBuilder().append("\"").append(value).append("\" is not a valid value for field ")
-                .append(field.getName()).append(" on line ").append(String.valueOf(lineNumber)).append(".").toString();
+        return new StringBuilder()
+                .append("\"")
+                .append(value)
+                .append("\" is not a valid value for field ")
+                .append(field.getName())
+                .append(" on line ")
+                .append(String.valueOf(lineNumber))
+                .append(".")
+                .toString();
     }
 
     // Validates all the entered values
-    protected Object validate(Tad field, String value, List<String> errors, int lineNumber,
-            Boolean nullValueAsEmptyString) throws ValidationException {
+    protected Object validate(
+            Tad field, String value, List<String> errors, int lineNumber, Boolean nullValueAsEmptyString)
+            throws ValidationException {
 
         String trimmedValue = value.trim();
         final boolean isEmpty = trimmedValue.isEmpty();
@@ -325,9 +336,14 @@ public class AssetConfigValidator {
                 }
                 if (!foundEqual) {
                     final StringBuilder sb = new StringBuilder();
-                    sb.append("Value \"").append(value).append("\" on line ").append(String.valueOf(lineNumber))
+                    sb.append("Value \"")
+                            .append(value)
+                            .append("\" on line ")
+                            .append(String.valueOf(lineNumber))
                             .append(" should be one of [");
-                    field.getOption().forEach(option -> sb.append("\"").append(option.getValue()).append("\", "));
+                    field.getOption()
+                            .forEach(option ->
+                                    sb.append("\"").append(option.getValue()).append("\", "));
                     sb.delete(sb.length() - 2, sb.length());
                     sb.append("]");
                     errors.add(sb.toString());
@@ -337,27 +353,27 @@ public class AssetConfigValidator {
             // Validate Data type and constraints.
             try {
                 switch (field.getType()) {
-                case CHAR:
-                    return new CharGwtValue(trimmedValue, field, errors).getValue();
-                case STRING:
-                    return new StringGwtValue(trimmedValue, field, errors).getValue();
-                case FLOAT:
-                    return new FloatGwtValue(trimmedValue, field, errors).getValue();
-                case INTEGER:
-                    return new IntegerGwtValue(trimmedValue, field, errors).getValue();
-                case SHORT:
-                    return new ShortGwtValue(trimmedValue, field, errors).getValue();
-                case BYTE:
-                    return new ByteGwtValue(trimmedValue, field, errors).getValue();
-                case LONG:
-                    return new LongGwtValue(trimmedValue, field, errors).getValue();
-                case DOUBLE:
-                    return new DoubleGwtValue(trimmedValue, field, errors).getValue();
-                case BOOLEAN:
-                    return new BooleanGwtValue(trimmedValue, field, errors).getValue();
-                default:
-                    errors.add("Unsupported data type: " + field.getType().toString());
-                    break;
+                    case CHAR:
+                        return new CharGwtValue(trimmedValue, field, errors).getValue();
+                    case STRING:
+                        return new StringGwtValue(trimmedValue, field, errors).getValue();
+                    case FLOAT:
+                        return new FloatGwtValue(trimmedValue, field, errors).getValue();
+                    case INTEGER:
+                        return new IntegerGwtValue(trimmedValue, field, errors).getValue();
+                    case SHORT:
+                        return new ShortGwtValue(trimmedValue, field, errors).getValue();
+                    case BYTE:
+                        return new ByteGwtValue(trimmedValue, field, errors).getValue();
+                    case LONG:
+                        return new LongGwtValue(trimmedValue, field, errors).getValue();
+                    case DOUBLE:
+                        return new DoubleGwtValue(trimmedValue, field, errors).getValue();
+                    case BOOLEAN:
+                        return new BooleanGwtValue(trimmedValue, field, errors).getValue();
+                    default:
+                        errors.add("Unsupported data type: " + field.getType().toString());
+                        break;
                 }
             } catch (NumberFormatException ex) {
                 errors.add(errorString(lineNumber, field, value));
@@ -390,13 +406,11 @@ public class AssetConfigValidator {
 
         private static final long serialVersionUID = 5954147929480218028L;
 
-        public ValidationException() {
-        }
+        public ValidationException() {}
 
         public ValidationException(final String message) {
             super(message);
         }
-
     }
 
     private abstract class GwtValue<T> {
@@ -423,9 +437,7 @@ public class AssetConfigValidator {
         @Override
         public void setValue(String csvInput, Tad param, List<String> errors) throws ValidationException {
             this.value = Boolean.parseBoolean(csvInput);
-
         }
-
     }
 
     private class CharGwtValue extends GwtValue<Object> {
@@ -449,7 +461,6 @@ public class AssetConfigValidator {
                 errors.add(errorString(AssetConfigValidator.this.lineNumber, field, csvInput));
                 throw new ValidationException();
             }
-
         }
     }
 
@@ -503,7 +514,6 @@ public class AssetConfigValidator {
                 errors.add(errorString(AssetConfigValidator.this.lineNumber, field, csvInput));
                 throw new ValidationException();
             }
-
         }
     }
 
@@ -524,7 +534,6 @@ public class AssetConfigValidator {
                 errors.add(errorString(AssetConfigValidator.this.lineNumber, field, csvInput));
                 throw new ValidationException();
             }
-
         }
     }
 
@@ -565,7 +574,6 @@ public class AssetConfigValidator {
                 errors.add(errorString(AssetConfigValidator.this.lineNumber, field, csvInput));
                 throw new ValidationException();
             }
-
         }
     }
 
@@ -586,7 +594,6 @@ public class AssetConfigValidator {
                 errors.add(errorString(AssetConfigValidator.this.lineNumber, field, csvInput));
                 throw new ValidationException();
             }
-
         }
     }
 
@@ -609,5 +616,4 @@ public class AssetConfigValidator {
             }
         }
     }
-
 }

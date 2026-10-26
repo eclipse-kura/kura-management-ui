@@ -12,12 +12,25 @@
  *******************************************************************************/
 package org.eclipse.kura.web.client.ui.users;
 
+import com.google.gwt.core.client.GWT;
+import com.google.gwt.uibinder.client.UiBinder;
+import com.google.gwt.uibinder.client.UiField;
+import com.google.gwt.user.cellview.client.CellTable;
+import com.google.gwt.user.cellview.client.Column;
+import com.google.gwt.user.cellview.client.ColumnSortEvent;
+import com.google.gwt.user.cellview.client.ColumnSortEvent.ListHandler;
+import com.google.gwt.user.cellview.client.SimplePager;
+import com.google.gwt.user.cellview.client.SimplePager.TextLocation;
+import com.google.gwt.user.cellview.client.TextColumn;
+import com.google.gwt.user.client.ui.Composite;
+import com.google.gwt.user.client.ui.Widget;
+import com.google.gwt.view.client.HasRows;
+import com.google.gwt.view.client.ListDataProvider;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-
 import org.eclipse.kura.web.client.configuration.HasConfiguration;
 import org.eclipse.kura.web.client.messages.Messages;
 import org.eclipse.kura.web.client.ui.ConfigurableComponentUi;
@@ -38,46 +51,38 @@ import org.gwtbootstrap3.client.ui.PanelHeader;
 import org.gwtbootstrap3.client.ui.constants.HeadingSize;
 import org.gwtbootstrap3.client.ui.constants.InputType;
 
-import com.google.gwt.core.client.GWT;
-import com.google.gwt.uibinder.client.UiBinder;
-import com.google.gwt.uibinder.client.UiField;
-import com.google.gwt.user.cellview.client.CellTable;
-import com.google.gwt.user.cellview.client.Column;
-import com.google.gwt.user.cellview.client.ColumnSortEvent;
-import com.google.gwt.user.cellview.client.ColumnSortEvent.ListHandler;
-import com.google.gwt.user.cellview.client.SimplePager;
-import com.google.gwt.user.cellview.client.SimplePager.TextLocation;
-import com.google.gwt.user.cellview.client.TextColumn;
-import com.google.gwt.user.client.ui.Composite;
-import com.google.gwt.user.client.ui.Widget;
-import com.google.gwt.view.client.HasRows;
-import com.google.gwt.view.client.ListDataProvider;
-
 public class UserConfigUi extends Composite {
 
     protected static final Messages MSGS = GWT.create(Messages.class);
 
     private static UserConfigUiUiBinder uiBinder = GWT.create(UserConfigUiUiBinder.class);
 
-    interface UserConfigUiUiBinder extends UiBinder<Widget, UserConfigUi> {
-    }
+    interface UserConfigUiUiBinder extends UiBinder<Widget, UserConfigUi> {}
 
     @UiField
     InlineRadio passwordChangeRequired;
+
     @UiField
     InlineRadio passwordPasswordChangeNotRequired;
+
     @UiField
     InlineRadio passwordEnabled;
+
     @UiField
     InlineRadio passwordDisabled;
+
     @UiField
     Button changePassword;
+
     @UiField
     Picker picker;
+
     @UiField
     CellTable<AssignedPermission> permissionTable;
+
     @UiField
     PanelFooter tablePanelFooter;
+
     @UiField
     PanelBody additionalConfigurationsPanel;
 
@@ -120,14 +125,14 @@ public class UserConfigUi extends Composite {
         this.pager.setDisplay(this.permissionTable);
         this.tablePanelFooter.add(this.pager);
 
-        final Column<AssignedPermission, String> assignedColumn = new Column<AssignedPermission, String>(
-                new BooleanInputCell()) {
+        final Column<AssignedPermission, String> assignedColumn =
+                new Column<AssignedPermission, String>(new BooleanInputCell()) {
 
-            @Override
-            public String getValue(final AssignedPermission object) {
-                return Boolean.toString(object.isAssigned());
-            }
-        };
+                    @Override
+                    public String getValue(final AssignedPermission object) {
+                        return Boolean.toString(object.isAssigned());
+                    }
+                };
 
         assignedColumn.setFieldUpdater((index, object, value) -> {
             final boolean assigned = Boolean.parseBoolean(value);
@@ -166,16 +171,18 @@ public class UserConfigUi extends Composite {
         final List<AssignedPermission> tableContent = this.dataProvider.getList();
 
         for (final String permission : definedPermissions) {
-            tableContent.add(new AssignedPermission(permission, userData.getPermissions().contains(permission)));
+            tableContent.add(
+                    new AssignedPermission(permission, userData.getPermissions().contains(permission)));
         }
 
         ColumnSortEvent.fire(this.permissionTable, this.permissionTable.getColumnSortList());
     }
 
     private void renderAdditionalConfigurations(final GwtUserConfig gwtUserConfig) {
-        for (final GwtConfigComponent additionalConfiguration : gwtUserConfig.getAdditionalConfigurations().values()) {
-            final ConfigurableComponentUi configurableComponentUi = new ConfigurableComponentUi(
-                    additionalConfiguration);
+        for (final GwtConfigComponent additionalConfiguration :
+                gwtUserConfig.getAdditionalConfigurations().values()) {
+            final ConfigurableComponentUi configurableComponentUi =
+                    new ConfigurableComponentUi(additionalConfiguration);
 
             configurableComponentUi.setListener(new HasConfiguration.Listener() {
 
@@ -197,12 +204,11 @@ public class UserConfigUi extends Composite {
                     if (hasConfiguration.isValid()) {
                         final GwtConfigComponent updatedConfiguration = hasConfiguration.getConfiguration();
 
-                        userData.getAdditionalConfigurations().put(hasConfiguration.getComponentId(),
-                                updatedConfiguration);
+                        userData.getAdditionalConfigurations()
+                                .put(hasConfiguration.getComponentId(), updatedConfiguration);
                         listener.onUserDataChanged(userData);
                     }
                 }
-
             });
 
             final PanelHeader header = new PanelHeader();
@@ -262,7 +268,6 @@ public class UserConfigUi extends Composite {
     private void pickPassword() {
 
         EntryClassUi.loadPasswordStrengthRequirements(passwordStrengthRequirements -> {
-
             final Runnable onDismiss = () -> {
                 if (!this.hasPassword) {
                     this.passwordEnabled.setValue(false);
@@ -272,27 +277,30 @@ public class UserConfigUi extends Composite {
                 }
             };
 
-            this.picker.builder() //
+            this.picker
+                    .builder() //
                     .setTitle(MSGS.usersSetPassword()) //
                     .setMessage(MSGS.usersDefineNewPassword()) //
                     .setPasswordInputCustomizer(input -> input.setInputPasswordType(InputType.PASSWORD)) //
                     .setOnCancel(onDismiss) //
-                    .setValidators(GwtValidators.newPassword(Optional.of(this.userData.getUserName()), //
+                    .setValidators(GwtValidators.newPassword(
+                            Optional.of(this.userData.getUserName()), //
                             passwordStrengthRequirements)) //
-                    .setOnPick(newPassword -> this.picker.builder() //
+                    .setOnPick(newPassword -> this.picker
+                            .builder() //
                             .setTitle(MSGS.usersConfirmPassword()) //
                             .setMessage(MSGS.usersRepeatPassword()) //
                             .setPasswordInputCustomizer(input -> input.setInputPasswordType(InputType.PASSWORD)) //
                             .setOnCancel(onDismiss) //
-                            .setValidators(Collections.singletonList(GwtValidators
-                                    .predicate(newPassword::equals, MSGS.usersPasswordMismatch()))) //
+                            .setValidators(Collections.singletonList(
+                                    GwtValidators.predicate(newPassword::equals, MSGS.usersPasswordMismatch()))) //
                             .setOnPick(p -> {
                                 this.userData.setNewPassword(Optional.of(p));
                                 this.listener.onUserDataChanged(this.userData);
-                            }).pick(NewPasswordInputForm.class)) //
+                            })
+                            .pick(NewPasswordInputForm.class)) //
                     .pick(NewPasswordInputForm.class);
         });
-
     }
 
     public void updatePasswordWidgetState() {

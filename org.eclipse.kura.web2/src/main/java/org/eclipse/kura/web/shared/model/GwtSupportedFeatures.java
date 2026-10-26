@@ -80,11 +80,11 @@ public class GwtSupportedFeatures extends GwtBaseModel implements Serializable {
     @Override
     public String toString() {
         final List<String> availableFeatures = new ArrayList<>();
-        
+
         if (this.isAssetAvailable()) {
             availableFeatures.add("assets");
         }
-        
+
         if (this.isPackagesServiceAvailable()) {
             availableFeatures.add("packages");
         }
@@ -92,11 +92,11 @@ public class GwtSupportedFeatures extends GwtBaseModel implements Serializable {
         if (this.areWiresServicesAvailable()) {
             availableFeatures.add("wires");
         }
-        
+
         if (this.areDriverServicesAvailable()) {
             availableFeatures.add("drivers");
         }
-        
+
         if (this.isCommandServiceAvailable()) {
             availableFeatures.add("command");
         }

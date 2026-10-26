@@ -34,10 +34,8 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
-
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
-
 import org.eclipse.kura.KuraException;
 import org.eclipse.kura.configuration.ComponentConfiguration;
 import org.eclipse.kura.configuration.ConfigurableComponent;
@@ -85,8 +83,7 @@ public class GwtComponentServiceInternal {
 
     private static final int SERVICE_WAIT_TIMEOUT = 60;
 
-    private GwtComponentServiceInternal() {
-    }
+    private GwtComponentServiceInternal() {}
 
     public static List<String> findTrackedPids() throws GwtKuraException {
         ConfigurationService cs = ServiceLocator.getInstance().getService(ConfigurationService.class);
@@ -102,8 +99,10 @@ public class GwtComponentServiceInternal {
 
         try {
             final Filter filter = FrameworkUtil.createFilter(osgiFilter);
-            return ServiceLocator.applyToServiceOptionally(ConfigurationService.class,
-                    configurationService -> configurationService.getComponentConfigurations(filter) //
+            return ServiceLocator.applyToServiceOptionally(
+                    ConfigurationService.class,
+                    configurationService -> configurationService
+                            .getComponentConfigurations(filter) //
                             .stream() //
                             .map(GwtComponentServiceInternal::createMetatypeOnlyGwtComponentConfigurationInternal) //
                             .filter(Objects::nonNull) //
@@ -154,8 +153,8 @@ public class GwtComponentServiceInternal {
         }
     }
 
-    private static ComponentConfiguration getComponentConfiguration(ConfigurationService cs,
-            GwtConfigComponent gwtCompConfig) throws KuraException {
+    private static ComponentConfiguration getComponentConfiguration(
+            ConfigurationService cs, GwtConfigComponent gwtCompConfig) throws KuraException {
         Map<String, Object> properties = new HashMap<>();
         ComponentConfiguration currentCC = cs.getComponentConfiguration(gwtCompConfig.getComponentId());
 
@@ -164,8 +163,8 @@ public class GwtComponentServiceInternal {
             Object objValue;
             Object currentValue = currentConfigProp.get(gwtConfigParam.getId());
 
-            boolean isReadOnly = gwtConfigParam.getMin() != null
-                    && gwtConfigParam.getMin().equals(gwtConfigParam.getMax());
+            boolean isReadOnly =
+                    gwtConfigParam.getMin() != null && gwtConfigParam.getMin().equals(gwtConfigParam.getMax());
             if (isReadOnly) {
                 objValue = currentValue;
             } else {
@@ -203,7 +202,8 @@ public class GwtComponentServiceInternal {
 
             String filterString = "(" + ConfigurationService.KURA_SERVICE_PID + "=" + pid + ")";
 
-            if (!ServiceUtil.waitForService(filterString, SERVICE_WAIT_TIMEOUT, TimeUnit.SECONDS).isPresent()) {
+            if (!ServiceUtil.waitForService(filterString, SERVICE_WAIT_TIMEOUT, TimeUnit.SECONDS)
+                    .isPresent()) {
                 throw new GwtKuraException("Created component did not start in " + SERVICE_WAIT_TIMEOUT + " seconds");
             }
 
@@ -258,27 +258,31 @@ public class GwtComponentServiceInternal {
     }
 
     private static List<String> findWireComponents() throws GwtKuraException {
-        final Set<String> wiresInterfaces = new HashSet<>(Arrays.asList(WireEmitter.class.getName(),
-                WireReceiver.class.getName(), WireComponent.class.getName()));
+        final Set<String> wiresInterfaces = new HashSet<>(Arrays.asList(
+                WireEmitter.class.getName(), WireReceiver.class.getName(), WireComponent.class.getName()));
 
-        return ServiceLocator.applyToServiceOptionally(ServiceComponentRuntime.class,
-                scr -> scr.getComponentDescriptionDTOs().stream().filter(dto -> {
+        return ServiceLocator.applyToServiceOptionally(
+                ServiceComponentRuntime.class,
+                scr -> scr.getComponentDescriptionDTOs().stream()
+                        .filter(dto -> {
+                            for (String s : dto.serviceInterfaces) {
+                                if (wiresInterfaces.contains(s)) {
+                                    return true;
+                                }
+                            }
 
-                    for (String s : dto.serviceInterfaces) {
-                        if (wiresInterfaces.contains(s)) {
-                            return true;
-                        }
-                    }
-
-                    return false;
-                }).map(dto -> dto.name).collect(Collectors.toList()));
-
+                            return false;
+                        })
+                        .map(dto -> dto.name)
+                        .collect(Collectors.toList()));
     }
 
     private static List<String> findFactoryHideComponents() throws GwtKuraException {
-        return ServiceLocator.applyToServiceOptionally(ServiceComponentRuntime.class,
+        return ServiceLocator.applyToServiceOptionally(
+                ServiceComponentRuntime.class,
                 scr -> scr.getComponentDescriptionDTOs().stream()
-                        .filter(dto -> dto.properties.containsKey("kura.ui.factory.hide")).map(dto -> dto.name)
+                        .filter(dto -> dto.properties.containsKey("kura.ui.factory.hide"))
+                        .map(dto -> dto.name)
                         .collect(Collectors.toList()));
     }
 
@@ -321,11 +325,11 @@ public class GwtComponentServiceInternal {
     }
 
     private static void fillServicesToHideList(List<String> hidePidsList) throws GwtKuraException {
-        Collection<ServiceReference<ConfigurableComponent>> configurableComponentReferences = ServiceLocator
-                .getInstance().getServiceReferences(ConfigurableComponent.class, null);
+        Collection<ServiceReference<ConfigurableComponent>> configurableComponentReferences =
+                ServiceLocator.getInstance().getServiceReferences(ConfigurableComponent.class, null);
 
-        Collection<ServiceReference<SelfConfiguringComponent>> selfConfiguringComponentReferences = ServiceLocator
-                .getInstance().getServiceReferences(SelfConfiguringComponent.class, null);
+        Collection<ServiceReference<SelfConfiguringComponent>> selfConfiguringComponentReferences =
+                ServiceLocator.getInstance().getServiceReferences(SelfConfiguringComponent.class, null);
 
         List<ServiceReference<?>> componentReferences = new ArrayList<>();
         componentReferences.addAll(configurableComponentReferences);
@@ -407,8 +411,8 @@ public class GwtComponentServiceInternal {
         return gwtConfigs;
     }
 
-    private static GwtConfigComponent addNonMetatypeProperties(GwtConfigComponent baseGwtConfig,
-            ComponentConfiguration config) {
+    private static GwtConfigComponent addNonMetatypeProperties(
+            GwtConfigComponent baseGwtConfig, ComponentConfiguration config) {
         GwtConfigComponent gwtConfigComponent = null;
         OCD ocd = config.getDefinition();
         if (ocd != null && baseGwtConfig != null) {
@@ -504,12 +508,14 @@ public class GwtComponentServiceInternal {
 
             boolean isWireComponent;
 
-            final BundleContext bundleContext = FrameworkUtil.getBundle(GwtComponentServiceInternal.class)
-                    .getBundleContext();
+            final BundleContext bundleContext =
+                    FrameworkUtil.getBundle(GwtComponentServiceInternal.class).getBundleContext();
 
             try {
-                isWireComponent = !bundleContext.getServiceReferences(WireComponent.class,
-                        "(kura.service.pid=" + gwtConfig.getComponentName() + ")").isEmpty();
+                isWireComponent = !bundleContext
+                        .getServiceReferences(
+                                WireComponent.class, "(kura.service.pid=" + gwtConfig.getComponentName() + ")")
+                        .isEmpty();
             } catch (InvalidSyntaxException e) {
                 isWireComponent = false;
             }
@@ -521,7 +527,8 @@ public class GwtComponentServiceInternal {
 
     private static List<GwtConfigParameter> getNonMetatypeProperties(ComponentConfiguration config) {
         List<GwtConfigParameter> gwtParams = new ArrayList<>();
-        for (Map.Entry<String, Object> entry : config.getConfigurationProperties().entrySet()) {
+        for (Map.Entry<String, Object> entry :
+                config.getConfigurationProperties().entrySet()) {
             GwtConfigParameter gwtParam = new GwtConfigParameter();
             gwtParam.setId(entry.getKey());
             Object value = entry.getValue();
@@ -630,7 +637,9 @@ public class GwtComponentServiceInternal {
     public static List<String> getDriverFactoriesList() throws GwtKuraException {
 
         List<String> driverFactoriesPids = new ArrayList<>();
-        final Bundle[] bundles = FrameworkUtil.getBundle(GwtWireGraphService.class).getBundleContext().getBundles();
+        final Bundle[] bundles = FrameworkUtil.getBundle(GwtWireGraphService.class)
+                .getBundleContext()
+                .getBundles();
         for (final Bundle bundle : bundles) {
             final Enumeration<URL> enumeration = bundle.findEntries("OSGI-INF", "*.xml", false);
             if (Objects.isNull(enumeration)) {
@@ -639,13 +648,15 @@ public class GwtComponentServiceInternal {
 
             while (enumeration.hasMoreElements()) {
                 final URL entry = enumeration.nextElement();
-                try (InputStreamReader inputStream = new InputStreamReader(entry.openConnection().getInputStream());
-                        BufferedReader reader = new BufferedReader(inputStream);) {
+                try (InputStreamReader inputStream =
+                                new InputStreamReader(entry.openConnection().getInputStream());
+                        BufferedReader reader = new BufferedReader(inputStream); ) {
                     final StringBuilder contents = getManifestContent(reader);
                     // Configuration Policy=Require and
                     // SelfConfiguringComponent or ConfigurableComponent
                     if ((contents.toString().contains(GwtServerUtil.PATTERN_SERVICE_PROVIDE_SELF_CONFIGURING_COMP)
-                            || contents.toString().contains(GwtServerUtil.PATTERN_SERVICE_PROVIDE_CONFIGURABLE_COMP))
+                                    || contents.toString()
+                                            .contains(GwtServerUtil.PATTERN_SERVICE_PROVIDE_CONFIGURABLE_COMP))
                             && contents.toString().contains(GwtServerUtil.PATTERN_CONFIGURATION_REQUIRE)) {
                         driverFactoriesPids.addAll(manageRequiredConfigurableComponents(entry, contents));
                     }
@@ -653,7 +664,6 @@ public class GwtComponentServiceInternal {
                     throw new GwtKuraException(GwtKuraErrorCode.RESOURCE_FETCHING_FAILURE);
                 }
             }
-
         }
 
         return driverFactoriesPids;
@@ -677,7 +687,8 @@ public class GwtComponentServiceInternal {
         dbf.setXIncludeAware(false);
         dbf.setExpandEntityReferences(false);
 
-        final Document dom = dbf.newDocumentBuilder().parse(entry.openConnection().getInputStream());
+        final Document dom =
+                dbf.newDocumentBuilder().parse(entry.openConnection().getInputStream());
         final NodeList nl = dom.getElementsByTagName("property");
         for (int i = 0; i < nl.getLength(); i++) {
             final Node n = nl.item(i);
@@ -698,9 +709,10 @@ public class GwtComponentServiceInternal {
 
         List<String> result = new ArrayList<>();
 
-        final BundleContext context = FrameworkUtil.getBundle(GwtWireGraphService.class).getBundleContext();
-        ServiceReference<ServiceComponentRuntime> scrServiceRef = context
-                .getServiceReference(ServiceComponentRuntime.class);
+        final BundleContext context =
+                FrameworkUtil.getBundle(GwtWireGraphService.class).getBundleContext();
+        ServiceReference<ServiceComponentRuntime> scrServiceRef =
+                context.getServiceReference(ServiceComponentRuntime.class);
         try {
             final ServiceComponentRuntime scrService = context.getService(scrServiceRef);
 
@@ -714,7 +726,9 @@ public class GwtComponentServiceInternal {
                             }
                         }
                         return null;
-                    }).filter(Objects::nonNull).collect(Collectors.toSet());
+                    })
+                    .filter(Objects::nonNull)
+                    .collect(Collectors.toSet());
 
             referenceInterfaces.forEach(reference -> {
                 try {
@@ -739,5 +753,4 @@ public class GwtComponentServiceInternal {
 
         return result;
     }
-
 }

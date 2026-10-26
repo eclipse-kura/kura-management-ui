@@ -1,12 +1,12 @@
 /*******************************************************************************
- * Copyright (c) 2011, 2021 Eurotech and/or its affiliates and others
- * 
+ * Copyright (c) 2011, 2026 Eurotech and/or its affiliates and others
+ *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
  * which is available at https://www.eclipse.org/legal/epl-2.0/
- * 
+ *
  * SPDX-License-Identifier: EPL-2.0
- * 
+ *
  * Contributors:
  *  Eurotech
  *******************************************************************************/
@@ -19,7 +19,6 @@ import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
-
 import org.eclipse.kura.KuraException;
 import org.eclipse.kura.security.SecurityService;
 import org.eclipse.kura.security.ThreatManagerService;
@@ -49,7 +48,6 @@ public class GwtSecurityServiceImpl extends OsgiRemoteServiceServlet implements 
         } catch (KuraException e) {
             throw new GwtKuraException(e.getMessage());
         }
-
     }
 
     @Override
@@ -76,7 +74,8 @@ public class GwtSecurityServiceImpl extends OsgiRemoteServiceServlet implements 
                 final TamperStatus tamperStatus = s.getTamperStatus();
 
                 final Map<String, String> properties = tamperStatus.getProperties().entrySet().stream()
-                        .collect(Collectors.toMap(Entry::getKey, e -> e.getValue().getValue().toString()));
+                        .collect(Collectors.toMap(
+                                Entry::getKey, e -> e.getValue().getValue().toString()));
 
                 result.add(new GwtTamperStatus(s.getDisplayName(), tamperStatus.isDeviceTampered(), properties));
             } catch (KuraException e) {
@@ -110,8 +109,8 @@ public class GwtSecurityServiceImpl extends OsgiRemoteServiceServlet implements 
 
     @Override
     public GwtSecurityCapabilities getCababilities() {
-        return new GwtSecurityCapabilities(isDebugMode(), isSecurityServiceAvailable(), isThreatManagerAvailable(),
-                isTamperDetectionAvailable());
+        return new GwtSecurityCapabilities(
+                isDebugMode(), isSecurityServiceAvailable(), isThreatManagerAvailable(), isTamperDetectionAvailable());
     }
 
     private boolean isSecurityServiceAvailable() {
@@ -130,7 +129,9 @@ public class GwtSecurityServiceImpl extends OsgiRemoteServiceServlet implements 
 
     private boolean isTamperDetectionAvailable() {
         try {
-            return !ServiceLocator.getInstance().getServiceReferences(TamperDetectionService.class, null).isEmpty();
+            return !ServiceLocator.getInstance()
+                    .getServiceReferences(TamperDetectionService.class, null)
+                    .isEmpty();
         } catch (GwtKuraException e) {
             return false;
         }
@@ -153,8 +154,8 @@ public class GwtSecurityServiceImpl extends OsgiRemoteServiceServlet implements 
     private boolean isThreatManagerAvailable() {
 
         try {
-            ThreatManagerService threatManagerService = ServiceLocator.getInstance()
-                    .getService(ThreatManagerService.class);
+            ThreatManagerService threatManagerService =
+                    ServiceLocator.getInstance().getService(ThreatManagerService.class);
             if (threatManagerService != null) {
                 return true;
             }

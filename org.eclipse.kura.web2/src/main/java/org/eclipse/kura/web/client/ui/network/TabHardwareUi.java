@@ -1,35 +1,33 @@
 /*******************************************************************************
- * Copyright (c) 2011, 2020 Eurotech and/or its affiliates and others
- * 
+ * Copyright (c) 2011, 2026 Eurotech and/or its affiliates and others
+ *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
  * which is available at https://www.eclipse.org/legal/epl-2.0/
- * 
+ *
  * SPDX-License-Identifier: EPL-2.0
- * 
+ *
  * Contributors:
  *  Eurotech
  *******************************************************************************/
 package org.eclipse.kura.web.client.ui.network;
-
-import org.eclipse.kura.web.client.messages.Messages;
-import org.eclipse.kura.web.shared.model.GwtNetInterfaceConfig;
-import org.eclipse.kura.web.shared.model.GwtSession;
-import org.gwtbootstrap3.client.ui.FormControlStatic;
-import org.gwtbootstrap3.client.ui.FormLabel;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.Widget;
+import org.eclipse.kura.web.client.messages.Messages;
+import org.eclipse.kura.web.shared.model.GwtNetInterfaceConfig;
+import org.eclipse.kura.web.shared.model.GwtSession;
+import org.gwtbootstrap3.client.ui.FormControlStatic;
+import org.gwtbootstrap3.client.ui.FormLabel;
 
 public class TabHardwareUi extends Composite implements NetworkTab {
 
     private static TabHardwareUiUiBinder uiBinder = GWT.create(TabHardwareUiUiBinder.class);
 
-    interface TabHardwareUiUiBinder extends UiBinder<Widget, TabHardwareUi> {
-    }
+    interface TabHardwareUiUiBinder extends UiBinder<Widget, TabHardwareUi> {}
 
     private static final Messages MSGS = GWT.create(Messages.class);
     GwtSession session;
@@ -37,51 +35,73 @@ public class TabHardwareUi extends Composite implements NetworkTab {
 
     @UiField
     FormLabel labelState;
+
     @UiField
     FormLabel labelName;
+
     @UiField
     FormLabel labelType;
+
     @UiField
     FormLabel labelHardware;
+
     @UiField
     FormLabel labelSerial;
+
     @UiField
     FormLabel labelDriver;
+
     @UiField
     FormLabel labelVersion;
+
     @UiField
     FormLabel labelFirmware;
+
     @UiField
     FormLabel labelMtu;
+
     @UiField
     FormLabel labelUsb;
+
     @UiField
     FormLabel labelRssi;
+
     @UiField
     FormLabel labelChannel;
 
     @UiField
     FormControlStatic state;
+
     @UiField
     FormControlStatic name;
+
     @UiField
     FormControlStatic type;
+
     @UiField
     FormControlStatic hardware;
+
     @UiField
     FormControlStatic serial;
+
     @UiField
     FormControlStatic driver;
+
     @UiField
     FormControlStatic version;
+
     @UiField
     FormControlStatic firmware;
+
     @UiField
     FormControlStatic mtu;
+
     @UiField
     FormControlStatic usb;
+
     @UiField
     FormControlStatic rssi;
+
     @UiField
     FormControlStatic channel;
 
@@ -107,8 +127,7 @@ public class TabHardwareUi extends Composite implements NetworkTab {
 
     // Dirty flag not needed here since this tab is not modifiable
     @Override
-    public void setDirty(boolean flag) {
-    }
+    public void setDirty(boolean flag) {}
 
     @Override
     public boolean isDirty() {
@@ -140,7 +159,6 @@ public class TabHardwareUi extends Composite implements NetworkTab {
     }
 
     /********* Private Methods ********/
-
     private void loadData() {
         this.state.setText(this.selectedNetIfConfig.getHwState());
         this.name.setText(this.selectedNetIfConfig.getHwName());

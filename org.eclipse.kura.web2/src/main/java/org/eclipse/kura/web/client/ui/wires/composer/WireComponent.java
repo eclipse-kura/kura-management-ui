@@ -1,95 +1,78 @@
 /*******************************************************************************
- * Copyright (c) 2018, 2020 Eurotech and/or its affiliates and others
- * 
+ * Copyright (c) 2018, 2026 Eurotech and/or its affiliates and others
+ *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
  * which is available at https://www.eclipse.org/legal/epl-2.0/
- * 
+ *
  * SPDX-License-Identifier: EPL-2.0
- * 
+ *
  * Contributors:
  *  Eurotech
  *******************************************************************************/
-
 package org.eclipse.kura.web.client.ui.wires.composer;
 
+import com.google.gwt.core.client.JavaScriptObject;
 import org.eclipse.kura.web.shared.model.GwtConfigComponent;
 import org.eclipse.kura.web.shared.model.GwtWireComponentConfiguration;
 
-import com.google.gwt.core.client.JavaScriptObject;
-
 public final class WireComponent extends JavaScriptObject {
 
-    protected WireComponent() {
-    }
+    protected WireComponent() {}
 
-    public static native WireComponent create()
-    /*-{
+    public static native WireComponent create() /*-{
         return new parent.window.WireComponent()
     }-*/;
 
-    public native String getPid()
-    /*-{
+    public native String getPid() /*-{
         return this.pid
     }-*/;
 
-    public native String getFactoryPid()
-    /*-{
+    public native String getFactoryPid() /*-{
         return this.factoryPid
     }-*/;
 
-    public native int getInputPortCount()
-    /*-{
+    public native int getInputPortCount() /*-{
         return this.inputPortCount
     }-*/;
 
-    public native int getOutputPortCount()
-    /*-{
+    public native int getOutputPortCount() /*-{
         return this.outputPortCount
     }-*/;
 
-    public native WireComponentRenderingProperties getRenderingProperties()
-    /*-{
+    public native WireComponentRenderingProperties getRenderingProperties() /*-{
         return this.renderingProperties
     }-*/;
 
-    public native String setPid(String pid)
-    /*-{
+    public native String setPid(String pid) /*-{
         this.pid = pid
     }-*/;
 
-    public native String setFactoryPid(String pid)
-    /*-{
+    public native String setFactoryPid(String pid) /*-{
         this.factoryPid = pid
     }-*/;
 
-    public native void setInputPortCount(int inputPortCount)
-    /*-{
+    public native void setInputPortCount(int inputPortCount) /*-{
         this.inputPortCount = inputPortCount
     }-*/;
 
-    public native void setOutputPortCount(int outputPortCount)
-    /*-{
+    public native void setOutputPortCount(int outputPortCount) /*-{
         this.outputPortCount = outputPortCount
     }-*/;
 
-    public native void setRenderingProperties(WireComponentRenderingProperties properties)
-    /*-{
+    public native void setRenderingProperties(WireComponentRenderingProperties properties) /*-{
         return this.renderingProperties = properties
     }-*/;
 
-    public native int getPortIndex(String portName, String direction)
-    /*-{
+    public native int getPortIndex(String portName, String direction) /*-{
         return this.getPortIndex(portName, direction)
     }-*/;
 
-    public native String getPortName(int portIndex, String direction)
-    /*-{
+    public native String getPortName(int portIndex, String direction) /*-{
         return this.getPortName(portIndex, direction)
     }-*/;
 
-    public native void setValid(boolean isValid)
-    /*-{
+    public native void setValid(boolean isValid) /*-{
         this.setValid(isValid)
     }-*/;
 

@@ -19,7 +19,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-
 import org.eclipse.kura.configuration.Password;
 import org.eclipse.kura.core.net.util.NetworkUtil;
 import org.eclipse.kura.web.shared.model.GwtNetIfStatus;
@@ -89,8 +88,8 @@ public class NetworkConfigurationServiceProperties {
     private static final String NET_INTERFACE_CONFIG_IP4_DNS_SERVERS = "net.interface.%s.config.ip4.dnsServers";
 
     public Optional<String> getIp4Status(String ifname) {
-        Optional<String> ip4Status = getNonEmptyStringProperty(
-                this.properties.get(String.format(NET_INTERFACE_CONFIG_IP4_STATUS, ifname)));
+        Optional<String> ip4Status =
+                getNonEmptyStringProperty(this.properties.get(String.format(NET_INTERFACE_CONFIG_IP4_STATUS, ifname)));
 
         // L2Only is an alias for Unmanaged
         if (ip4Status.isPresent() && ip4Status.get().equals(GwtNetIfStatus.netIPv4StatusL2Only.name())) {
@@ -254,17 +253,23 @@ public class NetworkConfigurationServiceProperties {
      * IPv4 DHCP Server properties
      */
 
-    private static final String NET_INTERFACE_CONFIG_DHCP_SERVER_ENABLED = "net.interface.%s.config.dhcpServer4.enabled";
-    private static final String NET_INTERFACE_CONFIG_DHCP_SERVER_RANGE_START = "net.interface.%s.config.dhcpServer4.rangeStart";
-    private static final String NET_INTERFACE_CONFIG_DHCP_SERVER_RANGE_END = "net.interface.%s.config.dhcpServer4.rangeEnd";
-    private static final String NET_INTERFACE_CONFIG_DHCP_LEASE_TIME = "net.interface.%s.config.dhcpServer4.defaultLeaseTime";
-    private static final String NET_INTERFACE_CONFIG_DHCP_MAX_LEASE_TIME = "net.interface.%s.config.dhcpServer4.maxLeaseTime";
+    private static final String NET_INTERFACE_CONFIG_DHCP_SERVER_ENABLED =
+            "net.interface.%s.config.dhcpServer4.enabled";
+    private static final String NET_INTERFACE_CONFIG_DHCP_SERVER_RANGE_START =
+            "net.interface.%s.config.dhcpServer4.rangeStart";
+    private static final String NET_INTERFACE_CONFIG_DHCP_SERVER_RANGE_END =
+            "net.interface.%s.config.dhcpServer4.rangeEnd";
+    private static final String NET_INTERFACE_CONFIG_DHCP_LEASE_TIME =
+            "net.interface.%s.config.dhcpServer4.defaultLeaseTime";
+    private static final String NET_INTERFACE_CONFIG_DHCP_MAX_LEASE_TIME =
+            "net.interface.%s.config.dhcpServer4.maxLeaseTime";
     private static final String NET_INTERFACE_CONFIG_DHCP_SERVER_NETMASK = "net.interface.%s.config.dhcpServer4.prefix";
-    private static final String NET_INTERFACE_CONFIG_DHCP_SERVER_PASS_DNS = "net.interface.%s.config.dhcpServer4.passDns";
+    private static final String NET_INTERFACE_CONFIG_DHCP_SERVER_PASS_DNS =
+            "net.interface.%s.config.dhcpServer4.passDns";
 
     public boolean getDhcpServer4Enabled(String ifname) {
-        return (boolean) this.properties.getOrDefault(String.format(NET_INTERFACE_CONFIG_DHCP_SERVER_ENABLED, ifname),
-                false);
+        return (boolean)
+                this.properties.getOrDefault(String.format(NET_INTERFACE_CONFIG_DHCP_SERVER_ENABLED, ifname), false);
     }
 
     public void setDhcpServer4Enabled(String ifname, boolean isDhcpServerEnabled) {
@@ -272,8 +277,8 @@ public class NetworkConfigurationServiceProperties {
     }
 
     public String getDhcpServer4RangeStart(String ifname) {
-        return (String) this.properties
-                .getOrDefault(String.format(NET_INTERFACE_CONFIG_DHCP_SERVER_RANGE_START, ifname), "172.16.0.100");
+        return (String) this.properties.getOrDefault(
+                String.format(NET_INTERFACE_CONFIG_DHCP_SERVER_RANGE_START, ifname), "172.16.0.100");
     }
 
     public void setDhcpServer4RangeStart(String ifname, String rangeStart) {
@@ -281,8 +286,8 @@ public class NetworkConfigurationServiceProperties {
     }
 
     public String getDhcpServer4RangeEnd(String ifname) {
-        return (String) this.properties.getOrDefault(String.format(NET_INTERFACE_CONFIG_DHCP_SERVER_RANGE_END, ifname),
-                "172.16.0.110");
+        return (String) this.properties.getOrDefault(
+                String.format(NET_INTERFACE_CONFIG_DHCP_SERVER_RANGE_END, ifname), "172.16.0.110");
     }
 
     public void setDhcpServer4RangeEnd(String ifname, String rangeEnd) {
@@ -298,8 +303,8 @@ public class NetworkConfigurationServiceProperties {
     }
 
     public int getDhcpServer4MaxLeaseTime(String ifname) {
-        return (int) this.properties.getOrDefault(String.format(NET_INTERFACE_CONFIG_DHCP_MAX_LEASE_TIME, ifname),
-                7200);
+        return (int)
+                this.properties.getOrDefault(String.format(NET_INTERFACE_CONFIG_DHCP_MAX_LEASE_TIME, ifname), 7200);
     }
 
     public void setDhcpServer4MaxLeaseTime(String ifname, int maxLeaseTime) {
@@ -325,8 +330,8 @@ public class NetworkConfigurationServiceProperties {
     }
 
     public boolean getDhcpServer4PassDns(String ifname) {
-        return (boolean) this.properties.getOrDefault(String.format(NET_INTERFACE_CONFIG_DHCP_SERVER_PASS_DNS, ifname),
-                false);
+        return (boolean)
+                this.properties.getOrDefault(String.format(NET_INTERFACE_CONFIG_DHCP_SERVER_PASS_DNS, ifname), false);
     }
 
     public void setDhcpServer4PassDns(String ifname, boolean isPassDns) {
@@ -337,11 +342,12 @@ public class NetworkConfigurationServiceProperties {
      * IPv4 DHCP Client properties
      */
 
-    private static final String NET_INTERFACE_CONFIG_DHCP_CLIENT_ENABLED = "net.interface.%s.config.dhcpClient4.enabled";
+    private static final String NET_INTERFACE_CONFIG_DHCP_CLIENT_ENABLED =
+            "net.interface.%s.config.dhcpClient4.enabled";
 
     public boolean getDhcpClient4Enabled(String ifname) {
-        return (boolean) this.properties.getOrDefault(String.format(NET_INTERFACE_CONFIG_DHCP_CLIENT_ENABLED, ifname),
-                true);
+        return (boolean)
+                this.properties.getOrDefault(String.format(NET_INTERFACE_CONFIG_DHCP_CLIENT_ENABLED, ifname), true);
     }
 
     public void setDhcpClient4Enabled(String ifname, boolean isDhcpClientEnabled) {
@@ -353,19 +359,26 @@ public class NetworkConfigurationServiceProperties {
      */
 
     private static final String NET_INTERFACE_CONFIG_WIFI_MASTER_DRIVER = "net.interface.%s.config.wifi.master.driver";
-    private static final String NET_INTERFACE_CONFIG_WIFI_MASTER_PASSPHRASE = "net.interface.%s.config.wifi.master.passphrase";
+    private static final String NET_INTERFACE_CONFIG_WIFI_MASTER_PASSPHRASE =
+            "net.interface.%s.config.wifi.master.passphrase";
     private static final String NET_INTERFACE_CONFIG_WIFI_MASTER_SSID = "net.interface.%s.config.wifi.master.ssid";
-    private static final String NET_INTERFACE_CONFIG_WIFI_MASTER_SECURITY_TYPE = "net.interface.%s.config.wifi.master.securityType";
+    private static final String NET_INTERFACE_CONFIG_WIFI_MASTER_SECURITY_TYPE =
+            "net.interface.%s.config.wifi.master.securityType";
     private static final String NET_INTERFACE_CONFIG_WIFI_MASTER_MODE = "net.interface.%s.config.wifi.master.mode";
-    private static final String NET_INTERFACE_CONFIG_WIFI_MASTER_CHANNEL = "net.interface.%s.config.wifi.master.channel";
-    private static final String NET_INTERFACE_CONFIG_WIFI_MASTER_RADIO_MODE = "net.interface.%s.config.wifi.master.radioMode";
-    private static final String NET_INTERFACE_CONFIG_WIFI_MASTER_IGNORE_SSID = "net.interface.%s.config.wifi.master.ignoreSSID";
-    private static final String NET_INTERFACE_CONFIG_WIFI_MASTER_PAIRWISE_CIPHERS = "net.interface.%s.config.wifi.master.pairwiseCiphers";
-    private static final String NET_INTERFACE_CONFIG_WIFI_MASTER_GROUP_CIPHERS = "net.interface.%s.config.wifi.master.groupCiphers";
+    private static final String NET_INTERFACE_CONFIG_WIFI_MASTER_CHANNEL =
+            "net.interface.%s.config.wifi.master.channel";
+    private static final String NET_INTERFACE_CONFIG_WIFI_MASTER_RADIO_MODE =
+            "net.interface.%s.config.wifi.master.radioMode";
+    private static final String NET_INTERFACE_CONFIG_WIFI_MASTER_IGNORE_SSID =
+            "net.interface.%s.config.wifi.master.ignoreSSID";
+    private static final String NET_INTERFACE_CONFIG_WIFI_MASTER_PAIRWISE_CIPHERS =
+            "net.interface.%s.config.wifi.master.pairwiseCiphers";
+    private static final String NET_INTERFACE_CONFIG_WIFI_MASTER_GROUP_CIPHERS =
+            "net.interface.%s.config.wifi.master.groupCiphers";
 
     public String getWifiMasterDriver(String ifname) {
-        return (String) this.properties.getOrDefault(String.format(NET_INTERFACE_CONFIG_WIFI_MASTER_DRIVER, ifname),
-                "");
+        return (String)
+                this.properties.getOrDefault(String.format(NET_INTERFACE_CONFIG_WIFI_MASTER_DRIVER, ifname), "");
     }
 
     public void setWifiMasterDriver(String ifname, String driver) {
@@ -378,8 +391,8 @@ public class NetworkConfigurationServiceProperties {
     }
 
     public void setWifiMasterPassphrase(String ifname, String passphrase) {
-        this.properties.put(String.format(NET_INTERFACE_CONFIG_WIFI_MASTER_PASSPHRASE, ifname),
-                new Password(passphrase));
+        this.properties.put(
+                String.format(NET_INTERFACE_CONFIG_WIFI_MASTER_PASSPHRASE, ifname), new Password(passphrase));
     }
 
     public String getWifiMasterSsid(String ifname) {
@@ -400,8 +413,8 @@ public class NetworkConfigurationServiceProperties {
     }
 
     public Optional<String> getWifiMasterMode(String ifname) {
-        return Optional
-                .ofNullable((String) this.properties.get(String.format(NET_INTERFACE_CONFIG_WIFI_MASTER_MODE, ifname)));
+        return Optional.ofNullable(
+                (String) this.properties.get(String.format(NET_INTERFACE_CONFIG_WIFI_MASTER_MODE, ifname)));
     }
 
     public void setWifiMasterMode(String ifname, String mode) {
@@ -409,13 +422,13 @@ public class NetworkConfigurationServiceProperties {
     }
 
     public List<Integer> getWifiMasterChannel(String ifname) {
-        return channelsAsIntegersList((String) this.properties
-                .getOrDefault(String.format(NET_INTERFACE_CONFIG_WIFI_MASTER_CHANNEL, ifname), ""));
+        return channelsAsIntegersList((String)
+                this.properties.getOrDefault(String.format(NET_INTERFACE_CONFIG_WIFI_MASTER_CHANNEL, ifname), ""));
     }
 
     public void setWifiMasterChannel(String ifname, List<Integer> channels) {
-        this.properties.put(String.format(NET_INTERFACE_CONFIG_WIFI_MASTER_CHANNEL, ifname),
-                integerListAsChannels(channels));
+        this.properties.put(
+                String.format(NET_INTERFACE_CONFIG_WIFI_MASTER_CHANNEL, ifname), integerListAsChannels(channels));
     }
 
     public Optional<String> getWifiMasterRadioMode(String ifname) {
@@ -430,8 +443,8 @@ public class NetworkConfigurationServiceProperties {
     }
 
     public boolean getWifiMasterIgnoreSsid(String ifname) {
-        return (boolean) this.properties
-                .getOrDefault(String.format(NET_INTERFACE_CONFIG_WIFI_MASTER_IGNORE_SSID, ifname), false);
+        return (boolean) this.properties.getOrDefault(
+                String.format(NET_INTERFACE_CONFIG_WIFI_MASTER_IGNORE_SSID, ifname), false);
     }
 
     public void setWifiMasterIgnoreSsid(String ifname, boolean ignoreSsid) {
@@ -445,8 +458,8 @@ public class NetworkConfigurationServiceProperties {
 
     public void setWifiMasterPairwiseCiphers(String ifname, Optional<String> ciphers) {
         if (ciphers.isPresent()) {
-            this.properties.put(String.format(NET_INTERFACE_CONFIG_WIFI_MASTER_PAIRWISE_CIPHERS, ifname),
-                    ciphers.get());
+            this.properties.put(
+                    String.format(NET_INTERFACE_CONFIG_WIFI_MASTER_PAIRWISE_CIPHERS, ifname), ciphers.get());
         }
     }
 
@@ -468,15 +481,22 @@ public class NetworkConfigurationServiceProperties {
     private static final String NET_INTERFACE_CONFIG_WIFI_INFRA_SSID = "net.interface.%s.config.wifi.infra.ssid";
     private static final String NET_INTERFACE_CONFIG_WIFI_INFRA_CHANNEL = "net.interface.%s.config.wifi.infra.channel";
     private static final String NET_INTERFACE_CONFIG_WIFI_INFRA_BGSCAN = "net.interface.%s.config.wifi.infra.bgscan";
-    private static final String NET_INTERFACE_CONFIG_WIFI_INFRA_PASSPHRASE = "net.interface.%s.config.wifi.infra.passphrase";
-    private static final String NET_INTERFACE_CONFIG_WIFI_INFRA_IGNORE_SSID = "net.interface.%s.config.wifi.infra.ignoreSSID";
+    private static final String NET_INTERFACE_CONFIG_WIFI_INFRA_PASSPHRASE =
+            "net.interface.%s.config.wifi.infra.passphrase";
+    private static final String NET_INTERFACE_CONFIG_WIFI_INFRA_IGNORE_SSID =
+            "net.interface.%s.config.wifi.infra.ignoreSSID";
     private static final String NET_INTERFACE_CONFIG_WIFI_INFRA_MODE = "net.interface.%s.config.wifi.infra.mode";
-    private static final String NET_INTERFACE_CONFIG_WIFI_INFRA_PING_AP = "net.interface.%s.config.wifi.infra.pingAccessPoint";
+    private static final String NET_INTERFACE_CONFIG_WIFI_INFRA_PING_AP =
+            "net.interface.%s.config.wifi.infra.pingAccessPoint";
     private static final String NET_INTERFACE_CONFIG_WIFI_INFRA_DRIVER = "net.interface.%s.config.wifi.infra.driver";
-    private static final String NET_INTERFACE_CONFIG_WIFI_INFRA_SECURITY_TYPE = "net.interface.%s.config.wifi.infra.securityType";
-    private static final String NET_INTERFACE_CONFIG_WIFI_INFRA_PAIRWISE_CIPHERS = "net.interface.%s.config.wifi.infra.pairwiseCiphers";
-    private static final String NET_INTERFACE_CONFIG_WIFI_INFRA_GROUP_CIPHERS = "net.interface.%s.config.wifi.infra.groupCiphers";
-    private static final String NET_INTERFACE_CONFIG_WIFI_INFRA_RADIO_MODE = "net.interface.%s.config.wifi.infra.radioMode";
+    private static final String NET_INTERFACE_CONFIG_WIFI_INFRA_SECURITY_TYPE =
+            "net.interface.%s.config.wifi.infra.securityType";
+    private static final String NET_INTERFACE_CONFIG_WIFI_INFRA_PAIRWISE_CIPHERS =
+            "net.interface.%s.config.wifi.infra.pairwiseCiphers";
+    private static final String NET_INTERFACE_CONFIG_WIFI_INFRA_GROUP_CIPHERS =
+            "net.interface.%s.config.wifi.infra.groupCiphers";
+    private static final String NET_INTERFACE_CONFIG_WIFI_INFRA_RADIO_MODE =
+            "net.interface.%s.config.wifi.infra.radioMode";
 
     public String getWifiInfraSsid(String ifname) {
         return (String) this.properties.get(String.format(NET_INTERFACE_CONFIG_WIFI_INFRA_SSID, ifname));
@@ -487,13 +507,13 @@ public class NetworkConfigurationServiceProperties {
     }
 
     public List<Integer> getWifiInfraChannel(String ifname) {
-        return channelsAsIntegersList((String) this.properties
-                .getOrDefault(String.format(NET_INTERFACE_CONFIG_WIFI_INFRA_CHANNEL, ifname), ""));
+        return channelsAsIntegersList((String)
+                this.properties.getOrDefault(String.format(NET_INTERFACE_CONFIG_WIFI_INFRA_CHANNEL, ifname), ""));
     }
 
     public void setWifiInfraChannel(String ifname, List<Integer> channels) {
-        this.properties.put(String.format(NET_INTERFACE_CONFIG_WIFI_INFRA_CHANNEL, ifname),
-                integerListAsChannels(channels));
+        this.properties.put(
+                String.format(NET_INTERFACE_CONFIG_WIFI_INFRA_CHANNEL, ifname), integerListAsChannels(channels));
     }
 
     public Optional<String> getWifiInfraBgscan(String ifname) {
@@ -511,13 +531,13 @@ public class NetworkConfigurationServiceProperties {
     }
 
     public void setWifiInfraPassphrase(String ifname, String passphrase) {
-        this.properties.put(String.format(NET_INTERFACE_CONFIG_WIFI_INFRA_PASSPHRASE, ifname),
-                new Password(passphrase));
+        this.properties.put(
+                String.format(NET_INTERFACE_CONFIG_WIFI_INFRA_PASSPHRASE, ifname), new Password(passphrase));
     }
 
     public boolean getWifiInfraIgnoreSsid(String ifname) {
-        return (boolean) this.properties
-                .getOrDefault(String.format(NET_INTERFACE_CONFIG_WIFI_INFRA_IGNORE_SSID, ifname), false);
+        return (boolean)
+                this.properties.getOrDefault(String.format(NET_INTERFACE_CONFIG_WIFI_INFRA_IGNORE_SSID, ifname), false);
     }
 
     public void setWifiInfraIgnoreSsid(String ifname, boolean ignoreSsid) {
@@ -534,8 +554,8 @@ public class NetworkConfigurationServiceProperties {
     }
 
     public boolean getWifiInfraPingAP(String ifname) {
-        return (boolean) this.properties.getOrDefault(String.format(NET_INTERFACE_CONFIG_WIFI_INFRA_PING_AP, ifname),
-                false);
+        return (boolean)
+                this.properties.getOrDefault(String.format(NET_INTERFACE_CONFIG_WIFI_INFRA_PING_AP, ifname), false);
     }
 
     public void setWifiInfraPingAP(String ifname, boolean isPingAP) {
@@ -566,8 +586,8 @@ public class NetworkConfigurationServiceProperties {
 
     public void setWifiInfraPairwiseCiphers(String ifname, Optional<String> pairwiseCiphers) {
         if (pairwiseCiphers.isPresent()) {
-            this.properties.put(String.format(NET_INTERFACE_CONFIG_WIFI_INFRA_PAIRWISE_CIPHERS, ifname),
-                    pairwiseCiphers.get());
+            this.properties.put(
+                    String.format(NET_INTERFACE_CONFIG_WIFI_INFRA_PAIRWISE_CIPHERS, ifname), pairwiseCiphers.get());
         }
     }
 
@@ -578,8 +598,8 @@ public class NetworkConfigurationServiceProperties {
 
     public void setWifiInfraGroupCiphers(String ifname, Optional<String> groupCiphers) {
         if (groupCiphers.isPresent()) {
-            this.properties.put(String.format(NET_INTERFACE_CONFIG_WIFI_INFRA_GROUP_CIPHERS, ifname),
-                    groupCiphers.get());
+            this.properties.put(
+                    String.format(NET_INTERFACE_CONFIG_WIFI_INFRA_GROUP_CIPHERS, ifname), groupCiphers.get());
         }
     }
 
@@ -687,8 +707,8 @@ public class NetworkConfigurationServiceProperties {
     }
 
     public boolean getModemDiversityEnabled(String ifname) {
-        return (boolean) this.properties.getOrDefault(String.format(NET_INTERFACE_CONFIG_DIVERSITY_ENABLED, ifname),
-                false);
+        return (boolean)
+                this.properties.getOrDefault(String.format(NET_INTERFACE_CONFIG_DIVERSITY_ENABLED, ifname), false);
     }
 
     public void setModemDiversityEnabled(String ifname, boolean isDiversityEnabled) {
@@ -712,8 +732,8 @@ public class NetworkConfigurationServiceProperties {
     }
 
     public String getModemGpsMode(String ifname) {
-        return (String) this.properties.getOrDefault(String.format(NET_INTERFACE_CONFIG_GPS_MODE, ifname),
-                "kuraModemGpsModeUnmanaged");
+        return (String) this.properties.getOrDefault(
+                String.format(NET_INTERFACE_CONFIG_GPS_MODE, ifname), "kuraModemGpsModeUnmanaged");
     }
 
     public void setModemGpsMode(String ifname, String gpsMode) {
@@ -811,23 +831,26 @@ public class NetworkConfigurationServiceProperties {
     /**
      * Wifi Enterprise / 802-1x Configuration
      */
-
     private static final String NET_INTERFACE_CONFIG_8021X_EAP = "net.interface.%s.config.802-1x.eap";
+
     private static final String NET_INTERFACE_CONFIG_8021X_PHASE2 = "net.interface.%s.config.802-1x.innerAuth";
     private static final String NET_INTERFACE_CONFIG_8021X_IDENTITY = "net.interface.%s.config.802-1x.identity";
     private static final String NET_INTERFACE_CONFIG_8021X_PASSWORD = "net.interface.%s.config.802-1x.password";
-    private static final String NET_INTERFACE_CONFIG_8021X_CA_KEYSTORE_PID = "net.interface.%s.config.802-1x.keystore.pid";
+    private static final String NET_INTERFACE_CONFIG_8021X_CA_KEYSTORE_PID =
+            "net.interface.%s.config.802-1x.keystore.pid";
     private static final String NET_INTERFACE_CONFIG_8021X_CA_CERT_NAME = "net.interface.%s.config.802-1x.ca-cert-name";
-    private static final String NET_INTERFACE_CONFIG_8021X_CLIENT_CERT_NAME = "net.interface.%s.config.802-1x.client-cert-name";
-    private static final String NET_INTERFACE_CONFIG_8021X_PUBLIC_PRIVATE_KEY_PAIR_NAME = "net.interface.%s.config.802-1x.private-key-name";
+    private static final String NET_INTERFACE_CONFIG_8021X_CLIENT_CERT_NAME =
+            "net.interface.%s.config.802-1x.client-cert-name";
+    private static final String NET_INTERFACE_CONFIG_8021X_PUBLIC_PRIVATE_KEY_PAIR_NAME =
+            "net.interface.%s.config.802-1x.private-key-name";
 
     public void set8021xEap(String ifname, String eap) {
         this.properties.put(String.format(NET_INTERFACE_CONFIG_8021X_EAP, ifname), eap);
     }
 
     public String get8021xEap(String ifname) {
-        return (String) this.properties.getOrDefault(String.format(NET_INTERFACE_CONFIG_8021X_EAP, ifname),
-                "Kura8021xEapTtls");
+        return (String)
+                this.properties.getOrDefault(String.format(NET_INTERFACE_CONFIG_8021X_EAP, ifname), "Kura8021xEapTtls");
     }
 
     public void set8021xInnerAuth(String ifname, String phase2) {
@@ -835,8 +858,8 @@ public class NetworkConfigurationServiceProperties {
     }
 
     public String get8021xInnerAuth(String ifname) {
-        return (String) this.properties.getOrDefault(String.format(NET_INTERFACE_CONFIG_8021X_PHASE2, ifname),
-                "Kura8021xEapNone");
+        return (String) this.properties.getOrDefault(
+                String.format(NET_INTERFACE_CONFIG_8021X_PHASE2, ifname), "Kura8021xEapNone");
     }
 
     public void set8021xIdentity(String ifname, String identity) {
@@ -844,8 +867,8 @@ public class NetworkConfigurationServiceProperties {
     }
 
     public String get8021xIdentity(String ifname) {
-        return (String) this.properties.getOrDefault(String.format(NET_INTERFACE_CONFIG_8021X_IDENTITY, ifname),
-                "changeme");
+        return (String)
+                this.properties.getOrDefault(String.format(NET_INTERFACE_CONFIG_8021X_IDENTITY, ifname), "changeme");
     }
 
     public void set8021xPassword(String ifname, String password) {
@@ -881,19 +904,20 @@ public class NetworkConfigurationServiceProperties {
     }
 
     public void set8021xPublicPrivateKeyPairName(String ifname, String privateKeyName) {
-        this.properties.put(String.format(NET_INTERFACE_CONFIG_8021X_PUBLIC_PRIVATE_KEY_PAIR_NAME, ifname),
-                privateKeyName);
+        this.properties.put(
+                String.format(NET_INTERFACE_CONFIG_8021X_PUBLIC_PRIVATE_KEY_PAIR_NAME, ifname), privateKeyName);
     }
 
     public String get8021xPublicPrivateKeyPairName(String ifname) {
-        return (String) this.properties
-                .get(String.format(NET_INTERFACE_CONFIG_8021X_PUBLIC_PRIVATE_KEY_PAIR_NAME, ifname));
+        return (String)
+                this.properties.get(String.format(NET_INTERFACE_CONFIG_8021X_PUBLIC_PRIVATE_KEY_PAIR_NAME, ifname));
     }
 
     /**
      * Advanced properties
      */
     private static final String NET_INTERFACE_CONFIG_IP4_MTU = "net.interface.%s.config.ip4.mtu";
+
     private static final String NET_INTERFACE_CONFIG_IP6_MTU = "net.interface.%s.config.ip6.mtu";
     private static final String NET_INTERFACE_CONFIG_PROMISC_MODE = "net.interface.%s.config.promisc";
 
@@ -987,5 +1011,4 @@ public class NetworkConfigurationServiceProperties {
 
         return result.toString().trim();
     }
-
 }

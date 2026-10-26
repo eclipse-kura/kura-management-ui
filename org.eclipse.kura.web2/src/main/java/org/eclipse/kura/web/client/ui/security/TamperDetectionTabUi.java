@@ -1,17 +1,22 @@
 /*******************************************************************************
- * Copyright (c) 2021 Eurotech and/or its affiliates and others
- * 
+ * Copyright (c) 2021, 2026 Eurotech and/or its affiliates and others
+ *
  * This program and the accompanying materials are made
  * available under the terms of the Eclipse Public License 2.0
  * which is available at https://www.eclipse.org/legal/epl-2.0/
- * 
+ *
  * SPDX-License-Identifier: EPL-2.0
- * 
+ *
  * Contributors:
  *  Eurotech
  *******************************************************************************/
 package org.eclipse.kura.web.client.ui.security;
 
+import com.google.gwt.core.client.GWT;
+import com.google.gwt.uibinder.client.UiBinder;
+import com.google.gwt.uibinder.client.UiField;
+import com.google.gwt.user.client.ui.Composite;
+import com.google.gwt.user.client.ui.Widget;
 import org.eclipse.kura.web.client.messages.Messages;
 import org.eclipse.kura.web.client.ui.AlertDialog;
 import org.eclipse.kura.web.client.ui.Tab;
@@ -27,18 +32,11 @@ import org.eclipse.kura.web.shared.service.GwtSecurityTokenServiceAsync;
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.Form;
 
-import com.google.gwt.core.client.GWT;
-import com.google.gwt.uibinder.client.UiBinder;
-import com.google.gwt.uibinder.client.UiField;
-import com.google.gwt.user.client.ui.Composite;
-import com.google.gwt.user.client.ui.Widget;
-
 public class TamperDetectionTabUi extends Composite implements Tab {
 
     private static TamperDetectionTabUiUiBinder uiBinder = GWT.create(TamperDetectionTabUiUiBinder.class);
 
-    interface TamperDetectionTabUiUiBinder extends UiBinder<Widget, TamperDetectionTabUi> {
-    }
+    interface TamperDetectionTabUiUiBinder extends UiBinder<Widget, TamperDetectionTabUi> {}
 
     private static final Messages MSGS = GWT.create(Messages.class);
 
@@ -47,15 +45,18 @@ public class TamperDetectionTabUi extends Composite implements Tab {
 
     @UiField
     Form tamperDetectionForm;
+
     @UiField
     Button resetButton;
+
     @UiField
     AlertDialog alertDialog;
 
     public TamperDetectionTabUi() {
         initWidget(uiBinder.createAndBindUi(this));
         clear();
-        resetButton.addClickHandler(e -> alertDialog.show(MSGS.securityTamperStateResetConfirm(),
+        resetButton.addClickHandler(e -> alertDialog.show(
+                MSGS.securityTamperStateResetConfirm(),
                 () -> RequestQueue.submit(c -> gwtXSRFService.generateSecurityToken(
                         c.callback(token -> gwtSecurityService.resetTamperStatus(token, c.callback()))))));
         EventService.subscribe(ForwardedEventTopic.TAMPER_EVENT, e -> this.refresh());
@@ -83,8 +84,8 @@ public class TamperDetectionTabUi extends Composite implements Tab {
 
     private void refreshInternal(final RequestContext context) {
         clear();
-        gwtXSRFService.generateSecurityToken(
-                context.callback(token -> gwtSecurityService.getTamperStatus(token, context.callback(states -> {
+        gwtXSRFService.generateSecurityToken(context.callback(token ->
+                gwtSecurityService.getTamperStatus(token, context.callback(states -> {
                     boolean isTampered = false;
                     for (final GwtTamperStatus status : states) {
                         isTampered |= status.isTampered();
