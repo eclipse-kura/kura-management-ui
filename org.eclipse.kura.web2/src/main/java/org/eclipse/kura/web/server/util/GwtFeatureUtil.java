@@ -15,7 +15,6 @@ package org.eclipse.kura.web.server.util;
 import java.util.Set;
 import java.util.stream.Collectors;
 import org.eclipse.kura.command.PasswordCommandService;
-import org.eclipse.kura.driver.DriverService;
 import org.eclipse.kura.driver.descriptor.DriverDescriptorService;
 import org.eclipse.kura.web.shared.model.GwtSupportedFeatures;
 import org.eclipse.kura.wire.graph.WireComponentDefinitionService;
@@ -37,8 +36,7 @@ public class GwtFeatureUtil {
 
         final Set<String> wiredPackages = getWiredPackages();
 
-        result.setDriverServicesAvailable(isProviderServiceAvailable(DriverService.class, bundleContext)
-                && isProviderServiceAvailable(DriverDescriptorService.class, bundleContext));
+        result.setDriverServicesAvailable(isProviderServiceAvailable(DriverDescriptorService.class, bundleContext));
 
         result.setWiresServicesAvailable(isProviderServiceAvailable(WireGraphService.class, bundleContext)
                 && isProviderServiceAvailable(WireComponentDefinitionService.class, bundleContext));
