@@ -316,7 +316,8 @@ public class FileServlet extends AuditServlet {
         List<DiskFileItem> fileItems = upload.getFileItems();
 
         try {
-            if (!fileItems.isEmpty()) {
+            // The command form always sends the file field, with an empty file name when no file is selected
+            if (!fileItems.isEmpty() && isFileSelected(fileItems.get(0))) {
                 unZipInCommandWorkingDirectory(fileItems.get(0));
             }
         } catch (IOException | ServletException | IllegalStateException e) {
@@ -326,6 +327,10 @@ public class FileServlet extends AuditServlet {
                 fileItem.delete();
             }
         }
+    }
+
+    private static boolean isFileSelected(DiskFileItem fileItem) {
+        return fileItem.getName() != null && !fileItem.getName().isEmpty();
     }
 
     private void unZipInCommandWorkingDirectory(DiskFileItem archive) throws ServletException, IOException {
