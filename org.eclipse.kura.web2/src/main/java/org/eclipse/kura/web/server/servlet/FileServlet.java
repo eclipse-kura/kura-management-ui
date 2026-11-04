@@ -62,13 +62,13 @@ import org.eclipse.kura.util.zip.UnZip;
 import org.eclipse.kura.web.server.KuraRemoteServiceServlet;
 import org.eclipse.kura.web.server.RequiredPermissions.Mode;
 import org.eclipse.kura.web.server.util.AssetConfigValidator;
+import org.eclipse.kura.web.server.util.GwtFeatureUtil;
 import org.eclipse.kura.web.server.util.ServiceLocator;
 import org.eclipse.kura.web.shared.GwtKuraException;
 import org.eclipse.kura.web.shared.GwtSafeHtmlUtils;
 import org.eclipse.kura.web.shared.KuraPermission;
 import org.eclipse.kura.web.shared.model.GwtConfigComponent;
 import org.eclipse.kura.web.shared.model.GwtConfigParameter;
-import org.eclipse.kura.web.shared.model.GwtSupportedFeatures;
 import org.eclipse.kura.web.shared.model.GwtXSRFToken;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
@@ -111,11 +111,9 @@ public class FileServlet extends AuditServlet {
     private FileCleaningTracker fileCleaningTracker;
 
     private final BundleContext bundleContext;
-    private final GwtSupportedFeatures supportedFeatures;
 
-    public FileServlet(final GwtSupportedFeatures supportedFeatures) {
+    public FileServlet() {
         super("UI FileServlet", "Handle upload request");
-        this.supportedFeatures = supportedFeatures;
         this.bundleContext = FrameworkUtil.getBundle(FileServlet.class).getBundleContext();
     }
 
@@ -188,7 +186,8 @@ public class FileServlet extends AuditServlet {
         if (reqPathInfo.equals("/configuration/snapshot")) {
             KuraRemoteServiceServlet.requirePermissions(req, Mode.ALL, new String[] {KuraPermission.ADMIN});
             doPostConfigurationSnapshot(req);
-        } else if (reqPathInfo.equals("/command") && supportedFeatures.isCommandServiceAvailable()) {
+        } else if (reqPathInfo.equals("/command")
+                && GwtFeatureUtil.getSupportedFeatures().isCommandServiceAvailable()) {
             KuraRemoteServiceServlet.requirePermissions(req, Mode.ALL, new String[] {KuraPermission.DEVICE});
             doPostCommand(req, resp);
         } else if (reqPathInfo.equals("/asset")) {

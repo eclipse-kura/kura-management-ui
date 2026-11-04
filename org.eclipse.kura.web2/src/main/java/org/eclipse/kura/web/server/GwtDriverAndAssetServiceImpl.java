@@ -44,6 +44,7 @@ import org.eclipse.kura.type.DataType;
 import org.eclipse.kura.type.TypedValue;
 import org.eclipse.kura.type.TypedValues;
 import org.eclipse.kura.web.server.util.GwtComponentServiceInternal;
+import org.eclipse.kura.web.server.util.GwtFeatureUtil;
 import org.eclipse.kura.web.server.util.GwtServerUtil;
 import org.eclipse.kura.web.server.util.GwtWireAssetConstants;
 import org.eclipse.kura.web.server.util.ServiceLocator;
@@ -55,7 +56,6 @@ import org.eclipse.kura.web.shared.model.GwtChannelRecord;
 import org.eclipse.kura.web.shared.model.GwtConfigComponent;
 import org.eclipse.kura.web.shared.model.GwtConfigParameter;
 import org.eclipse.kura.web.shared.model.GwtDriversAndAssetsInfo;
-import org.eclipse.kura.web.shared.model.GwtSupportedFeatures;
 import org.eclipse.kura.web.shared.model.GwtXSRFToken;
 import org.eclipse.kura.web.shared.service.GwtDriverAndAssetService;
 import org.osgi.framework.BundleContext;
@@ -69,12 +69,6 @@ public class GwtDriverAndAssetServiceImpl extends OsgiRemoteServiceServlet imple
     private static final Decoder BASE64_DECODER = Base64.getDecoder();
     private static final Encoder BASE64_ENCODER = Base64.getEncoder();
     private static final AtomicInteger NEXT_ID = new AtomicInteger();
-
-    private final GwtSupportedFeatures supportedFeatures;
-
-    public GwtDriverAndAssetServiceImpl(final GwtSupportedFeatures supportedFeatures) {
-        this.supportedFeatures = supportedFeatures;
-    }
 
     @Override
     public GwtChannelOperationResult readAllChannels(GwtXSRFToken xsrfToken, String assetPid) throws GwtKuraException {
@@ -428,7 +422,7 @@ public class GwtDriverAndAssetServiceImpl extends OsgiRemoteServiceServlet imple
         driverConfigurations.forEach(c -> c.setIsDriver(true));
         componentConfigurations.addAll(driverConfigurations);
 
-        if (supportedFeatures.isAssetAvailable()) {
+        if (GwtFeatureUtil.getSupportedFeatures().isAssetAvailable()) {
             result.setBaseChannelDescriptor(GwtWireAssetConstants.WIRE_ASSET_CHANNEL_DESCRIPTOR);
             componentDefinitions.add(GwtWireAssetConstants.WIRE_ASSET_OCD);
 
