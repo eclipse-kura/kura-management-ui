@@ -359,7 +359,7 @@ public class EntryClassUi extends Composite implements ServicesUi.Listener {
         this.securityCapabilities = securityCapabilities;
         this.securityBinder = new SecurityPanelUi(gwtUserData, securityCapabilities);
         this.driversAndTwinsBinder = new DriversAndAssetsUi(supportedFeatures);
-        this.deviceBinder = new DevicePanelUi(supportedFeatures);
+        this.deviceBinder = new DevicePanelUi();
 
         if (supportedFeatures.isPackagesServiceAvailable()) {
             this.packagesBinder = new PackagesPanelUi();
