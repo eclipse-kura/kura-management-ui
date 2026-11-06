@@ -71,6 +71,11 @@ public class GwtDriverAndAssetServiceImpl extends OsgiRemoteServiceServlet imple
     private static final AtomicInteger NEXT_ID = new AtomicInteger();
 
     @Override
+    protected boolean isServiceAvailable() {
+        return GwtFeatureUtil.getSupportedFeatures().areDriverServicesAvailable();
+    }
+
+    @Override
     public GwtChannelOperationResult readAllChannels(GwtXSRFToken xsrfToken, String assetPid) throws GwtKuraException {
         checkXSRFToken(xsrfToken);
 
