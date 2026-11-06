@@ -569,10 +569,7 @@ public class Console implements SelfConfiguringComponent {
         registerServlet(
                 "statusService", DENALI_MODULE_PATH + "/status", new GwtStatusServiceImpl(), sessionContextName);
         registerServlet(
-                "deviceService",
-                DENALI_MODULE_PATH + "/device",
-                new GwtDeviceServiceImpl(supportedFeatures),
-                sessionContextName);
+                "deviceService", DENALI_MODULE_PATH + "/device", new GwtDeviceServiceImpl(), sessionContextName);
         registerServlet("logService", DENALI_MODULE_PATH + "/logservice", new GwtLogServiceImpl(), sessionContextName);
         registerServlet(
                 "networkService", DENALI_MODULE_PATH + "/network", new GwtNetworkServiceImpl(), sessionContextName);
@@ -609,14 +606,10 @@ public class Console implements SelfConfiguringComponent {
             registerServlet(
                     "packagesExtendedFileServlet",
                     DENALI_MODULE_PATH + "/file/*",
-                    new PackagesExtendedFileServlet(supportedFeatures),
+                    new PackagesExtendedFileServlet(),
                     sessionContextName);
         } else {
-            registerServlet(
-                    "fileServlet",
-                    DENALI_MODULE_PATH + "/file/*",
-                    new FileServlet(supportedFeatures),
-                    sessionContextName);
+            registerServlet("fileServlet", DENALI_MODULE_PATH + "/file/*", new FileServlet(), sessionContextName);
         }
         registerServlet(
                 "deviceSnapshotsServlet",
@@ -637,25 +630,18 @@ public class Console implements SelfConfiguringComponent {
                 DENALI_MODULE_PATH + "/cloudservices",
                 new GwtCloudConnectionServiceImpl(),
                 sessionContextName);
-        if (supportedFeatures.areWiresServicesAvailable()) {
-            registerServlet(
-                    "wireGraphService",
-                    DENALI_MODULE_PATH + "/wires",
-                    new GwtWireGraphServiceImpl(supportedFeatures),
-                    sessionContextName);
-            registerServlet(
-                    "wiresSnapshotServlet",
-                    DENALI_MODULE_PATH + "/wiresSnapshot",
-                    new WiresSnapshotServlet(),
-                    sessionContextName);
-        }
-        if (supportedFeatures.areDriverServicesAvailable()) {
-            registerServlet(
-                    "driverAndAssetService",
-                    DENALI_MODULE_PATH + "/assetservices",
-                    new GwtDriverAndAssetServiceImpl(supportedFeatures),
-                    sessionContextName);
-        }
+        registerServlet(
+                "wireGraphService", DENALI_MODULE_PATH + "/wires", new GwtWireGraphServiceImpl(), sessionContextName);
+        registerServlet(
+                "wiresSnapshotServlet",
+                DENALI_MODULE_PATH + "/wiresSnapshot",
+                new WiresSnapshotServlet(),
+                sessionContextName);
+        registerServlet(
+                "driverAndAssetService",
+                DENALI_MODULE_PATH + "/assetservices",
+                new GwtDriverAndAssetServiceImpl(),
+                sessionContextName);
         registerServlet("wiresBlinkService", ADMIN_ROOT + "/sse", this.wiresBlinkService, sessionContextName);
         registerServlet("eventService", DENALI_MODULE_PATH + EVENT_PATH, this.eventService, sessionContextName);
 

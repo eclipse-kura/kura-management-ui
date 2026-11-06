@@ -29,6 +29,7 @@ import java.util.stream.Stream;
 import org.eclipse.kura.configuration.ComponentConfiguration;
 import org.eclipse.kura.configuration.ConfigurationService;
 import org.eclipse.kura.driver.Driver;
+import org.eclipse.kura.web.server.util.GwtFeatureUtil;
 import org.eclipse.kura.web.server.util.GwtServerUtil;
 import org.eclipse.kura.web.server.util.GwtWireAssetConstants;
 import org.eclipse.kura.web.server.util.ServiceLocator;
@@ -72,10 +73,9 @@ public final class GwtWireGraphServiceImpl extends OsgiRemoteServiceServlet impl
 
     private static final long serialVersionUID = -6577843865830245755L;
 
-    final GwtSupportedFeatures supportedFeatures;
-
-    public GwtWireGraphServiceImpl(final GwtSupportedFeatures supportedFeatures) {
-        this.supportedFeatures = supportedFeatures;
+    @Override
+    protected boolean isServiceAvailable() {
+        return GwtFeatureUtil.getSupportedFeatures().areWiresServicesAvailable();
     }
 
     @Override
@@ -315,7 +315,9 @@ public final class GwtWireGraphServiceImpl extends OsgiRemoteServiceServlet impl
     }
 
     private void fillWireComponentDefinitions(
-            List<GwtWireComponentDescriptor> resultDescriptors, List<GwtConfigComponent> resultDefinitions)
+            List<GwtWireComponentDescriptor> resultDescriptors,
+            List<GwtConfigComponent> resultDefinitions,
+            GwtSupportedFeatures supportedFeatures)
             throws GwtKuraException {
 
         ServiceLocator.applyToServiceOptionally(
@@ -384,7 +386,9 @@ public final class GwtWireGraphServiceImpl extends OsgiRemoteServiceServlet impl
         final List<GwtConfigComponent> componentDefinitions = new ArrayList<>();
         final List<GwtConfigComponent> driverDescriptors = new ArrayList<>();
 
-        fillWireComponentDefinitions(componentDescriptors, componentDefinitions);
+        final GwtSupportedFeatures supportedFeatures = GwtFeatureUtil.getSupportedFeatures();
+
+        fillWireComponentDefinitions(componentDescriptors, componentDefinitions, supportedFeatures);
 
         if (supportedFeatures.areDriverServicesAvailable()) {
             GwtServerUtil.fillDriverDefinitions(componentDefinitions);

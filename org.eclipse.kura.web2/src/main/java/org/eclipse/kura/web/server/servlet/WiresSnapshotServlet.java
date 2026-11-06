@@ -38,8 +38,10 @@ import org.eclipse.kura.marshalling.Marshaller;
 import org.eclipse.kura.web.server.GwtWireGraphServiceImpl;
 import org.eclipse.kura.web.server.KuraRemoteServiceServlet;
 import org.eclipse.kura.web.server.RequiredPermissions.Mode;
+import org.eclipse.kura.web.server.util.GwtFeatureUtil;
 import org.eclipse.kura.web.server.util.GwtServerUtil;
 import org.eclipse.kura.web.server.util.ServiceLocator;
+import org.eclipse.kura.web.shared.GwtKuraErrorCode;
 import org.eclipse.kura.web.shared.GwtKuraException;
 import org.eclipse.kura.web.shared.KuraPermission;
 import org.eclipse.kura.web.shared.model.GwtXSRFToken;
@@ -119,6 +121,11 @@ public class WiresSnapshotServlet extends AuditServlet {
             KuraRemoteServiceServlet.checkXSRFToken(request, token);
         } catch (Exception e) {
             throw new ServletException("Security error: please retry this operation correctly.", e);
+        }
+
+        if (!GwtFeatureUtil.getSupportedFeatures().areWiresServicesAvailable()) {
+            throw new ServletException(
+                    "Wires services are not available", new GwtKuraException(GwtKuraErrorCode.SERVICE_NOT_ENABLED));
         }
 
         try {
