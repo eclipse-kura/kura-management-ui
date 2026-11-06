@@ -17,6 +17,7 @@ import com.google.gwt.user.client.rpc.SerializationException;
 import com.google.gwt.user.server.rpc.RPCRequest;
 import com.google.gwt.user.server.rpc.SerializationPolicy;
 import com.google.gwt.user.server.rpc.SerializationPolicyLoader;
+import com.google.gwt.user.server.rpc.jakarta.RPC;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -33,6 +34,8 @@ import java.util.Optional;
 import org.eclipse.kura.audit.AuditContext;
 import org.eclipse.kura.audit.AuditContext.Scope;
 import org.eclipse.kura.web.Console;
+import org.eclipse.kura.web.shared.GwtKuraErrorCode;
+import org.eclipse.kura.web.shared.GwtKuraException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -200,7 +203,17 @@ public class OsgiRemoteServiceServlet extends KuraRemoteServiceServlet {
         final Optional<Audit> methodAudit = Optional.ofNullable(methodAuditSettings.get(method));
 
         try {
-            final String result = super.processCall(rpcRequest);
+            final String result;
+
+            if (isServiceAvailable()) {
+                result = super.processCall(rpcRequest);
+            } else {
+                result = RPC.encodeResponseForFailure(
+                        method,
+                        new GwtKuraException(GwtKuraErrorCode.SERVICE_NOT_ENABLED),
+                        rpcRequest.getSerializationPolicy(),
+                        rpcRequest.getFlags());
+            }
 
             if (methodAudit.isPresent()) {
                 if (result == null || result.startsWith("//EX")) {
@@ -231,6 +244,10 @@ public class OsgiRemoteServiceServlet extends KuraRemoteServiceServlet {
 
             throw e;
         }
+    }
+
+    protected boolean isServiceAvailable() {
+        return true;
     }
 
     private void checkPermissions(final RPCRequest request) {

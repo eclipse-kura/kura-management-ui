@@ -74,6 +74,11 @@ public final class GwtWireGraphServiceImpl extends OsgiRemoteServiceServlet impl
     private static final long serialVersionUID = -6577843865830245755L;
 
     @Override
+    protected boolean isServiceAvailable() {
+        return GwtFeatureUtil.getSupportedFeatures().areWiresServicesAvailable();
+    }
+
+    @Override
     public GwtConfigComponent getGwtChannelDescriptor(final GwtXSRFToken xsrfToken, final String driverPid)
             throws GwtKuraException {
         checkXSRFToken(xsrfToken);
