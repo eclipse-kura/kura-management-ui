@@ -164,6 +164,20 @@ public class NetworkInterfacesTableUi extends Composite {
         this.interfacesProvider.addDataDisplay(this.interfacesGrid);
         this.interfacesGrid.setSelectionModel(this.selectionModel);
 
+        ListHandler<GwtNetInterfaceConfig> columnSortHandler = new ListHandler<>(this.interfacesProvider.getList());
+        columnSortHandler.setComparator(this.col1, (o1, o2) -> {
+            if (o1 == o2) {
+                return 0;
+            }
+
+            // Compare the name columns.
+            if (o1 != null) {
+                return o2 != null ? compareFromName(o1.getName(), o2.getName()) : 1;
+            }
+            return -1;
+        });
+        this.interfacesGrid.addColumnSortHandler(columnSortHandler);
+
         this.interfacesGrid.getColumnSortList().push(this.col1);
     }
 
@@ -171,21 +185,6 @@ public class NetworkInterfacesTableUi extends Composite {
         this.interfacesProvider.getList().clear();
         RequestQueue.submit(context ->
                 this.gwtNetworkService.findNetInterfaceConfigurations(recompute, context.callback(result -> {
-                    ListHandler<GwtNetInterfaceConfig> columnSortHandler =
-                            new ListHandler<>(NetworkInterfacesTableUi.this.interfacesProvider.getList());
-                    columnSortHandler.setComparator(NetworkInterfacesTableUi.this.col1, (o1, o2) -> {
-                        if (o1 == o2) {
-                            return 0;
-                        }
-
-                        // Compare the name columns.
-                        if (o1 != null) {
-                            return o2 != null ? compareFromName(o1.getName(), o2.getName()) : 1;
-                        }
-                        return -1;
-                    });
-                    NetworkInterfacesTableUi.this.interfacesGrid.addColumnSortHandler(columnSortHandler);
-
                     NetworkInterfacesTableUi.this.interfacesProvider.getList().addAll(result);
                     ColumnSortEvent.fire(
                             NetworkInterfacesTableUi.this.interfacesGrid,
