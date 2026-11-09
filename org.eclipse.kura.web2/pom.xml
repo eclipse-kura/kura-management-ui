@@ -183,6 +183,19 @@
             <artifactId>gwt-servlet-jakarta</artifactId>
             <version>${gwt.version}</version>
         </dependency>
+
+        <!-- TEMPORARY WORKAROUND, remove once Eclipse fixes
+            https://gitlab.eclipse.org/eclipsefdn/helpdesk/-/work_items/7992
+            When gwt-dev is not a project dependency, gwt-maven-plugin resolves its dependency tree
+            by itself and ignores dependencyManagement, so the org.osgi.service.prefs pin in the root
+            POM has no effect. Declared here, gwt-dev is resolved by Maven with the pinned versions and
+            the plugin takes it from the project classpath. Build time only: it is not embedded. -->
+        <dependency>
+            <groupId>org.gwtproject</groupId>
+            <artifactId>gwt-dev</artifactId>
+            <version>${gwt.version}</version>
+            <scope>provided</scope>
+        </dependency>
     </dependencies>
 
     <build>
