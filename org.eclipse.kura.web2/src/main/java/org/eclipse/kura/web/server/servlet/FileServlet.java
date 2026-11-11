@@ -41,7 +41,6 @@ import java.util.Properties;
 import java.util.stream.Collectors;
 import org.apache.commons.fileupload2.core.DiskFileItem;
 import org.apache.commons.fileupload2.core.DiskFileItemFactory;
-import org.apache.commons.fileupload2.core.FileItem;
 import org.apache.commons.fileupload2.core.FileUploadByteCountLimitException;
 import org.apache.commons.fileupload2.core.FileUploadException;
 import org.apache.commons.fileupload2.core.FileUploadFileCountLimitException;
@@ -327,7 +326,7 @@ public class FileServlet extends AuditServlet {
             }
             // END XSRF security check
 
-            List<FileItem> fileItems = upload.getFileItems();
+            List<DiskFileItem> fileItems = upload.getFileItems();
 
             try {
                 // The command form always sends the file field, with an empty file name when no file is selected
@@ -339,7 +338,7 @@ public class FileServlet extends AuditServlet {
             }
         } finally {
             // Also when the XSRF check fails, do not wait for the FileCleaningTracker to remove the temporary files
-            for (FileItem fileItem : upload.getFileItems()) {
+            for (DiskFileItem fileItem : upload.getFileItems()) {
                 fileItem.delete();
             }
         }
