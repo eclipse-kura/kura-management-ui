@@ -55,9 +55,32 @@ public class PubSubFactoryDiscoveryTest {
     }
 
     @Test
+    public void configurationPidIsUsedAsFactoryPid() {
+        givenComponentProviding(CloudPublisher.class.getName());
+        givenCloudConnectionFactoryPid(CLOUD_CONNECTION_FACTORY_PID);
+        givenConfigurationPids("org.example.cloud.PubSubConfiguration");
+
+        whenTheComponentIsConverted();
+
+        thenEntryPidIs("org.example.cloud.PubSubConfiguration");
+    }
+
+    @Test
+    public void componentWithSeveralConfigurationPidsIsListedUnderItsComponentName() {
+        givenComponentProviding(CloudPublisher.class.getName());
+        givenCloudConnectionFactoryPid(CLOUD_CONNECTION_FACTORY_PID);
+        givenConfigurationPids("org.example.cloud.PubSubConfiguration", "org.example.cloud.SharedConfiguration");
+
+        whenTheComponentIsConverted();
+
+        thenEntryPidIs(COMPONENT_NAME);
+    }
+
+    @Test
     public void declaredServicePidIsUsedAsFactoryPid() {
         givenComponentProviding(CloudPublisher.class.getName());
         givenCloudConnectionFactoryPid(CLOUD_CONNECTION_FACTORY_PID);
+        givenConfigurationPids("org.example.cloud.PubSubConfiguration");
         givenProperty("service.pid", "org.example.LegacyPublisher");
 
         whenTheComponentIsConverted();
@@ -113,6 +136,10 @@ public class PubSubFactoryDiscoveryTest {
 
     private void givenProperty(final String key, final Object value) {
         this.component.properties.put(key, value);
+    }
+
+    private void givenConfigurationPids(final String... configurationPids) {
+        this.component.configurationPid = configurationPids;
     }
 
     /*

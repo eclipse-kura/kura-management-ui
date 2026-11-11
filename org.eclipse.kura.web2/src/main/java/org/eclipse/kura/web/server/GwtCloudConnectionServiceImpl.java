@@ -369,7 +369,14 @@ public class GwtCloudConnectionServiceImpl extends OsgiRemoteServiceServlet impl
 
     private static String pubSubFactoryPid(final ComponentDescriptionDTO component) {
         final Object servicePid = component.properties.get("service.pid");
-        return servicePid instanceof String pid ? pid : component.name;
+
+        if (servicePid instanceof String pid) {
+            return pid;
+        }
+
+        final String[] configurationPids = component.configurationPid;
+
+        return configurationPids != null && configurationPids.length == 1 ? configurationPids[0] : component.name;
     }
 
     private static List<GwtCloudEntry> getPubSubFactories() throws GwtKuraException {
