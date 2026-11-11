@@ -77,6 +77,7 @@ import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.framework.ServiceReference;
 import org.osgi.service.cm.ConfigurationAdmin;
 import org.osgi.service.component.runtime.ServiceComponentRuntime;
+import org.osgi.service.component.runtime.dto.ComponentDescriptionDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -91,15 +92,6 @@ public final class GwtServerUtil {
 
     public static final String PASSWORD_PLACEHOLDER = "Placeholder";
 
-    /** The Constant to check if configuration policy is set to require. */
-    public static final String PATTERN_CONFIGURATION_REQUIRE = "configuration-policy=\"require\"";
-
-    /**
-     * The Constant to check if the provided interface is a configurable component.
-     */
-    public static final String PATTERN_SERVICE_PROVIDE_CONFIGURABLE_COMP =
-            "provide interface=\"" + "org.eclipse.kura.configuration.ConfigurableComponent\"";
-
     /** The Constant to check if provided interface is Wire Emitter. */
     public static final String PATTERN_SERVICE_PROVIDE_EMITTER =
             "provide interface=\"org.eclipse.kura.wire.WireEmitter\"";
@@ -107,13 +99,6 @@ public final class GwtServerUtil {
     /** The Constant to check if provided interface is Wire Receiver. */
     public static final String PATTERN_SERVICE_PROVIDE_RECEIVER =
             "provide interface=\"org.eclipse.kura.wire.WireReceiver\"";
-
-    /**
-     * The Constant to check if the provided interface is a self configuring
-     * component.
-     */
-    public static final String PATTERN_SERVICE_PROVIDE_SELF_CONFIGURING_COMP =
-            "provide interface=\"" + "org.eclipse.kura.configuration.SelfConfiguringComponent\"";
 
     private static final String DRIVER_PID = "driver.pid";
 
@@ -362,6 +347,18 @@ public final class GwtServerUtil {
      */
     private GwtServerUtil() {
         // No need to instantiate
+    }
+
+    public static String getFactoryPid(final ComponentDescriptionDTO component) {
+        final Object servicePid = component.properties.get("service.pid");
+
+        if (servicePid instanceof String pid) {
+            return pid;
+        }
+
+        final String[] configurationPids = component.configurationPid;
+
+        return configurationPids != null && configurationPids.length == 1 ? configurationPids[0] : component.name;
     }
 
     public static Map<String, Object> fillPropertiesFromConfiguration(

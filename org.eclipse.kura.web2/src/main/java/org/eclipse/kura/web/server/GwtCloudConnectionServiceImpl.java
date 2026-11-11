@@ -298,7 +298,7 @@ public class GwtCloudConnectionServiceImpl extends OsgiRemoteServiceServlet impl
                         return false;
                     }
 
-                    return Objects.equals(factoryPid, pubSubFactoryPid(c)) && pubSubToGwt(c) != null;
+                    return Objects.equals(factoryPid, GwtServerUtil.getFactoryPid(c)) && pubSubToGwt(c) != null;
                 }));
 
         if (!isPubSub) {
@@ -359,24 +359,12 @@ public class GwtCloudConnectionServiceImpl extends OsgiRemoteServiceServlet impl
 
         final GwtCloudEntry entry = new GwtCloudEntry();
 
-        entry.setPid(pubSubFactoryPid(component));
+        entry.setPid(GwtServerUtil.getFactoryPid(component));
         entry.setFactoryPid(cloudConnectionFactoryPid);
         entry.setDefaultFactoryPid((String) defaultFactoryPid);
         entry.setDefaultFactoryPidRegex((String) defaultFactoryPidRegex);
 
         return entry;
-    }
-
-    private static String pubSubFactoryPid(final ComponentDescriptionDTO component) {
-        final Object servicePid = component.properties.get("service.pid");
-
-        if (servicePid instanceof String pid) {
-            return pid;
-        }
-
-        final String[] configurationPids = component.configurationPid;
-
-        return configurationPids != null && configurationPids.length == 1 ? configurationPids[0] : component.name;
     }
 
     private static List<GwtCloudEntry> getPubSubFactories() throws GwtKuraException {
