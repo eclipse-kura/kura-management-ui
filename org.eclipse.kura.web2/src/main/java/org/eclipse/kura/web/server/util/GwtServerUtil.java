@@ -23,6 +23,7 @@ import jakarta.servlet.http.HttpSession;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -616,16 +617,27 @@ public final class GwtServerUtil {
         try {
             return ServiceLocator.applyToServiceOptionally(
                     ServiceComponentRuntime.class,
-                    scr -> scr.getComponentDescriptionDTOs().stream().anyMatch(c -> {
-                        if (!Objects.equals(factoryPid, c.name)) {
-                            return false;
-                        }
-
-                        return providedInterfacesMatch(c.serviceInterfaces, filter);
-                    }));
+                    scr -> isFactoryOf(scr.getComponentDescriptionDTOs(), factoryPid, filter));
         } catch (final Exception e) {
             return false;
         }
+    }
+
+    static boolean isFactoryOf(
+            final Collection<ComponentDescriptionDTO> components,
+            final String factoryPid,
+            final Predicate<Set<String>> filter) {
+        return components.stream()
+                .anyMatch(c -> isFactoryPidOf(factoryPid, c) && providedInterfacesMatch(c.serviceInterfaces, filter));
+    }
+
+    private static boolean isFactoryPidOf(final String factoryPid, final ComponentDescriptionDTO component) {
+        if (Objects.equals(factoryPid, component.name)) {
+            return true;
+        }
+
+        return component.configurationPid != null
+                && Arrays.asList(component.configurationPid).contains(factoryPid);
     }
 
     public static boolean isFactoryOfAnyService(final String factoryPid, final Class<?>... interfaces) {
