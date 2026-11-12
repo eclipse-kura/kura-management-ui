@@ -19,6 +19,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Stream;
 import org.eclipse.kura.configuration.Password;
 import org.eclipse.kura.core.net.util.NetworkUtil;
 import org.eclipse.kura.web.shared.model.GwtNetIfStatus;
@@ -274,6 +275,12 @@ public class NetworkConfigurationServiceProperties {
 
     public void setDhcpServer4Enabled(String ifname, boolean isDhcpServerEnabled) {
         this.properties.put(String.format(NET_INTERFACE_CONFIG_DHCP_SERVER_ENABLED, ifname), isDhcpServerEnabled);
+    }
+
+    public boolean hasDhcpServer4Range(String ifname) {
+        return Stream.of(NET_INTERFACE_CONFIG_DHCP_SERVER_RANGE_START, NET_INTERFACE_CONFIG_DHCP_SERVER_RANGE_END)
+                .map(key -> this.properties.get(String.format(key, ifname)))
+                .anyMatch(value -> value instanceof String range && !range.isEmpty());
     }
 
     public String getDhcpServer4RangeStart(String ifname) {
