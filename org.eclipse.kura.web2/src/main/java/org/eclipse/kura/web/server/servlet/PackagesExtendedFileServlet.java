@@ -33,17 +33,12 @@ import org.eclipse.kura.web.server.RequiredPermissions.Mode;
 import org.eclipse.kura.web.server.util.ServiceLocator;
 import org.eclipse.kura.web.shared.GwtKuraException;
 import org.eclipse.kura.web.shared.KuraPermission;
-import org.eclipse.kura.web.shared.model.GwtSupportedFeatures;
 import org.eclipse.kura.web.shared.model.GwtXSRFToken;
 
 /*
     This class extends the FileServlet to add support for package deployment operations, which require the installation of the kura-deployment addon.
 */
 public class PackagesExtendedFileServlet extends FileServlet {
-
-    public PackagesExtendedFileServlet(final GwtSupportedFeatures supportedFeatures) {
-        super(supportedFeatures);
-    }
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
