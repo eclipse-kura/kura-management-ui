@@ -15,16 +15,12 @@ package org.eclipse.kura.web.server.util;
 
 import static java.util.Objects.isNull;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Dictionary;
-import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Hashtable;
@@ -34,8 +30,6 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
 import org.eclipse.kura.KuraException;
 import org.eclipse.kura.configuration.ComponentConfiguration;
 import org.eclipse.kura.configuration.ConfigurableComponent;
@@ -46,6 +40,7 @@ import org.eclipse.kura.configuration.metatype.Icon;
 import org.eclipse.kura.configuration.metatype.OCD;
 import org.eclipse.kura.configuration.metatype.Option;
 import org.eclipse.kura.core.configuration.ComponentConfigurationImpl;
+import org.eclipse.kura.driver.Driver;
 import org.eclipse.kura.util.service.ServiceUtil;
 import org.eclipse.kura.web.shared.GwtKuraErrorCode;
 import org.eclipse.kura.web.shared.GwtKuraException;
@@ -57,7 +52,6 @@ import org.eclipse.kura.wire.WireComponent;
 import org.eclipse.kura.wire.WireEmitter;
 import org.eclipse.kura.wire.WireHelperService;
 import org.eclipse.kura.wire.WireReceiver;
-import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.Filter;
 import org.osgi.framework.FrameworkUtil;
@@ -66,12 +60,8 @@ import org.osgi.framework.ServiceReference;
 import org.osgi.service.cm.Configuration;
 import org.osgi.service.cm.ConfigurationAdmin;
 import org.osgi.service.component.runtime.ServiceComponentRuntime;
+import org.osgi.service.component.runtime.dto.ComponentDescriptionDTO;
 import org.osgi.service.component.runtime.dto.ReferenceDTO;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-import org.xml.sax.SAXException;
 
 public class GwtComponentServiceInternal {
 
@@ -79,7 +69,10 @@ public class GwtComponentServiceInternal {
     private static final String KURA_SERVICE_PID = ConfigurationService.KURA_SERVICE_PID;
     private static final String SERVICE_FACTORY_PID = "service.factoryPid";
     private static final String KURA_UI_SERVICE_HIDE = "kura.ui.service.hide";
-    private static final String PATTERN_SERVICE_PROVIDE_DRIVER = "provide interface=\"org.eclipse.kura.driver.Driver\"";
+    private static final String DRIVER = Driver.class.getName();
+    private static final String CONFIGURABLE_COMPONENT = ConfigurableComponent.class.getName();
+    private static final String SELF_CONFIGURING_COMPONENT = SelfConfiguringComponent.class.getName();
+    private static final String CONFIGURATION_POLICY_REQUIRE = "require";
 
     private static final int SERVICE_WAIT_TIMEOUT = 60;
 
@@ -636,73 +629,33 @@ public class GwtComponentServiceInternal {
 
     public static List<String> getDriverFactoriesList() throws GwtKuraException {
 
-        List<String> driverFactoriesPids = new ArrayList<>();
-        final Bundle[] bundles = FrameworkUtil.getBundle(GwtWireGraphService.class)
-                .getBundleContext()
-                .getBundles();
-        for (final Bundle bundle : bundles) {
-            final Enumeration<URL> enumeration = bundle.findEntries("OSGI-INF", "*.xml", false);
-            if (Objects.isNull(enumeration)) {
-                continue;
-            }
-
-            while (enumeration.hasMoreElements()) {
-                final URL entry = enumeration.nextElement();
-                try (InputStreamReader inputStream =
-                                new InputStreamReader(entry.openConnection().getInputStream());
-                        BufferedReader reader = new BufferedReader(inputStream); ) {
-                    final StringBuilder contents = getManifestContent(reader);
-                    // Configuration Policy=Require and
-                    // SelfConfiguringComponent or ConfigurableComponent
-                    if ((contents.toString().contains(GwtServerUtil.PATTERN_SERVICE_PROVIDE_SELF_CONFIGURING_COMP)
-                                    || contents.toString()
-                                            .contains(GwtServerUtil.PATTERN_SERVICE_PROVIDE_CONFIGURABLE_COMP))
-                            && contents.toString().contains(GwtServerUtil.PATTERN_CONFIGURATION_REQUIRE)) {
-                        driverFactoriesPids.addAll(manageRequiredConfigurableComponents(entry, contents));
-                    }
-                } catch (final Exception ex) {
-                    throw new GwtKuraException(GwtKuraErrorCode.RESOURCE_FETCHING_FAILURE);
-                }
-            }
-        }
-
-        return driverFactoriesPids;
+        return ServiceLocator.applyToServiceOptionally(
+                ServiceComponentRuntime.class,
+                scr -> scr == null
+                        ? Collections.<String>emptyList()
+                        : getDriverFactoryPids(scr.getComponentDescriptionDTOs()));
     }
 
-    private static StringBuilder getManifestContent(BufferedReader reader) throws IOException {
-        final StringBuilder contents = new StringBuilder();
-        String line;
-        while ((line = reader.readLine()) != null) {
-            contents.append(line);
-        }
-        return contents;
+    static List<String> getDriverFactoryPids(final Collection<ComponentDescriptionDTO> components) {
+
+        return components.stream()
+                .filter(GwtComponentServiceInternal::isDriverFactory)
+                .map(GwtServerUtil::getFactoryPid)
+                .collect(Collectors.toList());
     }
 
-    private static List<String> manageRequiredConfigurableComponents(final URL entry, final StringBuilder contents)
-            throws ParserConfigurationException, SAXException, IOException {
-        List<String> driverFactoriesPids = new ArrayList<>();
-        DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-        dbf.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
-        dbf.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false);
-        dbf.setXIncludeAware(false);
-        dbf.setExpandEntityReferences(false);
+    private static boolean isDriverFactory(final ComponentDescriptionDTO component) {
 
-        final Document dom =
-                dbf.newDocumentBuilder().parse(entry.openConnection().getInputStream());
-        final NodeList nl = dom.getElementsByTagName("property");
-        for (int i = 0; i < nl.getLength(); i++) {
-            final Node n = nl.item(i);
-            if (n instanceof Element element) {
-                final String name = element.getAttribute("name");
-                if ("service.pid".equals(name)) {
-                    final String factoryPid = element.getAttribute("value");
-                    if (contents.toString().contains(PATTERN_SERVICE_PROVIDE_DRIVER)) {
-                        driverFactoriesPids.add(factoryPid);
-                    }
-                }
-            }
+        if (component.serviceInterfaces == null) {
+            return false;
         }
-        return driverFactoriesPids;
+
+        final List<String> serviceInterfaces = Arrays.asList(component.serviceInterfaces);
+
+        return serviceInterfaces.contains(DRIVER)
+                && (serviceInterfaces.contains(CONFIGURABLE_COMPONENT)
+                        || serviceInterfaces.contains(SELF_CONFIGURING_COMPONENT))
+                && CONFIGURATION_POLICY_REQUIRE.equals(component.configurationPolicy);
     }
 
     public static List<String> getPidsFromTarget(final String componentName, final String targetRef) {
