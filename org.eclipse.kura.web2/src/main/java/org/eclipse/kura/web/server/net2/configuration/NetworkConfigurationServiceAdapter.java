@@ -21,6 +21,7 @@ import org.eclipse.kura.configuration.ComponentConfiguration;
 import org.eclipse.kura.configuration.ConfigurationService;
 import org.eclipse.kura.net.status.NetworkInterfaceType;
 import org.eclipse.kura.web.server.util.ServiceLocator;
+import org.eclipse.kura.web.shared.GwtKuraErrorCode;
 import org.eclipse.kura.web.shared.GwtKuraException;
 import org.eclipse.kura.web.shared.model.GwtNetInterfaceConfig;
 import org.slf4j.Logger;
@@ -43,9 +44,17 @@ public class NetworkConfigurationServiceAdapter {
     private final Map<String, Object> netConfServProperties;
 
     public NetworkConfigurationServiceAdapter() throws GwtKuraException, KuraException {
-        this.configurationService = ServiceLocator.getInstance().getService(ConfigurationService.class);
+        this(ServiceLocator.getInstance().getService(ConfigurationService.class));
+    }
+
+    NetworkConfigurationServiceAdapter(ConfigurationService configurationService)
+            throws GwtKuraException, KuraException {
+        this.configurationService = configurationService;
         ComponentConfiguration config =
                 configurationService.getComponentConfiguration(NETWORK_CONFIGURATION_SERVICE_PID);
+        if (config == null || config.getConfigurationProperties() == null) {
+            throw new GwtKuraException(GwtKuraErrorCode.SERVICE_NOT_ENABLED);
+        }
         this.netConfServProperties = config.getConfigurationProperties();
     }
 

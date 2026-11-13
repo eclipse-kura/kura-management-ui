@@ -298,7 +298,7 @@ public class GwtCloudConnectionServiceImpl extends OsgiRemoteServiceServlet impl
                         return false;
                     }
 
-                    return Objects.equals(factoryPid, properties.get("service.pid")) && pubSubToGwt(c) != null;
+                    return Objects.equals(factoryPid, GwtServerUtil.getFactoryPid(c)) && pubSubToGwt(c) != null;
                 }));
 
         if (!isPubSub) {
@@ -336,7 +336,7 @@ public class GwtCloudConnectionServiceImpl extends OsgiRemoteServiceServlet impl
         }
     }
 
-    private static GwtCloudEntry pubSubToGwt(final ComponentDescriptionDTO component) {
+    static GwtCloudEntry pubSubToGwt(final ComponentDescriptionDTO component) {
 
         if (Arrays.stream(component.serviceInterfaces)
                 .noneMatch(intf -> CLOUD_PUBLISHER.equals(intf) || CLOUD_SUBSCRIBER.equals(intf))) {
@@ -346,16 +346,8 @@ public class GwtCloudConnectionServiceImpl extends OsgiRemoteServiceServlet impl
         final String ccsfFactoryPidPropName = CloudConnectionConstants.CLOUD_CONNECTION_FACTORY_PID_PROP_NAME.value();
 
         final Object ccsfFactoryPid = component.properties.get(ccsfFactoryPidPropName);
-        final Object factoryPid = component.properties.get("service.pid");
         final Object defaultFactoryPid = component.properties.get(KURA_UI_CSF_PID_DEFAULT);
         final Object defaultFactoryPidRegex = component.properties.get(KURA_UI_CSF_PID_REGEX);
-
-        if (!(factoryPid instanceof String servicePid)) {
-            logger.warn(
-                    "component {} defines a CloudPublisher or CloudSubscriber but does not specify the service.pid property, ignoring it",
-                    component.name);
-            return null;
-        }
 
         if (!(ccsfFactoryPid instanceof String cloudConnectionFactoryPid)) {
             logger.warn(
@@ -367,7 +359,7 @@ public class GwtCloudConnectionServiceImpl extends OsgiRemoteServiceServlet impl
 
         final GwtCloudEntry entry = new GwtCloudEntry();
 
-        entry.setPid(servicePid);
+        entry.setPid(GwtServerUtil.getFactoryPid(component));
         entry.setFactoryPid(cloudConnectionFactoryPid);
         entry.setDefaultFactoryPid((String) defaultFactoryPid);
         entry.setDefaultFactoryPidRegex((String) defaultFactoryPidRegex);

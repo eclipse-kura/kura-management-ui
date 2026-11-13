@@ -176,7 +176,7 @@ public class GwtNetInterfaceConfigBuilder {
     }
 
     private void setIpv4DhcpServerProperties() {
-        if (this.properties.getDhcpServer4Enabled(this.ifName)) {
+        if (this.properties.getDhcpServer4Enabled(this.ifName) || this.properties.hasDhcpServer4Range(this.ifName)) {
             this.gwtConfig.setRouterDhcpBeginAddress(this.properties.getDhcpServer4RangeStart(this.ifName));
             this.gwtConfig.setRouterDhcpEndAddress(this.properties.getDhcpServer4RangeEnd(this.ifName));
             this.gwtConfig.setRouterDhcpSubnetMask(this.properties.getDhcpServer4Netmask(this.ifName));
