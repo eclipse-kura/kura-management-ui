@@ -46,12 +46,11 @@ import org.eclipse.kura.web.shared.model.GwtXSRFToken;
 public interface GwtCloudConnectionService extends RemoteService {
 
     /**
-     * Returns the list of all the {@link org.eclipse.kura.cloud.CloudService} instances registered in the framework. An
-     * entry will be added to the returned result only if the {@link org.eclipse.kura.cloud.CloudService} implementation
-     * specifies the {@link org.eclipse.kura.cloud.factory.CloudServiceFactory} KURA_CLOUD_SERVICE_FACTORY_PID property.
+     * Returns the list of all the cloud connection instances registered in the framework, as managed by the
+     * registered {@link org.eclipse.kura.cloudconnection.factory.CloudConnectionFactory} services.
      *
      * @return the list of {@link GwtCloudConnectionEntry} that represent the
-     *         different {@link org.eclipse.kura.cloud.CloudService} instances registered in the framework.
+     *         different cloud connection instances registered in the framework.
      * @throws GwtKuraException
      *             when service referencing fails
      */
@@ -97,14 +96,14 @@ public interface GwtCloudConnectionService extends RemoteService {
      * @throws GwtKuraException
      *             when service referencing fails
      * @throws GwtKuraException
-     *             if the creation and initialization of a {@link CloudService} instance fails.
+     *             if the creation and initialization of a cloud connection instance fails.
      */
     @Audit(componentName = "UI CloudConnection", description = "Create cloud service from factory")
     public void createCloudServiceFromFactory(GwtXSRFToken xsrfToken, String factoryPid, String cloudServicePid)
             throws GwtKuraException;
 
     /**
-     * Invokes the deletion of the associated {@link CloudService} instance by the specified Factory Component.
+     * Invokes the deletion of the associated cloud connection instance by the specified Factory Component.
      *
      * @param xsrfToken
      *            the cross site request forgery token
@@ -115,7 +114,7 @@ public interface GwtCloudConnectionService extends RemoteService {
      * @throws GwtKuraException
      *             when service referencing fails
      * @throws GwtKuraException
-     *             if the deletion of the specified {@link CloudService} instance fails.
+     *             if the deletion of the specified cloud connection instance fails.
      */
     @Audit(componentName = "UI CloudConnection", description = "Delete cloud service from factory")
     public void deleteCloudServiceFromFactory(GwtXSRFToken xsrfToken, String factoryPid, String cloudServicePid)
