@@ -246,6 +246,10 @@ public class OsgiRemoteServiceServlet extends KuraRemoteServiceServlet {
         }
     }
 
+    /**
+     * Overridden by servlets that depend on optional services: if it returns {@code false}, each call fails with
+     * {@link GwtKuraErrorCode#SERVICE_NOT_ENABLED}.
+     */
     protected boolean isServiceAvailable() {
         return true;
     }
