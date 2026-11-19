@@ -75,7 +75,6 @@ import org.eclipse.kura.web.server.util.GwtFeatureUtil;
 import org.eclipse.kura.web.server.util.GwtServerUtil;
 import org.eclipse.kura.web.session.Attributes;
 import org.eclipse.kura.web.session.BaseSecurityHandler;
-import org.eclipse.kura.web.session.CreateSessionSecurityHandler;
 import org.eclipse.kura.web.session.HttpServletContextHelper;
 import org.eclipse.kura.web.session.RoutingSecurityHandler;
 import org.eclipse.kura.web.session.SecurityHandler;
@@ -137,6 +136,13 @@ public class Console implements SelfConfiguringComponent {
 
     private static final String XSRF_PATH = "/xsrf";
 
+    /**
+     * The paths of the built-in servlets and resources that can be accessed without an authenticated session. These
+     * paths do not need a session to be created in advance: the built-in authentication servlets create their own
+     * session only once the authentication flow has been successfully completed.
+     */
+    static final Set<String> BUILTIN_AUTHENTICATION_PATHS = Set.of(AUTH_PATH, PASSWORD_AUTH_PATH, CERT_AUTH_PATH);
+
     private static final Logger logger = LoggerFactory.getLogger(Console.class);
 
     private String appRoot;
@@ -157,9 +163,6 @@ public class Console implements SelfConfiguringComponent {
     private final Set<ServiceRegistration<ServletContextHelper>> contexts = new CopyOnWriteArraySet<>();
     private final Set<ServiceRegistration<ResourcesService>> resources = new CopyOnWriteArraySet<>();
     private final Set<ServiceRegistration<Servlet>> servlets = new CopyOnWriteArraySet<>();
-
-    private final Set<String> authenticationPaths =
-            new HashSet<>(Arrays.asList(AUTH_PATH, PASSWORD_AUTH_PATH, CERT_AUTH_PATH));
 
     private BundleContext bundleContext;
 
@@ -383,7 +386,7 @@ public class Console implements SelfConfiguringComponent {
         return instance;
     }
 
-    private static void setInstance(final Console instance) {
+    static void setInstance(final Console instance) {
         Console.instance = instance;
     }
 
@@ -391,7 +394,7 @@ public class Console implements SelfConfiguringComponent {
         return consoleOptions;
     }
 
-    private static void setConsoleOptions(final ConsoleOptions options) {
+    static void setConsoleOptions(final ConsoleOptions options) {
         Console.consoleOptions = options;
     }
 
@@ -422,7 +425,7 @@ public class Console implements SelfConfiguringComponent {
         return newSession;
     }
 
-    public HttpSession createSession(final HttpServletRequest request) {
+    private HttpSession createSession(final HttpServletRequest request) {
         final HttpSession session = request.getSession();
 
         session.setMaxInactiveInterval(this.sessionMaxInactiveInterval * 60);
@@ -445,7 +448,7 @@ public class Console implements SelfConfiguringComponent {
         }
     }
 
-    private SecurityHandler createSessionHandlerChain() {
+    SecurityHandler createSessionHandlerChain() {
 
         final Set<String> eventPaths = new HashSet<>(Arrays.asList(DENALI_MODULE_PATH + EVENT_PATH, "/sse"));
 
@@ -463,10 +466,11 @@ public class Console implements SelfConfiguringComponent {
         final RoutingSecurityHandler routingHandler =
                 new RoutingSecurityHandler(defaultHandler.sendErrorOnFailure(401));
 
-        // exception on authentication paths, allow access without authentication but
-        // create a session
-        routingHandler.addRouteHandler(
-                this.authenticationPaths::contains, chain(baseHandler, new CreateSessionSecurityHandler()));
+        // exception on built-in authentication paths, allow access without
+        // authentication. No session is created here: the built-in authentication
+        // servlets allocate one only once the authentication flow has been successfully
+        // completed, so that unauthenticated requests cannot allocate server side state
+        routingHandler.addRouteHandler(BUILTIN_AUTHENTICATION_PATHS::contains, baseHandler);
 
         // exception on event paths, activity on these paths does not count towards
         // session expiration
