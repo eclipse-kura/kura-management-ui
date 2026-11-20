@@ -19,7 +19,6 @@ import jakarta.servlet.http.HttpSession;
 import java.io.IOException;
 import java.util.Objects;
 import org.eclipse.kura.audit.AuditContext;
-import org.eclipse.kura.audit.AuditContext.Scope;
 import org.eclipse.kura.web.Console;
 import org.eclipse.kura.web.shared.GwtKuraException;
 import org.slf4j.Logger;
@@ -34,40 +33,37 @@ public class SessionAutorizationSecurityHandler implements SecurityHandler {
     @Override
     public boolean handleSecurity(HttpServletRequest request, HttpServletResponse response) throws IOException {
 
-        final AuditContext auditContext = Console.instance().initAuditContext(request);
+        final AuditContext auditContext = AuditContext.currentOrInternal();
 
-        try (final Scope scope = AuditContext.openScope(auditContext)) {
-            final HttpSession session = request.getSession(false);
+        final HttpSession session = request.getSession(false);
 
-            if (session == null) {
-                auditLogger.warn("{} UI Session - Failure - User session does not exist", auditContext);
-                return false;
-            }
-
-            final Object authorized = session.getAttribute(Attributes.AUTORIZED_USER.getValue());
-
-            if (!(authorized instanceof String userName)) {
-                auditLogger.warn("{} UI Session - Failure - User is not authenticated", auditContext);
-                return false;
-            }
-
-            boolean isPasswordSame;
-
-            try {
-                isPasswordSame = Objects.equals(
-                        session.getAttribute(Attributes.CREDENTIALS_HASH.getValue()),
-                        Console.instance().getUserManager().getCredentialsHash(userName));
-            } catch (GwtKuraException e) {
-                logger.warn("failed to compute credential hash", e);
-                isPasswordSame = false;
-            }
-
-            if (!isPasswordSame) {
-                auditLogger.warn(
-                        "{} UI Session - Failure - Ending session due to identity password change", auditContext);
-            }
-
-            return isPasswordSame;
+        if (session == null) {
+            auditLogger.warn("{} UI Session - Failure - User session does not exist", auditContext);
+            return false;
         }
+
+        final Object authorized = session.getAttribute(Attributes.AUTORIZED_USER.getValue());
+
+        if (!(authorized instanceof String userName)) {
+            auditLogger.warn("{} UI Session - Failure - User is not authenticated", auditContext);
+            return false;
+        }
+
+        boolean isPasswordSame;
+
+        try {
+            isPasswordSame = Objects.equals(
+                    session.getAttribute(Attributes.CREDENTIALS_HASH.getValue()),
+                    Console.instance().getUserManager().getCredentialsHash(userName));
+        } catch (GwtKuraException e) {
+            logger.warn("failed to compute credential hash", e);
+            isPasswordSame = false;
+        }
+
+        if (!isPasswordSame) {
+            auditLogger.warn("{} UI Session - Failure - Ending session due to identity password change", auditContext);
+        }
+
+        return isPasswordSame;
     }
 }
