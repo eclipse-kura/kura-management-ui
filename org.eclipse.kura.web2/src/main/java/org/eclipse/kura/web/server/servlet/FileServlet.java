@@ -125,8 +125,12 @@ public class FileServlet extends AuditServlet {
     protected final UploadGuard uploadGuard = new UploadGuard();
 
     public FileServlet() {
+        this(FrameworkUtil.getBundle(FileServlet.class).getBundleContext());
+    }
+
+    FileServlet(BundleContext bundleContext) {
         super("UI FileServlet", "Handle upload request");
-        this.bundleContext = FrameworkUtil.getBundle(FileServlet.class).getBundleContext();
+        this.bundleContext = bundleContext;
     }
 
     @Override
