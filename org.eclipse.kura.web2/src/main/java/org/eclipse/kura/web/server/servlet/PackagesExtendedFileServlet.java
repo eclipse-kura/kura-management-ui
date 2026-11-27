@@ -34,11 +34,20 @@ import org.eclipse.kura.web.server.util.ServiceLocator;
 import org.eclipse.kura.web.shared.GwtKuraException;
 import org.eclipse.kura.web.shared.KuraPermission;
 import org.eclipse.kura.web.shared.model.GwtXSRFToken;
+import org.osgi.framework.BundleContext;
 
 /*
     This class extends the FileServlet to add support for package deployment operations, which require the installation of the kura-deployment addon.
 */
 public class PackagesExtendedFileServlet extends FileServlet {
+
+    public PackagesExtendedFileServlet() {
+        super();
+    }
+
+    PackagesExtendedFileServlet(BundleContext bundleContext) {
+        super(bundleContext);
+    }
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
@@ -196,7 +205,7 @@ public class PackagesExtendedFileServlet extends FileServlet {
             deploymentAgentService.installDeploymentPackageAsync(packageUrl);
         } catch (Exception e) {
             tracker.complete();
-            logger.error("Failed to install package at URL {}", packageUrl);
+            logger.error("Failed to install package");
             throw new ServletException("Error installing deployment package", e);
         }
 
