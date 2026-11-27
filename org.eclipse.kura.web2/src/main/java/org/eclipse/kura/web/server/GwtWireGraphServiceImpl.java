@@ -266,6 +266,8 @@ public final class GwtWireGraphServiceImpl extends OsgiRemoteServiceServlet impl
             originalConfigs = Collections.emptyMap();
         }
 
+        GwtServerUtil.requireMatchingFactoryPids(additionalGwtConfigs, originalConfigs);
+
         final List<WireComponentConfiguration> wireComponentConfigurations = gwtConfigurations
                 .getWireComponentConfigurations() //
                 .stream() //
